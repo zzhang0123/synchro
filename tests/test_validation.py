@@ -17,6 +17,7 @@ import validate_transfer
 import validate_kirchhoff
 import validate_rt_moments
 import validate_sed
+import validate_cumulants
 import test_design
 from synchro.sed import power_law_emissivity_rel
 
@@ -106,6 +107,20 @@ def test_curvature_is_var_p_over_4():
 def test_emissivity_differentiable_in_p():
     g = jax.grad(lambda p: power_law_emissivity_rel(1.0, p))(jnp.asarray(2.5))
     assert bool(jnp.isfinite(g))
+
+
+# --- strict cumulant expansion ---------------------------------------------
+
+def test_cumulant_gaussian_exactness():
+    approx, exact, raw2 = validate_cumulants.test_cumulant_expansion_exact_for_gaussian()
+    assert abs(approx - exact) / exact < 1e-8   # cumulant K=2 is exact
+    assert abs(raw2 - exact) / exact > 1e-2     # raw Taylor-2 is not
+
+
+def test_cumulant_gaussian_moments_nonzero():
+    m3, m4 = validate_cumulants.test_gaussian_moments_vs_cumulants()
+    assert abs(m3) > 1e-3 and abs(m4) > 1e-3    # raw moments nonzero
+    # (the Gaussian cumulants kappa_3, kappa_4 vanish exactly by construction)
 
 
 # --- design (jit / autodiff) ----------------------------------------------

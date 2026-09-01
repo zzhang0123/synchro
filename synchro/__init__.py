@@ -11,7 +11,8 @@ bessel           : differentiable J_n, J_n', K_nu (integral representations)
 stokes           : exact Schott harmonic Stokes (I, Q, V) with correct
                    normalisation
 derivatives      : derivative spectra dS/dp, d^2S/dp^2 via autodiff
-moment_expansion : eqx.Module realising the moment/cumulant expansion
+moment_expansion : eqx.Module realising the strict cumulant expansion
+cumulants        : general-order cumulant expansion (Bell/Faà di Bruno)
 ultrarel         : ultra-relativistic F(x), G(x) fast path
 rm               : rotation measure (RM) constants + Burn depolarisation
 transfer         : Mueller matrix + exact slab/LOS polarised transfer
@@ -30,7 +31,7 @@ import jax
 # Enable float64 for accuracy of Bessel quadrature and likelihood-style sums.
 jax.config.update("jax_enable_x64", True)
 
-from . import bessel, conversion, derivatives, kirchhoff, los_moments, magnus, moment_expansion, rm, sed, solutions, stokes, transfer, ultrarel  # noqa: E402,F401
+from . import bessel, conversion, cumulants, derivatives, kirchhoff, los_moments, magnus, moment_expansion, rm, sed, solutions, stokes, transfer, ultrarel  # noqa: E402,F401
 from .stokes import larmor_power, stokes_harmonic  # noqa: E402,F401
 from .derivatives import derivative_spectra  # noqa: E402,F401
 from .moment_expansion import MomentExpansion, build_expansion  # noqa: E402,F401
@@ -41,6 +42,7 @@ __all__ = [
     "stokes",
     "derivatives",
     "moment_expansion",
+    "cumulants",
     "ultrarel",
     "rm",
     "transfer",

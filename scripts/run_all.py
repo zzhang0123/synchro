@@ -15,6 +15,7 @@ SCRIPTS = [
     "validate_kirchhoff.py",  # absorption / Kirchhoff (6 checks)
     "validate_rt_moments.py", # Magnus / conversion / cross-cumulants (4 checks)
     "validate_sed.py",        # SED / spectral index / LOS cumulants (6 checks)
+    "validate_cumulants.py",  # strict cumulant expansion (Gaussian exactness)
     "test_design.py",         # JAX/Equinox jit + differentiability
 ]
 

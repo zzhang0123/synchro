@@ -1,23 +1,30 @@
-"""Moment expansion of the ensemble Stokes parameters (JAX + Equinox).
+"""Ensemble Stokes expansion: raw moments (2nd order) and cumulants (general).
 
 The single-particle Stokes S_n(p) are Taylor-expanded around a reference point
-p0.  The electron/field population then enters only through its moments.  With
-p = (gamma, alpha, theta) and B, phi treated separately (B is a multiplicative
-factor w_B^2 ~ B^2; phi only rotates Q,U on the sky), the *corrected*
-second-order expansion in raw moments is
+p0.  The electron/field population then enters through its distribution's
+statistics.  Two equivalent-to-second-order but differently-truncated forms
+are implemented:
+
+* the *raw-moment* (Taylor) expansion (Sec 4.1 of the paper), and
+* the *cumulant* expansion (Sec 4.2), via :mod:`synchro.cumulants`.
+
+This module implements the second-order form, which the two coincide on:
 
     <S_n> = S_n(p0)
-          + sum_i  S_n^{(i)}       mu_i
-          + (1/2) sum_ij S_n^{(ij)} (Sigma_ij + mu_i mu_j) + ...
+          + sum_i  S_n^{(i)}       kappa_i
+          + (1/2) sum_ij S_n^{(ij)} (kappa_ij + kappa_i kappa_j) + ...
 
-where mu_i = <dp_i> and Sigma_ij = <dp_i dp_j> - mu_i mu_j are the first
-moments and covariance of the distribution, and S_n^{(i)}, S_n^{(ij)} are the
-derivative spectra precomputed by :mod:`synchro.derivatives`.
+with kappa_i = <dp_i>, kappa_ij = <dp_i dp_j> - <dp_i><dp_j> the first two
+cumulants of dp = p - p0 (equivalently the mean and covariance), and
+S_n^{(i)}, S_n^{(ij)} the derivative spectra from :mod:`synchro.derivatives`.
+The general-order cumulant truncation (where the two formalisms differ) lives
+in :mod:`synchro.cumulants`; a systematic moment-vs-cumulant comparison is the
+natural follow-up.
 
-The derivative spectra depend only on p0 (not on the moments), so they are
+The derivative spectra depend only on p0 (not on the statistics), so they are
 precomputed once and bound into the module as *traced, non-differentiated*
 array leaves.  The online evaluation is a cheap tensor contraction, jittable
-and differentiable w.r.t. the moments.
+and differentiable w.r.t. the cumulants.
 """
 
 from __future__ import annotations
@@ -50,23 +57,31 @@ class MomentExpansion(eqx.Module):
     dS: jax.Array
     ddS: jax.Array
 
-    def __call__(self, mu, cov):
-        """Evaluate <S> at harmonic grid.
+    def __call__(self, kappa1, kappa2):
+        """Evaluate <S> at the harmonic grid via the strict cumulant expansion.
+
+        This is the cumulant expansion truncated at order 2 (kappa_k = 0 for
+        k >= 3), which is EXACT for a Gaussian joint distribution of the
+        parameters and for independent parameters (whose cross-cumulants
+        vanish) — see synchro.cumulants for the general-order machinery and the
+        Gaussian-exactness demonstration.
 
         Parameters
         ----------
-        mu : (P,) array
-            First moments <dp_i>.
-        cov : (P, P) array
-            Covariance <dp_i dp_j> - mu_i mu_j (must be symmetric).
+        kappa1 : (P,) array
+            First cumulants <dp_i> (the deviation means; zero if the reference
+            point is the mean).
+        kappa2 : (P, P) array
+            Second cumulants <dp_i dp_j> - <dp_i><dp_j> (the covariance).
 
         Returns
         -------
         (N, 3) array of ensemble Stokes (I, Q, V) per harmonic.
         """
-        raw = cov + mu[:, None] * mu[None, :]  # Sigma_ij + mu_i mu_j
-        t1 = jnp.einsum("nsi,i->ns", self.dS, mu)
-        t2 = 0.5 * jnp.einsum("nsij,ij->ns", self.ddS, raw)
+        # <S> = S0 + S^(i) kappa1_i + (1/2) S^(ij) (kappa2_ij + kappa1_i kappa1_j)
+        raw2 = kappa2 + kappa1[:, None] * kappa1[None, :]
+        t1 = jnp.einsum("nsi,i->ns", self.dS, kappa1)
+        t2 = 0.5 * jnp.einsum("nsij,ij->ns", self.ddS, raw2)
         return self.S0 + t1 + t2
 
     def apply_B(self, S, B0, mu_B=0.0, var_B=0.0):
