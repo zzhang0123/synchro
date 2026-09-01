@@ -26,16 +26,17 @@ Chluba+2017 are determined by the physics-level moments:
 prefactor.)  This is the first-principles origin of the phenomenological
 spectral-index moment expansion.
 
-Boundary: this is an *analytic/NumPy* module. The closed-form emissivity uses
-``scipy.special.gamma`` (not differentiable in p); ``emissivity_curved``
-evaluates the jitted JAX ``F`` pointwise inside a NumPy loop. Use it for
-precompute and slope/curvature work, not inside ``jax.jit``/``jax.grad``.
+Boundary: the closed-form emissivity (power_law_emissivity_abs/_rel) is JAX-
+traceable and differentiable in (p, nu) via ``jax.scipy.special.gammaln``; the
+numerical gamma-integrals (emissivity_curved, running_spectral_index) remain
+NumPy/precompute and should not be used inside ``jax.jit``/``jax.grad``.
 """
 
 from __future__ import annotations
 
 import numpy as np
-from scipy.special import gamma as _Gamma
+import jax
+import jax.numpy as jnp
 
 E_ESU = 4.80320427e-10
 M_E = 9.1093837e-28
@@ -55,19 +56,29 @@ def spectral_curvature(var_p):
 def power_law_emissivity_abs(nu, p, C, B):
     """Absolute isotropic power-law emissivity j_nu [erg/s/cm^3/Hz/sr].
 
-    N(gamma) = C gamma^-p [cm^-3], B [G], nu [Hz].
+    N(gamma) = C gamma^-p [cm^-3], B [G], nu [Hz].  Differentiable in (p, nu).
     """
-    pref = np.sqrt(3.0) * E_ESU**3 * C * B / (4.0 * np.pi * M_E * C_CGS**2 * (p + 1.0))
-    g1 = _Gamma(p / 4.0 + 19.0 / 12.0) * _Gamma(p / 4.0 - 1.0 / 12.0)
-    x = 3.0 * E_ESU * B / (2.0 * np.pi * M_E * C_CGS * nu)
-    ang = np.sqrt(np.pi) * _Gamma((p + 5.0) / 4.0) / _Gamma((p + 7.0) / 4.0)
-    return pref * g1 * x ** ((p - 1.0) / 2.0) * ang
+    p = jnp.asarray(p)
+    nu = jnp.asarray(nu)
+    pref = np.sqrt(3.0) * E_ESU**3 * C * B / (4.0 * np.pi * M_E * C_CGS**2)
+    g1 = jnp.exp(jax.scipy.special.gammaln(p / 4.0 + 19.0 / 12.0)
+                 + jax.scipy.special.gammaln(p / 4.0 - 1.0 / 12.0))
+    x = jnp.asarray(3.0 * E_ESU * B / (2.0 * np.pi * M_E * C_CGS)) / nu
+    ang = jnp.exp(0.5 * jnp.log(jnp.pi)
+                  + jax.scipy.special.gammaln((p + 5.0) / 4.0)
+                  - jax.scipy.special.gammaln((p + 7.0) / 4.0))
+    return pref * g1 * x ** ((p - 1.0) / 2.0) * ang / (p + 1.0)
 
 
 def power_law_emissivity_rel(nu, p):
-    """Relative (unit-normalised) power-law emissivity, for slope/curvature work."""
-    g1 = _Gamma(p / 4.0 + 19.0 / 12.0) * _Gamma(p / 4.0 - 1.0 / 12.0)
-    ang = np.sqrt(np.pi) * _Gamma((p + 5.0) / 4.0) / _Gamma((p + 7.0) / 4.0)
+    """Relative (unit-normalised) power-law emissivity, differentiable in (p, nu)."""
+    p = jnp.asarray(p)
+    nu = jnp.asarray(nu)
+    g1 = jnp.exp(jax.scipy.special.gammaln(p / 4.0 + 19.0 / 12.0)
+                 + jax.scipy.special.gammaln(p / 4.0 - 1.0 / 12.0))
+    ang = jnp.exp(0.5 * jnp.log(jnp.pi)
+                  + jax.scipy.special.gammaln((p + 5.0) / 4.0)
+                  - jax.scipy.special.gammaln((p + 7.0) / 4.0))
     return 3.0 ** ((p - 1.0) / 2.0) * nu ** (-(p - 1.0) / 2.0) * g1 * ang / (p + 1.0)
 
 
