@@ -42,6 +42,36 @@ def test_cumulant_expansion_exact_for_gaussian():
     return approx, exact, raw2
 
 
+def test_vector_cumulant():
+    """Vector (multi-parameter) cumulant expansion: scalar reduction + jit."""
+    import math
+    import jax
+    import jax.numpy as jnp
+    from synchro.cumulants import vector_cumulant_expansion
+
+    # P=1 reduction must match the scalar Bell sum to Taylor order 4
+    k1 = jnp.array([0.3]); k2 = jnp.array([[0.25]]); k3 = jnp.array([[[0.1]]]); k4 = jnp.array([[[[0.05]]]])
+    S0 = jnp.array(1.0); g = jnp.array([1.0]); H = jnp.array([[1.0]])
+    T = jnp.array([[[1.0]]]); F4 = jnp.array([[[[1.0]]]])
+    vec = vector_cumulant_expansion([S0, g, H, T, F4], [k1, k2, k3, k4])
+    m = raw_moments_from_cumulants([0.3, 0.25, 0.1, 0.05], 4)
+    scalar = sum(m[n] / math.factorial(n) for n in range(5))
+    assert abs(float(vec) - scalar) < 1e-12
+
+    # 2-parameter case: jittable
+    p0 = jnp.array([1.0, 2.0])
+    grad = jnp.array([2 * p0[0] * p0[1]**3, 3 * p0[0]**2 * p0[1]**2])
+    hess = jnp.array([[2 * p0[1]**3, 6 * p0[0] * p0[1]**2],
+                      [6 * p0[0] * p0[1]**2, 6 * p0[0]**2 * p0[1]]])
+    third = jnp.zeros((2, 2, 2))
+    S0v = p0[0]**2 * p0[1]**3
+    kappa1 = jnp.array([0.1, 0.2]); kappa2 = jnp.array([[0.5, 0.0], [0.0, 0.3]])
+    fn = lambda a, b: vector_cumulant_expansion([S0v, grad, hess, third], [a, b, third])  # noqa: E731
+    out = jax.jit(fn)(kappa1, kappa2)
+    assert bool(jnp.isfinite(out))
+    return float(out)
+
+
 if __name__ == "__main__":
     print("=== 1. Gaussian: raw moments vs cumulants ===")
     m3, m4 = test_gaussian_moments_vs_cumulants()
@@ -56,4 +86,8 @@ if __name__ == "__main__":
     assert abs(approx - exact) / exact < 1e-8
     assert abs(raw2 - exact) / exact > 1e-2
     print("  -> cumulant expansion is exact for a Gaussian; raw-2 truncation is not.")
+
+    print("=== 3. Vector cumulant expansion ===")
+    v = test_vector_cumulant()
+    print(f"  2-param K=3 output = {v:.6f} (scalar reduction + jit ok)")
     print("ALL CUMULANT CHECKS PASSED")
