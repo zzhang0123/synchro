@@ -36,14 +36,16 @@ class MomentExpansion(eqx.Module):
     Attributes
     ----------
     harmonics : tuple of int (static)
-    S0 : (N, 3) array -- zeroth-order Stokes at p0 (traced, not differentiated)
+    S0 : (N, 3) array -- zeroth-order Stokes at the reference point
+        (traced, not differentiated)
     dS : (N, 3, P) array -- first derivative spectra
     ddS : (N, 3, P, P) array -- second derivative spectra
-    p0 : (3,) array -- reference (gamma0, alpha0, theta0) (traced, fixed)
+
+    The reference point (gamma0, alpha0, theta0) is implicit in S0/dS/ddS; it is
+    not stored as a field (so it never enters the jit cache or the gradient).
     """
 
     harmonics: tuple = eqx.field(static=True)
-    p0: jax.Array
     S0: jax.Array
     dS: jax.Array
     ddS: jax.Array
@@ -93,7 +95,6 @@ def build_expansion(harmonics, gamma0, alpha0, theta0):
         ddSs.append(h)
     return MomentExpansion(
         harmonics=harmonics,
-        p0=jnp.array([gamma0, alpha0, theta0]),
         S0=jnp.stack(S0s),
         dS=jnp.stack(dSs),
         ddS=jnp.stack(ddSs),

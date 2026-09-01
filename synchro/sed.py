@@ -25,6 +25,11 @@ Chluba+2017 are determined by the physics-level moments:
 (There is an O(Var(p)^2) correction from the p-dependence of the Gamma-function
 prefactor.)  This is the first-principles origin of the phenomenological
 spectral-index moment expansion.
+
+Boundary: this is an *analytic/NumPy* module. The closed-form emissivity uses
+``scipy.special.gamma`` (not differentiable in p); ``emissivity_curved``
+evaluates the jitted JAX ``F`` pointwise inside a NumPy loop. Use it for
+precompute and slope/curvature work, not inside ``jax.jit``/``jax.grad``.
 """
 
 from __future__ import annotations

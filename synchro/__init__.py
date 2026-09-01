@@ -1,4 +1,9 @@
-"""PySync: moment expansion of synchrotron emission (JAX + Equinox).
+"""synchro: moment expansion of synchrotron emission (JAX + Equinox).
+
+Note: importing this package enables ``jax_enable_x64`` (float64) as a global
+side effect, because the Bessel quadrature and the likelihood-style sums need
+float64 for accuracy. Do this once at the top of any driver script, before any
+array is created.
 
 Modules
 -------

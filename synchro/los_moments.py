@@ -8,8 +8,10 @@ synchro.transfer.
 
 The emissivity/absorption are in *relative* units (Kirchhoff prefactors c^2/8pi
 omitted); the source function S = j/alpha and the transfer I = S(1 - e^-tau) are
-self-consistent in these units.  Polarised absorption (alpha_Q, alpha_V) is not
-yet moment-expanded and is set to zero (deferred; see RT_FRAMEWORK §2.2).
+self-consistent in these units.  Polarised absorption alpha_Q is implemented in
+synchro.kirchhoff (perpendicular/parallel source functions) but not yet wired
+into this slab driver, which currently propagates only the Stokes-I absorption
+(alpha_Q, alpha_V set to zero here); see RT_FRAMEWORK §2.2/§4.4.
 """
 
 from __future__ import annotations

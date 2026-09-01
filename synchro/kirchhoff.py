@@ -18,6 +18,12 @@ Moment expansion: expanding P(nu, gamma) around gamma0 gives j_nu as moments
 of N and alpha_nu as moments of g, with the SAME derivative spectra of P
 (computed by autodiff).  This is the transfer-side analogue of the emissivity
 derivative spectra of the main paper.
+
+Boundary: this is a *NumPy precompute* module. The gamma-integrals use
+``np.trapezoid``/``np.gradient`` (not differentiable), but the single-particle
+kernel P = F(nu/nu_c) is evaluated by the jitted JAX ``F``. Do NOT wrap these
+functions in ``jax.jit``/``jax.grad``; they are meant to be called once per
+reference point and the results (moments) passed into a JAX module.
 """
 
 from __future__ import annotations

@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 
 from synchro.stokes import beta_of_gamma
-from synchro.bessel import bessel_jn_jnp
+from synchro.bessel import bessel_jn_and_prime
 
 rc("text", usetex=False)
 rc("font", family="serif", size=11)
@@ -43,7 +43,7 @@ def stokes_vec(n, gamma, alpha, theta):
     D = 1.0 - b_par * ct
     x = n * b_perp * st / D
 
-    jn, jnp_ = bessel_jn_jnp(n, x)
+    jn, jnp_ = bessel_jn_and_prime(n, x)
 
     g_par = (ct - b_par) ** 2 / st**2
     P_par = n**2 * g_par * jn**2 / D**3

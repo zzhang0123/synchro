@@ -14,6 +14,12 @@ References
 
 The Gauss--Legendre grids are precomputed once (NumPy, at import) and held as
 static arrays; they never enter any jitted graph as leaves.
+
+Note: these functions are *eager* (not jitted) and re-run the fixed quadrature
+on every call. For repeated evaluation the fast path is to precompute the
+derivative spectra once via ``synchro.moment_expansion.build_expansion`` (or
+``synchro.derivatives.derivative_spectra``), not to call ``stokes_harmonic`` in
+a loop.
 """
 
 from __future__ import annotations
@@ -66,7 +72,7 @@ def bessel_jn(n, x):
     return jnp.sum(_W_J * integrand, axis=-1) / jnp.pi
 
 
-def bessel_jnp(n, x):
+def bessel_jn_prime(n, x):
     """Derivative J_n'(x) = dJ_n/dx via its integral representation."""
     n = jnp.asarray(n)
     x = jnp.asarray(x)
@@ -74,7 +80,7 @@ def bessel_jnp(n, x):
     return jnp.sum(_W_J * integrand, axis=-1) / jnp.pi
 
 
-def bessel_jn_jnp(n, x):
+def bessel_jn_and_prime(n, x):
     """Return (J_n(x), J_n'(x)) together (single quadrature pass)."""
     n = jnp.asarray(n)
     x = jnp.asarray(x)

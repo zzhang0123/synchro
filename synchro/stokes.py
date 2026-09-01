@@ -25,7 +25,7 @@ from __future__ import annotations
 import jax
 import jax.numpy as jnp
 
-from .bessel import bessel_jn_jnp
+from .bessel import bessel_jn_and_prime
 
 # CGS constants
 E_ESU = 4.80320427e-10  # elementary charge [esu]
@@ -55,7 +55,7 @@ def _harmonic(n, gamma, alpha, theta):
     D = doppler(b_par, theta)
     x = n * b_perp * st / D
 
-    jn, jnp_ = bessel_jn_jnp(n, x)
+    jn, jnp_ = bessel_jn_and_prime(n, x)
 
     g_par = (ct - b_par) ** 2 / st**2
     # dP/dOmega divided by [e^2 w_B^2 / (2 pi c)]
