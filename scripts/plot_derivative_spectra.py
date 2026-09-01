@@ -1,91 +1,65 @@
 """
-Compute and plot the Schott harmonic Stokes parameters and their
-derivative spectra (dI/dgamma, dI/dalpha) for synchrotron radiation.
+Compute and plot the Schott harmonic Stokes parameters and their derivative
+spectra using the synchro package (corrected normalisation, autodiff).
 
-This script generates Figure 2 of the paper:
-  - Panel (a): I_n, Q_n, V_n vs harmonic number n for several gamma values
-  - Panel (b): derivative spectra dI_n/dgamma and dI_n/dalpha vs n
+Generates figures/derivative_spectra.pdf:
+  (a) I_n vs harmonic number n for several gamma
+  (b) Q_n / I_n (linear polarisation fraction)
+  (c) energy derivative spectra dI/dgamma, dQ/dgamma at gamma_0
+  (d) pitch-angle derivative spectra dI/dalpha, dQ/dalpha, dV/dalpha
 
-All quantities in CGS units; plots are normalised for clarity.
+Derivative spectra are computed exactly by JAX automatic differentiation of
+the Bessel-based Stokes expressions (no finite differences).
 """
 
 import numpy as np
-from scipy.special import jv, jvp
+import jax
+import jax.numpy as jnp
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
-rc("text", usetex=True)
+from synchro.stokes import beta_of_gamma
+from synchro.bessel import bessel_jn_jnp
+
+rc("text", usetex=False)
 rc("font", family="serif", size=11)
+rc("mathtext", fontset="cm")
 
 
-# --- Physical functions ---
+def stokes_vec(n, gamma, alpha, theta):
+    """Vectorised normalised Stokes (I, Q, V) for an array of harmonics n.
 
-def bessel_arg(n, beta, alpha, theta):
-    """Bessel function argument x_n = n * beta_perp * sin(theta) / (1 - beta_par * cos(theta))."""
-    beta_perp = beta * np.sin(alpha)
-    beta_par = beta * np.cos(alpha)
-    return n * beta_perp * np.sin(theta) / (1.0 - beta_par * np.cos(theta))
-
-
-def stokes_harmonic(n, gamma, alpha, theta):
+    Normalised by e^2 w_B^2 / (2 pi c) with the corrected 1/D^3 factor.
+    Returns (N,) arrays.
     """
-    Compute normalised Stokes (I_n, Q_n, V_n) at harmonic n.
+    n = jnp.asarray(n, dtype=jnp.float64)
+    beta = beta_of_gamma(gamma)
+    b_par = beta * jnp.cos(alpha)
+    b_perp = beta * jnp.sin(alpha)
+    st = jnp.sin(theta)
+    ct = jnp.cos(theta)
+    D = 1.0 - b_par * ct
+    x = n * b_perp * st / D
 
-    Returns values normalised by the common prefactor e^2 omega_B^2 / (8 pi^2 c),
-    so the returned quantities are dimensionless functions of (n, gamma, alpha, theta).
-    """
-    beta = np.sqrt(1.0 - 1.0 / gamma**2)
-    beta_perp = beta * np.sin(alpha)
-    beta_par = beta * np.cos(alpha)
-    x = bessel_arg(n, beta, alpha, theta)
+    jn, jnp_ = bessel_jn_jnp(n, x)
 
-    Jn = jv(n, x)
-    Jnp = jvp(n, x, 1)
+    g_par = (ct - b_par) ** 2 / st**2
+    P_par = n**2 * g_par * jn**2 / D**3
+    P_perp = n**2 * b_perp**2 * jnp_**2 / D**3
 
-    denom = (1.0 - beta_par * np.cos(theta))**2
-    geom_par = (np.cos(theta) - beta_par)**2 / (np.sin(theta)**2)
+    I = P_par + P_perp
+    Q = P_par - P_perp
+    V = 2.0 * n**2 * b_perp * (ct - b_par) / (st * D**3) * jn * jnp_
+    return I, Q, V
 
-    P_par = n**2 * geom_par * Jn**2 / denom
-    P_perp = n**2 * beta_perp**2 * Jnp**2 / denom
-
-    I_n = P_par + P_perp
-    Q_n = P_par - P_perp
-    V_n = 2.0 * n**2 * beta_perp * (np.cos(theta) - beta_par) / (
-        np.sin(theta) * denom
-    ) * Jn * Jnp
-
-    return I_n, Q_n, V_n
-
-
-def derivative_gamma(n, gamma, alpha, theta, dgamma=0.01):
-    """Numerical derivative dS_n/dgamma via central differences."""
-    I_p, Q_p, V_p = stokes_harmonic(n, gamma + dgamma, alpha, theta)
-    I_m, Q_m, V_m = stokes_harmonic(n, gamma - dgamma, alpha, theta)
-    return (
-        (I_p - I_m) / (2 * dgamma),
-        (Q_p - Q_m) / (2 * dgamma),
-        (V_p - V_m) / (2 * dgamma),
-    )
-
-
-def derivative_alpha(n, gamma, alpha, theta, dalpha=0.01):
-    """Numerical derivative dS_n/dalpha via central differences."""
-    I_p, Q_p, V_p = stokes_harmonic(n, gamma, alpha + dalpha, theta)
-    I_m, Q_m, V_m = stokes_harmonic(n, gamma, alpha - dalpha, theta)
-    return (
-        (I_p - I_m) / (2 * dalpha),
-        (Q_p - Q_m) / (2 * dalpha),
-        (V_p - V_m) / (2 * dalpha),
-    )
-
-
-# --- Plotting ---
 
 def main():
-    theta = np.pi / 3       # observation angle 60 deg from B
-    alpha_ref = np.pi / 4   # pitch angle 45 deg
+    theta = np.pi / 3
+    alpha_ref = np.pi / 4
     n_max = 80
-    harmonics = np.arange(1, n_max + 1)
+    harmonics = jnp.arange(1, n_max + 1, dtype=jnp.float64)
 
     gammas = [2, 5, 10, 20]
     colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
@@ -95,9 +69,11 @@ def main():
     # --- Panel (a): I_n for several gamma ---
     ax = axes[0, 0]
     for gamma, col in zip(gammas, colors):
-        I_vals = np.array([stokes_harmonic(n, gamma, alpha_ref, theta)[0] for n in harmonics])
-        I_vals /= I_vals.max() if I_vals.max() > 0 else 1.0
-        ax.plot(harmonics, I_vals, color=col, label=rf"$\gamma = {gamma}$", lw=1.2)
+        I, _, _ = stokes_vec(harmonics, gamma, alpha_ref, theta)
+        I = np.asarray(I)
+        I = I / I.max()
+        ax.plot(np.arange(1, n_max + 1), I, color=col,
+                label=rf"$\gamma = {gamma}$", lw=1.2)
     ax.set_xlabel(r"Harmonic number $n$")
     ax.set_ylabel(r"$I_n$ (normalised)")
     ax.set_title(r"(a) Intensity spectrum $I_n$")
@@ -106,14 +82,16 @@ def main():
     ax.set_yscale("log")
     ax.set_ylim(1e-6, 1.5)
 
-    # --- Panel (b): Q_n / I_n (polarisation fraction) ---
+    # --- Panel (b): Q_n / I_n ---
     ax = axes[0, 1]
     for gamma, col in zip(gammas, colors):
-        I_vals = np.array([stokes_harmonic(n, gamma, alpha_ref, theta)[0] for n in harmonics])
-        Q_vals = np.array([stokes_harmonic(n, gamma, alpha_ref, theta)[1] for n in harmonics])
-        mask = I_vals > 1e-30
-        pol_frac = np.where(mask, Q_vals / I_vals, 0.0)
-        ax.plot(harmonics[mask], pol_frac[mask], color=col, label=rf"$\gamma = {gamma}$", lw=1.2)
+        I, Q, _ = stokes_vec(harmonics, gamma, alpha_ref, theta)
+        I = np.asarray(I)
+        Q = np.asarray(Q)
+        mask = I > 1e-30
+        frac = np.where(mask, Q / I, 0.0)
+        ax.plot(np.arange(1, n_max + 1)[mask], frac[mask], color=col,
+                label=rf"$\gamma = {gamma}$", lw=1.2)
     ax.set_xlabel(r"Harmonic number $n$")
     ax.set_ylabel(r"$Q_n / I_n$")
     ax.set_title(r"(b) Linear polarisation fraction")
@@ -121,14 +99,25 @@ def main():
     ax.set_xlim(1, n_max)
     ax.axhline(0, color="gray", lw=0.5, ls="--")
 
-    # --- Panel (c): dI_n/dgamma (energy derivative spectrum) ---
+    # --- Panels (c),(d): derivative spectra via autodiff ---
+    gamma_ref = 10.0
+    p_ref = jnp.array([gamma_ref, alpha_ref, theta])
+
+    def f(p):
+        I, Q, V = stokes_vec(harmonics, p[0], p[1], p[2])
+        return jnp.stack([I, Q, V])  # (3, N)
+
+    J = jax.jacfwd(f)(p_ref)  # (3, N, 3): [Stokes, harmonic, param(gamma,alpha,theta)]
+    J = np.asarray(J)
+    dI_dg, dQ_dg = J[0, :, 0], J[1, :, 0]  # d/dgamma
+    dI_da, dQ_da, dV_da = J[0, :, 1], J[1, :, 1], J[2, :, 1]  # d/dalpha
+    ns = np.arange(1, n_max + 1)
+
+    # --- Panel (c): energy derivative ---
     ax = axes[1, 0]
-    gamma_ref = 10
-    dI_dgamma = np.array([derivative_gamma(n, gamma_ref, alpha_ref, theta)[0] for n in harmonics])
-    dQ_dgamma = np.array([derivative_gamma(n, gamma_ref, alpha_ref, theta)[1] for n in harmonics])
-    scale = np.abs(dI_dgamma).max()
-    ax.plot(harmonics, dI_dgamma / scale, "b-", label=r"$\partial I_n / \partial\gamma$", lw=1.2)
-    ax.plot(harmonics, dQ_dgamma / scale, "r--", label=r"$\partial Q_n / \partial\gamma$", lw=1.2)
+    scale = np.abs(dI_dg).max()
+    ax.plot(ns, dI_dg / scale, "b-", label=r"$\partial I_n / \partial\gamma$", lw=1.2)
+    ax.plot(ns, dQ_dg / scale, "r--", label=r"$\partial Q_n / \partial\gamma$", lw=1.2)
     ax.set_xlabel(r"Harmonic number $n$")
     ax.set_ylabel(r"Derivative spectrum (normalised)")
     ax.set_title(rf"(c) Energy derivative ($\gamma_0 = {gamma_ref}$)")
@@ -136,26 +125,26 @@ def main():
     ax.set_xlim(1, n_max)
     ax.axhline(0, color="gray", lw=0.5, ls="--")
 
-    # --- Panel (d): dI_n/dalpha (pitch angle derivative spectrum) ---
+    # --- Panel (d): pitch-angle derivative ---
     ax = axes[1, 1]
-    dI_dalpha = np.array([derivative_alpha(n, gamma_ref, alpha_ref, theta)[0] for n in harmonics])
-    dQ_dalpha = np.array([derivative_alpha(n, gamma_ref, alpha_ref, theta)[1] for n in harmonics])
-    dV_dalpha = np.array([derivative_alpha(n, gamma_ref, alpha_ref, theta)[2] for n in harmonics])
-    scale = np.abs(dI_dalpha).max()
-    ax.plot(harmonics, dI_dalpha / scale, "b-", label=r"$\partial I_n / \partial\alpha$", lw=1.2)
-    ax.plot(harmonics, dQ_dalpha / scale, "r--", label=r"$\partial Q_n / \partial\alpha$", lw=1.2)
-    ax.plot(harmonics, dV_dalpha / scale, "g:", label=r"$\partial V_n / \partial\alpha$", lw=1.5)
+    scale = np.abs(dI_da).max()
+    ax.plot(ns, dI_da / scale, "b-", label=r"$\partial I_n / \partial\alpha$", lw=1.2)
+    ax.plot(ns, dQ_da / scale, "r--", label=r"$\partial Q_n / \partial\alpha$", lw=1.2)
+    ax.plot(ns, dV_da / scale, "g:", label=r"$\partial V_n / \partial\alpha$", lw=1.5)
     ax.set_xlabel(r"Harmonic number $n$")
     ax.set_ylabel(r"Derivative spectrum (normalised)")
-    ax.set_title(rf"(d) Pitch angle derivative ($\alpha_0 = \pi/4$)")
+    ax.set_title(rf"(d) Pitch-angle derivative ($\alpha_0 = \pi/4$)")
     ax.legend(fontsize=9)
     ax.set_xlim(1, n_max)
     ax.axhline(0, color="gray", lw=0.5, ls="--")
 
-    fig.suptitle("Synchrotron harmonic spectra and derivative spectra", fontsize=13, y=0.98)
+    fig.suptitle("Synchrotron harmonic spectra and derivative spectra",
+                 fontsize=13, y=0.98)
     plt.tight_layout(rect=[0, 0, 1, 0.96])
 
-    outpath = "../figures/derivative_spectra.pdf"
+    import os
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    outpath = os.path.join(repo_root, "figures", "derivative_spectra.pdf")
     fig.savefig(outpath, bbox_inches="tight")
     print(f"Saved figure to {outpath}")
     plt.close()
