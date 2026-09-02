@@ -562,3 +562,38 @@ def test_pitch_angle_is_the_binding_direction():
     assert err_g.max() < 1e-4          # 6% energy spread is harmless
     assert err_a[1] > 1e-2             # 0.1 rad pitch spread is not, at n=20
     assert err_a[1] / err_g[1] > 100   # the two directions differ by >2 decades
+
+
+def test_mildly_relativistic_claims_of_section_5_4():
+    """Pins the numbers quoted in Sec. 5.4 (isotropic pitch angles, theta=pi/3).
+
+    These were previously stated for an unspecified pitch angle and did not
+    reproduce; V_n/I_n at a single harmonic is fixed by geometry (full
+    polarisation), so the meaningful statement is about the ensemble.
+    """
+    from synchro.stokes import stokes_harmonic
+    th = np.pi / 3
+    mus = np.linspace(-0.995, 0.995, 61)      # coarse but adequate for a pin
+    out = {}
+    for g, nmax in ((2.0, 200), (5.0, 400)):
+        I = np.zeros(nmax - 1)
+        V = np.zeros(nmax - 1)
+        for mu in mus:
+            al = float(np.arccos(mu))
+            for k, n in enumerate(range(1, nmax)):
+                i, _, v = [float(x) for x in stokes_harmonic(n, g, al, th)]
+                I[k] += i
+                V[k] += v
+        tot = I.sum()
+        c = np.cumsum(I)
+        out[g] = (V.sum() / tot, I[0] / tot,
+                  int(np.searchsorted(c, 0.9 * tot)) + 1)
+
+    v2, f2, n90_2 = out[2.0]
+    v5, f5, _ = out[5.0]
+    assert abs(v2 - 0.46) < 0.05          # <V>/<I> at gamma=2
+    assert abs(v5 - 0.20) < 0.03          # matches the gamma=5 value of Sec. 5.3
+    assert abs(2.0 * v2 - 1.0) < 0.15     # the 1/gamma law, unit coefficient
+    assert abs(5.0 * v5 - 1.0) < 0.15
+    assert abs(f2 - 0.046) < 0.01         # fundamental carries ~4.6% at gamma=2
+    assert 15 <= n90_2 <= 30              # 90% of the power below n ~ 22
