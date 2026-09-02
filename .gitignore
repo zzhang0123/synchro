@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.benchmarks/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# editors / OS
+.DS_Store
+*.swp
+*~
+
+# agent / assistant artefacts
+CLAUDE.md
+AGENTS.md
+.claude/
+.claude*
+.cursor/
+.cursorrules
+.aider*
+.continue/
