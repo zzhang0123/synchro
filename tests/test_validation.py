@@ -54,9 +54,9 @@ def test_derivative_spectra_match_finite_difference():
     assert gerr < 1e-5  # limited by the FD step, not by the autodiff
 
 
-def test_moment_expansion_matches_gaussian_ensemble():
+def test_cumulant_expansion_matches_gaussian_ensemble():
     # reduced sample count keeps the suite fast; see scripts/ for the full run
-    _, _, rel = validate_model.test_moment_expansion(
+    _, _, rel = validate_model.test_cumulant_expansion(
         ns=(1, 2, 3), sigma_g=0.3, sigma_a=0.1, n_samples=20000)
     assert float(np.max(rel)) < 0.02  # 2nd-order truncation at low harmonics
 
@@ -219,12 +219,12 @@ def test_vector_cumulant_expansion_reduces_and_jits():
 
 # --- design (jit / autodiff) ----------------------------------------------
 
-def test_design_moment_expansion_jit():
-    test_design.test_moment_expansion_jit()
+def test_design_cumulant_expansion_jit():
+    test_design.test_cumulant_expansion_jit()
 
 
-def test_design_moment_expansion_grad():
-    test_design.test_moment_expansion_grad()
+def test_design_cumulant_expansion_grad():
+    test_design.test_cumulant_expansion_grad()
 
 
 def test_design_transfer_los_jit():
@@ -261,7 +261,7 @@ def test_larmor_power_and_dimensional_stokes_scale_as_B_squared():
 
 
 def test_apply_B_is_exact_second_moment():
-    from synchro.moment_expansion import build_expansion
+    from synchro.expansion import build_expansion
     exp = build_expansion([1, 2, 3], 5.0, np.pi / 4, np.pi / 3)
     S = exp(jnp.zeros(3), jnp.zeros((3, 3)))
     B0, mu_B, sig_B = 1e-6, 2e-7, 3e-7
@@ -515,7 +515,7 @@ def test_convergence_is_fourth_order_in_the_width():
 
     Pins the exponent quoted in the paper (q = 4.01).
     """
-    from synchro.moment_expansion import build_expansion
+    from synchro.expansion import build_expansion
     g0, a0, t0 = 20.0, np.pi / 4, np.pi / 3
     ns = (1, 10, 50)
     fracs = np.array([0.01, 0.02, 0.04])
@@ -540,7 +540,7 @@ def test_pitch_angle_is_the_binding_direction():
     The paper previously attributed a ~10% error at n=20 to a 6% energy spread;
     it is in fact the 0.1 rad pitch-angle spread. This pins the separation.
     """
-    from synchro.moment_expansion import build_expansion
+    from synchro.expansion import build_expansion
     g0, a0, t0 = 5.0, np.pi / 4, np.pi / 3
     ns = (1, 20)
     exp = build_expansion(ns, g0, a0, t0)

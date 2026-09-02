@@ -1,14 +1,14 @@
 # synchro
 
-A differentiable JAX implementation of the moment expansion of synchrotron
-emission — the reference implementation for *A moment expansion for synchrotron
-emission* (`main.tex`).
+A differentiable JAX implementation of a perturbative statistical model of
+synchrotron emission — the reference implementation for *A perturbative
+statistical model for synchrotron emission* (Zhang & Chluba).
 
 The idea it implements: the **deterministic** half of the model (the radiation
 from one electron of given energy, pitch angle and local field) is treated
 exactly, from the Schott harmonic decomposition; the **statistical** half (the
 distribution of those conditions) is never modelled at all, only summarised by
-its moments or cumulants. Physics lives in the *derivative spectra*, which are
+a truncated hierarchy of statistics. Physics lives in the *derivative spectra*, which are
 precomputed once by automatic differentiation; statistics enter afterwards as a
 cheap tensor contraction.
 
@@ -61,15 +61,21 @@ larmor_power(5.0, 0.785, 1e-6)   # 1.903e-26 erg/s
 Without `B` the Stokes parameters are normalised by `e^2 w_B^2 / (2 pi c)`;
 pass `B` in Gauss for physical `dP_n/dOmega` in erg/s/sr.
 
-### Moment expansion
+### Moment and cumulant expansion
 
 `build_expansion` does the expensive part once (autodiff of the Bessel-based
-Stokes parameters at the reference point). The returned `MomentExpansion` is an
-`eqx.Module`: jittable, and differentiable with respect to the moments.
+Stokes parameters at the reference point). The returned `CumulantExpansion` is
+an `eqx.Module`: jittable, and differentiable with respect to the moments.
+
+The two names are both deliberate. The **interface is raw moments** —
+`__call__(mu, cov)` takes the mean and covariance, which is what an observer
+measures — but the expansion is **organised in cumulants**, which is what makes
+the truncation principled: for a Gaussian the `K=2` cumulant truncation is
+exact to all Taylor orders, while the raw-moment series is not.
 
 ```python
 import jax.numpy as jnp
-from synchro.moment_expansion import build_expansion
+from synchro.expansion import build_expansion
 
 exp = build_expansion([1, 2, 5, 10, 20], gamma0=5.0, alpha0=0.785, theta0=1.047)
 
@@ -151,7 +157,7 @@ PYTHONPATH=. python3 -m pytest tests/ -q --cov=synchro --cov-report=term-missing
 | `stokes.py` | exact Schott harmonic Stokes `(I, Q, V)`; Larmor power | Sec. 2.3–2.4 |
 | `ultrarel.py` | ultra-relativistic `F(x)`, `G(x)` | Sec. 2.5 |
 | `derivatives.py` | derivative spectra by autodiff | Sec. 4.4 |
-| `moment_expansion.py` | `MomentExpansion`, `build_expansion`, exact `B` moments | Sec. 4.1–4.3 |
+| `expansion.py` | `CumulantExpansion`, `build_expansion`, exact `B` moments | Sec. 4.1–4.3 |
 | `cumulants.py` | general-order cumulant expansion (Bell / Faà di Bruno) | Sec. 4.2 |
 | `sed.py` | spectral index, curvature, LOS cumulants, absolute emissivity | Sec. 4.6 |
 | `kirchhoff.py` | emissivity/absorption moments + Kirchhoff closure | Sec. 6.1 |
@@ -176,7 +182,7 @@ MIT — see [LICENSE](LICENSE).
 The Bessel functions are evaluated eagerly from a 512-point Gauss–Legendre
 quadrature on every call, which is the right trade for the precompute path but
 slow in a loop. The fast path for repeated evaluation is
-`build_expansion` once, then `MomentExpansion.__call__` (a single `einsum`,
+`build_expansion` once, then `CumulantExpansion.__call__` (a single `einsum`,
 jittable) — not repeated `stokes_harmonic`.
 
 `transfer_slab` uses an augmented 5×5 matrix exponential with a normalised

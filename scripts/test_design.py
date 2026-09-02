@@ -2,7 +2,7 @@
 
 These check the *design* half of the deliverable (not the physics, which the
 validate_*.py scripts cover):
-  1. MomentExpansion.__call__ compiles and runs under eqx.filter_jit.
+  1. CumulantExpansion.__call__ compiles and runs under eqx.filter_jit.
   2. __call__ is differentiable w.r.t. the moments (mu, cov) via jax.grad.
   3. transfer_los compiles and runs under jax.jit (path-ordered LOS chain).
 """
@@ -14,11 +14,11 @@ import jax
 import jax.numpy as jnp
 import equinox as eqx
 
-from synchro.moment_expansion import build_expansion
+from synchro.expansion import build_expansion
 from synchro.transfer import mueller_matrix, transfer_los
 
 
-def test_moment_expansion_jit():
+def test_cumulant_expansion_jit():
     exp = build_expansion([1, 2, 3, 5, 10], 5.0, np.pi / 4, np.pi / 3)
     mu = jnp.zeros(3)
     cov = jnp.diag(jnp.array([0.1, 0.01, 0.0]))
@@ -28,7 +28,7 @@ def test_moment_expansion_jit():
     return float(jnp.sum(out))
 
 
-def test_moment_expansion_grad():
+def test_cumulant_expansion_grad():
     exp = build_expansion([1, 2, 3, 5, 10], 5.0, np.pi / 4, np.pi / 3)
     mu = jnp.zeros(3)
     cov = jnp.diag(jnp.array([0.1, 0.01, 0.0]))
@@ -55,10 +55,10 @@ def test_transfer_los_jit():
 
 
 if __name__ == "__main__":
-    s1 = test_moment_expansion_jit()
-    s2 = test_moment_expansion_grad()
+    s1 = test_cumulant_expansion_jit()
+    s2 = test_cumulant_expansion_grad()
     s3 = test_transfer_los_jit()
-    print(f"moment_expansion filter_jit: ok (sum={s1:.4f})")
-    print(f"moment_expansion grad: ok (max|grad|={s2:.4f})")
+    print(f"CumulantExpansion filter_jit: ok (sum={s1:.4f})")
+    print(f"CumulantExpansion grad: ok (max|grad|={s2:.4f})")
     print(f"transfer_los jit: ok (sum={s3:.4f})")
     print("ALL DESIGN TESTS PASSED")

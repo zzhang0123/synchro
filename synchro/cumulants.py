@@ -81,7 +81,7 @@ def raw_moments_gaussian(mu, sigma, N):
 def vector_cumulant_expansion(S_derivs, kappas):
     """Vector (multi-parameter) cumulant expansion, truncated at total order K.
 
-    Generalises :class:`synchro.moment_expansion.MomentExpansion` beyond second
+    Generalises :class:`synchro.expansion.CumulantExpansion` beyond second
     order by adding the non-Gaussian cumulants kappa_3, kappa_4.  Parameters:
 
     ``S_derivs`` : list of derivative tensors of S at p0,

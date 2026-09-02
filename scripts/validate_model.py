@@ -17,7 +17,7 @@ import jax.numpy as jnp
 
 from synchro.stokes import stokes_harmonic
 from synchro.derivatives import derivative_spectra, _stokes_stack
-from synchro.moment_expansion import build_expansion
+from synchro.expansion import build_expansion
 from synchro.ultrarel import F, G
 
 
@@ -112,7 +112,7 @@ def test_derivatives(n=10, gamma0=5.0, alpha0=np.pi / 4, theta0=np.pi / 3, h=1e-
     return val, grad, gerr
 
 
-def test_moment_expansion(ns=(1, 2, 3, 5, 10, 20), gamma0=5.0, alpha0=np.pi / 4,
+def test_cumulant_expansion(ns=(1, 2, 3, 5, 10, 20), gamma0=5.0, alpha0=np.pi / 4,
                           theta0=np.pi / 3, sigma_g=0.3, sigma_a=0.1, n_samples=200000):
     exp = build_expansion(ns, gamma0, alpha0, theta0)
     mu = jnp.zeros(3)
@@ -159,6 +159,6 @@ if __name__ == "__main__":
     print(f"  grad rel err = {gerr:.2e}")
 
     print("=== 7. Moment expansion vs direct Gaussian ensemble ===")
-    approx, exact, rel = test_moment_expansion()
+    approx, exact, rel = test_cumulant_expansion()
     for k, n in enumerate((1, 2, 3, 5, 10, 20)):
         print(f"    n={n:2d}: I={rel[k,0]:.2e}  Q={rel[k,1]:.2e}  V={rel[k,2]:.2e}")

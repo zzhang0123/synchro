@@ -11,7 +11,7 @@ Parameter vector (natural polarisation basis, U = 0)::
     p = (gamma, alpha, theta)
 
 ``B`` is omitted: it enters S_n only as an overall factor w_B^2 ~ B^2, so
-``d S/dB = 2 S/B`` and ``d^2 S/dB^2 = 2 S/B^2`` exactly (see moment_expansion).
+``d S/dB = 2 S/B`` and ``d^2 S/dB^2 = 2 S/B^2`` exactly (see expansion).
 The azimuth ``phi`` enters only through the sky-plane rotation
 ``Q -> Q cos 2phi, U -> Q sin 2phi`` and is handled by its own moments.
 """

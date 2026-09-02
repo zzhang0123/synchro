@@ -17,7 +17,7 @@ static arrays; they never enter any jitted graph as leaves.
 
 Note: these functions are *eager* (not jitted) and re-run the fixed quadrature
 on every call. For repeated evaluation the fast path is to precompute the
-derivative spectra once via ``synchro.moment_expansion.build_expansion`` (or
+derivative spectra once via ``synchro.expansion.build_expansion`` (or
 ``synchro.derivatives.derivative_spectra``), not to call ``stokes_harmonic`` in
 a loop.
 """

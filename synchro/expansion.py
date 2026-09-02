@@ -37,8 +37,14 @@ from .derivatives import N_PARAM, STOKES, derivative_spectra
 from .stokes import E_ESU, M_E, C_CGS
 
 
-class MomentExpansion(eqx.Module):
-    """Ensemble Stokes <S_n> from moments of (gamma, alpha, theta).
+class CumulantExpansion(eqx.Module):
+    """Ensemble Stokes <S_n> from the statistics of (gamma, alpha, theta).
+
+    The interface is raw moments -- ``__call__(mu, cov)`` takes the mean and
+    covariance, which is what an observer measures -- but the expansion is
+    *organised* in cumulants, which is what makes the truncation principled:
+    for a Gaussian the K=2 cumulant truncation is exact to all Taylor orders,
+    whereas the raw-moment series is not.  Hence the name.
 
     Attributes
     ----------
@@ -100,7 +106,7 @@ class MomentExpansion(eqx.Module):
 
 
 def build_expansion(harmonics, gamma0, alpha0, theta0):
-    """Precompute derivative spectra and return a :class:`MomentExpansion`."""
+    """Precompute derivative spectra and return a :class:`CumulantExpansion`."""
     harmonics = tuple(int(n) for n in harmonics)
     S0s, dSs, ddSs = [], [], []
     for n in harmonics:
@@ -108,7 +114,7 @@ def build_expansion(harmonics, gamma0, alpha0, theta0):
         S0s.append(val)
         dSs.append(g)
         ddSs.append(h)
-    return MomentExpansion(
+    return CumulantExpansion(
         harmonics=harmonics,
         S0=jnp.stack(S0s),
         dS=jnp.stack(dSs),
