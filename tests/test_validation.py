@@ -490,3 +490,75 @@ def test_magnus_orders_on_a_two_region_path():
     assert abs(s1 - 2.0) < 0.15
     assert abs(s2 - 3.0) < 0.15
     assert e1[0] / e2[0] > 20.0   # order gain, not just a constant factor
+
+
+def _gauss_hermite_ensemble(n, gamma0, alpha0, theta0, sig_g=0.0, sig_a=0.0,
+                            n_nodes=21):
+    """Exact Gaussian ensemble average of I_n by Gauss-Hermite quadrature.
+
+    Deterministic (no Monte-Carlo noise), which is what makes the fourth-order
+    convergence law measurable.  n_nodes=21 reaches +-7.85 sigma, so gamma stays
+    above 1 for sigma_gamma/gamma0 < 0.12 -- a Gaussian in gamma is unphysical
+    in its tails beyond that.
+    """
+    from synchro.stokes import stokes_harmonic
+    x, w = np.polynomial.hermite_e.hermegauss(n_nodes)
+    W = w / np.sum(w)
+    vals = np.array([float(stokes_harmonic(n, gamma0 + sig_g * xi,
+                                           alpha0 + sig_a * xi, theta0)[0])
+                     for xi in x])
+    return float(np.sum(W * vals))
+
+
+def test_convergence_is_fourth_order_in_the_width():
+    """Sec. 4.7: for a Gaussian the leading neglected term is 4th order.
+
+    Pins the exponent quoted in the paper (q = 4.01).
+    """
+    from synchro.moment_expansion import build_expansion
+    g0, a0, t0 = 20.0, np.pi / 4, np.pi / 3
+    ns = (1, 10, 50)
+    fracs = np.array([0.01, 0.02, 0.04])
+    exp = build_expansion(ns, g0, a0, t0)
+    errs = []
+    for f in fracs:
+        sig = f * g0
+        ap = np.asarray(exp(jnp.zeros(3),
+                            jnp.diag(jnp.array([sig ** 2, 0.0, 0.0]))))[:, 0]
+        ex = np.array([_gauss_hermite_ensemble(n, g0, a0, t0, sig_g=sig)
+                       for n in ns])
+        errs.append(np.abs(ap - ex) / np.abs(ex))
+    errs = np.array(errs)
+    for i in range(len(ns)):
+        q = np.polyfit(np.log(fracs), np.log(errs[:, i]), 1)[0]
+        assert abs(q - 4.0) < 0.15, f"n={ns[i]}: exponent {q}"
+
+
+def test_pitch_angle_is_the_binding_direction():
+    """Sec. 4.7: the pitch-angle width constrains the expansion, not the energy.
+
+    The paper previously attributed a ~10% error at n=20 to a 6% energy spread;
+    it is in fact the 0.1 rad pitch-angle spread. This pins the separation.
+    """
+    from synchro.moment_expansion import build_expansion
+    g0, a0, t0 = 5.0, np.pi / 4, np.pi / 3
+    ns = (1, 20)
+    exp = build_expansion(ns, g0, a0, t0)
+
+    sig_g = 0.06 * g0
+    ap_g = np.asarray(exp(jnp.zeros(3),
+                          jnp.diag(jnp.array([sig_g ** 2, 0.0, 0.0]))))[:, 0]
+    ex_g = np.array([_gauss_hermite_ensemble(n, g0, a0, t0, sig_g=sig_g)
+                     for n in ns])
+    err_g = np.abs(ap_g - ex_g) / np.abs(ex_g)
+
+    sig_a = 0.1
+    ap_a = np.asarray(exp(jnp.zeros(3),
+                          jnp.diag(jnp.array([0.0, sig_a ** 2, 0.0]))))[:, 0]
+    ex_a = np.array([_gauss_hermite_ensemble(n, g0, a0, t0, sig_a=sig_a)
+                     for n in ns])
+    err_a = np.abs(ap_a - ex_a) / np.abs(ex_a)
+
+    assert err_g.max() < 1e-4          # 6% energy spread is harmless
+    assert err_a[1] > 1e-2             # 0.1 rad pitch spread is not, at n=20
+    assert err_a[1] / err_g[1] > 100   # the two directions differ by >2 decades
