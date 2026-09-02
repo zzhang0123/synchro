@@ -98,7 +98,7 @@ def test_end_to_end(gamma0=30.0, sigma=3.0, nu_c_ref=1.0, L=1e4):
 
     nus = np.logspace(1.0, 3.0, 12)
     I_direct = np.array([source_function(N, g, nu, nu_c_ref)
-                         * (1 - np.exp(-absorption(N, g, nu, nu_c_ref) * L))
+                         * (-np.expm1(-absorption(N, g, nu, nu_c_ref) * L))
                          for nu in nus])
     I_mom = np.array([float(absorbed_intensity_from_moments(
         nu, gamma0, nu_c_ref, M0, M1, M2, L, inv_gamma)) for nu in nus])

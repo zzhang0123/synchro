@@ -45,7 +45,8 @@ def uniform_source_intensity(nu, p, B, L, eps0=1.0, alpha0=1.0):
     alpha = alpha0 * power_law_absorption(nu, p, B)
     tau = alpha * L
     S = eps / alpha
-    return S * (1.0 - jnp.exp(-tau))
+    # -expm1(-tau) is accurate as tau -> 0, where 1-exp(-tau) underflows
+    return S * (-jnp.expm1(-tau))
 
 
 def thin_rotation_depolarisation(Q0, U0, mean_rm, var_rm, lam):

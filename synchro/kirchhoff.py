@@ -154,7 +154,10 @@ def absorbed_intensity_from_moments(nu, gamma0, nu_c_ref, M0, M1, M2, L,
     j = emissivity_from_moments(nu, gamma0, nu_c_ref, M0, M1, M2)
     a = absorption_from_moments(nu, gamma0, nu_c_ref, M0, M1, M2, inv_gamma)
     S = j / a
-    return S * (1.0 - jnp.exp(-a * L))
+    # -expm1(-x) rather than 1-exp(-x): the latter underflows to 0 for the
+    # small optical depths of the thin regime (tau < 1e-16) and already
+    # loses precision at tau ~ 1e-12.
+    return S * (-jnp.expm1(-a * L))
 
 
 # ---------------------------------------------------------------------------
@@ -235,6 +238,8 @@ def absorbed_polarisation_fraction(nu, gamma0, nu_c_ref, M0, M1, M2, L,
     S_perp = j_perp / a_perp
     S_par = j_par / a_par
 
-    I = S_perp * (1.0 - jnp.exp(-a_perp * L)) + S_par * (1.0 - jnp.exp(-a_par * L))
-    Q = S_perp * (1.0 - jnp.exp(-a_perp * L)) - S_par * (1.0 - jnp.exp(-a_par * L))
+    f_perp = -jnp.expm1(-a_perp * L)   # = 1 - exp(-tau), accurate as tau -> 0
+    f_par = -jnp.expm1(-a_par * L)
+    I = S_perp * f_perp + S_par * f_par
+    Q = S_perp * f_perp - S_par * f_par
     return Q / I

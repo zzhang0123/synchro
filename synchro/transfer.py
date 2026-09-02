@@ -43,13 +43,22 @@ def transfer_slab(S, eps, K, ds):
     Uses the augmented 5x5 matrix exponential
         y(ds) = exp( [[-K, eps], [0, 0]] ds ) @ [S; 1],   S = y[:4]
     which is well-defined even when K is singular (pure rotation/conversion).
+
+    The source column is normalised before exponentiating.  The map
+    eps -> S is linear, so carrying the scale in the input vector instead of
+    in the matrix is exact; without it the augmented matrix mixes entries of
+    order ``|K| ds`` with entries of order ``|eps| ds``, and the
+    scaling-and-squaring in ``expm`` overflows to NaN when those differ by
+    many orders of magnitude (an optically thick slab with a bright source).
     """
     dtype = jnp.result_type(S, K, eps)
+    scale = jnp.linalg.norm(eps) * ds
+    scale = jnp.where(scale > 0.0, scale, 1.0).astype(dtype)
     M = jnp.zeros((5, 5), dtype=dtype)
-    M = M.at[:4, :4].set(-K)
-    M = M.at[:4, 4].set(eps)
-    y0 = jnp.concatenate([S, jnp.array([1.0], dtype=dtype)])
-    return (expm(M * ds) @ y0)[:4]
+    M = M.at[:4, :4].set(-K * ds)
+    M = M.at[:4, 4].set(eps * ds / scale)
+    y0 = jnp.concatenate([S, scale[None]])
+    return (expm(M) @ y0)[:4]
 
 
 def transfer_los(S0, eps_s, K_s, ds):

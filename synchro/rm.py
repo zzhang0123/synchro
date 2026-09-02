@@ -60,7 +60,7 @@ def burn_depolarisation(P0, mean_rm, var_rm, lam):
     return P0 * jnp.exp(2j * mean_rm * lam**2) * jnp.exp(-2.0 * var_rm * lam**4)
 
 
-def gaussian_rm_cumulants(rms, sigmas, weights=None):
+def gaussian_rm_cumulants(rms, weights=None):
     """First two cumulants of a sampled RM distribution (rad/m^2).
 
     Returns (mean_rm, var_rm).  Weights default to uniform.
