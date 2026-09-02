@@ -162,6 +162,15 @@ PYTHONPATH=. python3 -m pytest tests/ -q --cov=synchro --cov-report=term-missing
 | `solutions.py` | thin / self-absorbed / rotation limits | Sec. 6 |
 | `los_moments.py` | end-to-end: moments → coefficients → transfer | Sec. 6 |
 
+## Citation
+
+If you use this package, please cite the accompanying paper (Zhang & Chluba,
+*A moment expansion for synchrotron emission*).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
 ## Performance notes
 
 The Bessel functions are evaluated eagerly from a 512-point Gauss–Legendre
