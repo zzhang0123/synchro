@@ -171,7 +171,7 @@ PYTHONPATH=. python3 -m pytest tests/ -q --cov=synchro --cov-report=term-missing
 ## Citation
 
 If you use this package, please cite the accompanying paper (Zhang & Chluba,
-*A moment expansion for synchrotron emission*).
+*A perturbative statistical model for synchrotron emission*).
 
 ## License
 
