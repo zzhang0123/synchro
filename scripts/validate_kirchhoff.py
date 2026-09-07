@@ -12,11 +12,18 @@ from __future__ import annotations
 import numpy as np
 
 from synchro.kirchhoff import (
-    emissivity, absorption, source_function, derivative_weighted,
-    P_derivatives, moment_expansion_emissivity, moment_expansion_absorption,
-    absorption_moments, emissivity_from_moments, absorption_from_moments,
-    absorbed_intensity_from_moments, inverse_gamma_moment,
-    emissivity_Q, absorption_Q,
+    emissivity,
+    absorption,
+    source_function,
+    derivative_weighted,
+    P_derivatives,
+    moment_expansion_emissivity,
+    moment_expansion_absorption,
+    absorption_moments,
+    absorbed_intensity_from_moments,
+    inverse_gamma_moment,
+    emissivity_Q,
+    absorption_Q,
 )
 
 
@@ -59,8 +66,14 @@ def test_moment_expansion(gamma0=30.0, sigma=3.0, nu_c_ref=1.0, nu=100.0):
     j_me = moment_expansion_emissivity(N, g, gamma0, P0, P1, P2)
     a_me = moment_expansion_absorption(gw, g, gamma0, P0, P1, P2, nu)
 
-    return (j_ex, j_me, a_ex, a_me,
-            abs(j_ex - j_me) / abs(j_ex), abs(a_ex - a_me) / abs(a_ex))
+    return (
+        j_ex,
+        j_me,
+        a_ex,
+        a_me,
+        abs(j_ex - j_me) / abs(j_ex),
+        abs(a_ex - a_me) / abs(a_ex),
+    )
 
 
 def test_closure_form(gamma0=30.0, sigma=3.0):
@@ -73,15 +86,18 @@ def test_closure_form(gamma0=30.0, sigma=3.0):
     M0 = np.trapezoid(N, g)
     M1 = np.trapezoid(N * dg, g)
     M2 = np.trapezoid(N * dg**2, g)
-    inv_gamma = np.trapezoid(N / g, g)                    # exact inverse moment
+    inv_gamma = np.trapezoid(N / g, g)  # exact inverse moment
     inv_gamma_ser = inverse_gamma_moment(M0, M1, M2, gamma0)  # geometric series
 
     D0, D1, D2 = absorption_moments(M0, M1, M2, gamma0, inv_gamma)
     D0_d = np.trapezoid(gw, g)
     D1_d = np.trapezoid(gw * dg, g)
     D2_d = np.trapezoid(gw * dg**2, g)
-    exact_err = (abs(D0 - D0_d) / abs(D0_d), abs(D1 - D1_d) / abs(D1_d),
-                 abs(D2 - D2_d) / abs(D2_d))
+    exact_err = (
+        abs(D0 - D0_d) / abs(D0_d),
+        abs(D1 - D1_d) / abs(D1_d),
+        abs(D2 - D2_d) / abs(D2_d),
+    )
     approx_err = abs(inv_gamma_ser - inv_gamma) / abs(inv_gamma)
     return exact_err, approx_err
 
@@ -97,31 +113,42 @@ def test_end_to_end(gamma0=30.0, sigma=3.0, nu_c_ref=1.0, L=1e4):
     inv_gamma = np.trapezoid(N / g, g)
 
     nus = np.logspace(1.0, 3.0, 12)
-    I_direct = np.array([source_function(N, g, nu, nu_c_ref)
-                         * (-np.expm1(-absorption(N, g, nu, nu_c_ref) * L))
-                         for nu in nus])
-    I_mom = np.array([float(absorbed_intensity_from_moments(
-        nu, gamma0, nu_c_ref, M0, M1, M2, L, inv_gamma)) for nu in nus])
+    I_direct = np.array(
+        [
+            source_function(N, g, nu, nu_c_ref)
+            * (-np.expm1(-absorption(N, g, nu, nu_c_ref) * L))
+            for nu in nus
+        ]
+    )
+    I_mom = np.array(
+        [
+            float(
+                absorbed_intensity_from_moments(
+                    nu, gamma0, nu_c_ref, M0, M1, M2, L, inv_gamma
+                )
+            )
+            for nu in nus
+        ]
+    )
     rel = np.abs(I_direct - I_mom) / np.abs(I_direct)
     return nus, I_direct, I_mom, rel
 
 
 def test_polarisation_fraction():
-    """Thin (p+1)/(p+7/3) and thick -3/(6p+13) polarisation fractions."""
-    g = np.geomspace(0.01, 2000.0, 2000)
+    """Signed thin -(p+1)/(p+7/3) and thick +3/(6p+13) polarisation fractions."""
+    g = np.geomspace(1.0, 2e5, 4000)
     out = []
     for p in [2.0, 2.5, 3.0, 4.0]:
         N = g**-p
-        jF = emissivity(N, g, 1.0, 1.0)
-        jG = emissivity_Q(N, g, 1.0, 1.0)
-        aF = absorption(N, g, 1.0, 1.0)
-        aG = absorption_Q(N, g, 1.0, 1.0)
+        jF = emissivity(N, g, 100.0, 1.0)
+        jG = emissivity_Q(N, g, 100.0, 1.0)
+        aF = absorption(N, g, 100.0, 1.0)
+        aG = absorption_Q(N, g, 100.0, 1.0)
         Pi_thin = jG / jF
         Sp = (jF + jG) / (aF + aG)
         Sm = (jF - jG) / (aF - aG)
         Pi_thick = (Sp - Sm) / (Sp + Sm)
-        out.append((p, Pi_thin, (p + 1) / (p + 7 / 3),
-                    Pi_thick, -3 / (6 * p + 13)))
+        out.append((p, Pi_thin, -(p + 1) / (p + 7 / 3), Pi_thick, 3 / (6 * p + 13)))
     return out
 
 
@@ -143,7 +170,9 @@ if __name__ == "__main__":
 
     print("=== 4. Kirchhoff closure in moment form (D_k from M_k + <1/g>) ===")
     exact_err, approx_err = test_closure_form()
-    print(f"  exact closure rel err: D0={exact_err[0]:.2e}  D1={exact_err[1]:.2e}  D2={exact_err[2]:.2e}")
+    print(
+        f"  exact closure rel err: D0={exact_err[0]:.2e}  D1={exact_err[1]:.2e}  D2={exact_err[2]:.2e}"
+    )
     print(f"  <1/g> geometric-series approx rel err = {approx_err:.2e}")
 
     print("=== 5. End-to-end absorbed I_nu (moments vs direct) ===")
@@ -154,4 +183,6 @@ if __name__ == "__main__":
 
     print("=== 6. Polarised absorption: thin & thick polarisation fractions ===")
     for p, pt, pt_th, pk, pk_th in test_polarisation_fraction():
-        print(f"  p={p}: thin {pt:.4f} (theory {pt_th:.4f})  thick {pk:+.4f} (theory {pk_th:+.4f})")
+        print(
+            f"  p={p}: thin {pt:.4f} (theory {pt_th:.4f})  thick {pk:+.4f} (theory {pk_th:+.4f})"
+        )

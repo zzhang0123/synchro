@@ -1,0 +1,3689 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-09-06T00:05:22.829711+00:00",
+  "scope": "Finite independent numerical comparisons, not a uniform kernel or all-physics certificate.",
+  "runtime": {
+    "python": "3.12.9 | packaged by Anaconda, Inc. | (main, Feb  6 2025, 12:55:12) [Clang 14.0.6 ]",
+    "platform": "macOS-26.5-arm64-arm-64bit",
+    "jax": "0.10.0",
+    "jaxlib": "0.10.0",
+    "equinox": "0.13.7",
+    "numpy": "2.3.5",
+    "scipy": "1.16.3",
+    "jax_x64": true
+  },
+  "source": {
+    "git_head": "92128dc6519894965e7d9c5a927e8de54619ac13",
+    "sha256": {
+      "synchro/__init__.py": "6089e9017e2a3ac79b673c33d272684be918ef3a444c21db3e9e7aa91d18391d",
+      "synchro/bessel.py": "9899eb6dc7f1efacefd929d0bbb07b2313141c44ff41e6f984bee116bd86f822",
+      "synchro/constants.py": "2140a242caba5992ce607e16c2585109ae073e76510bb801dca7e7bc09c14ee3",
+      "synchro/conversion.py": "80781dade073f944a98aa3be9b6cadd591ac31c6ed1f9e10e75826933a9fb502",
+      "synchro/cumulants.py": "aaf499b9e9da5020de81319b825dfaaef5e7b44b512f8c36ecaa0ae7581a506f",
+      "synchro/derivatives.py": "6be4f7666c89d50932eec981d84ca69c914ff7098ee9fa3dd3b2e6970fe8f250",
+      "synchro/expansion.py": "05ea1cb6efdb20ea3005296becca02fa85a1aa29d5d4904f3dbff47efbc80c24",
+      "synchro/kirchhoff.py": "1c58b16d99b3ce94162411786f5c02119b75080ee77f447a7c9887ccc83bf1ec",
+      "synchro/los_moments.py": "ff045ecdd90af0b8fa512b20b60cabf0c72262ef66f7b5a1e1048a6f449eea34",
+      "synchro/magnus.py": "255319281e77a085a5d988cdfae3b96c45b66f6fb124ce7de1a93a3deff86e22",
+      "synchro/rm.py": "9cd198806d83e22e952deed11df76af2aabd5a185f20bb53b35e8359ed126555",
+      "synchro/sed.py": "cd45663100a8fd5fd03fd82e42e718649ff5815ad8425a73498329fcf650241c",
+      "synchro/solutions.py": "b1f9bf75aab9e77d3a690c0245332ef1e70835b23efb991ab2888e40423833ef",
+      "synchro/stokes.py": "956b1673976b4d8ffd1d419103341f327d4c2817801095d4afa0d1a3fcd41195",
+      "synchro/transfer.py": "a44eefacc6aff49537ae68de859cd2da4b518a6c620bb855c501618197cd8c7d",
+      "synchro/ultrarel.py": "21f795bcc1c27ec9cb8f74686bad83428bd61d6fc75abd1f7722f27d7b51f3dc",
+      "scripts/review_radiation.py": "85ef6b01c095bd8f6da9d1a966e1d57a73de4567c20b88d7913ca8008c467546"
+    },
+    "import_paths": {
+      "synchro.bessel": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/bessel.py",
+      "synchro.constants": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/constants.py",
+      "synchro.rm": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/rm.py",
+      "synchro.conversion": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/conversion.py",
+      "synchro.cumulants": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/cumulants.py",
+      "synchro.stokes": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/stokes.py",
+      "synchro.derivatives": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/derivatives.py",
+      "synchro.ultrarel": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/ultrarel.py",
+      "synchro.transfer": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/transfer.py",
+      "synchro.kirchhoff": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/kirchhoff.py",
+      "synchro.los_moments": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/los_moments.py",
+      "synchro.magnus": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/magnus.py",
+      "synchro.expansion": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/expansion.py",
+      "synchro.sed": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/sed.py",
+      "synchro.solutions": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/solutions.py",
+      "synchro": "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling/.worktrees/synchro-code-review/synchro/__init__.py"
+    },
+    "imported_file_sha256": {
+      "synchro.bessel": "9899eb6dc7f1efacefd929d0bbb07b2313141c44ff41e6f984bee116bd86f822",
+      "synchro.constants": "2140a242caba5992ce607e16c2585109ae073e76510bb801dca7e7bc09c14ee3",
+      "synchro.rm": "9cd198806d83e22e952deed11df76af2aabd5a185f20bb53b35e8359ed126555",
+      "synchro.conversion": "80781dade073f944a98aa3be9b6cadd591ac31c6ed1f9e10e75826933a9fb502",
+      "synchro.cumulants": "aaf499b9e9da5020de81319b825dfaaef5e7b44b512f8c36ecaa0ae7581a506f",
+      "synchro.stokes": "956b1673976b4d8ffd1d419103341f327d4c2817801095d4afa0d1a3fcd41195",
+      "synchro.derivatives": "6be4f7666c89d50932eec981d84ca69c914ff7098ee9fa3dd3b2e6970fe8f250",
+      "synchro.ultrarel": "21f795bcc1c27ec9cb8f74686bad83428bd61d6fc75abd1f7722f27d7b51f3dc",
+      "synchro.transfer": "a44eefacc6aff49537ae68de859cd2da4b518a6c620bb855c501618197cd8c7d",
+      "synchro.kirchhoff": "1c58b16d99b3ce94162411786f5c02119b75080ee77f447a7c9887ccc83bf1ec",
+      "synchro.los_moments": "ff045ecdd90af0b8fa512b20b60cabf0c72262ef66f7b5a1e1048a6f449eea34",
+      "synchro.magnus": "255319281e77a085a5d988cdfae3b96c45b66f6fb124ce7de1a93a3deff86e22",
+      "synchro.expansion": "05ea1cb6efdb20ea3005296becca02fa85a1aa29d5d4904f3dbff47efbc80c24",
+      "synchro.sed": "cd45663100a8fd5fd03fd82e42e718649ff5815ad8425a73498329fcf650241c",
+      "synchro.solutions": "b1f9bf75aab9e77d3a690c0245332ef1e70835b23efb991ab2888e40423833ef",
+      "synchro": "6089e9017e2a3ac79b673c33d272684be918ef3a444c21db3e9e7aa91d18391d"
+    },
+    "note": "Imported module paths are checked against this checkout before computation; per-file hashes identify uncommitted changes independently of git HEAD."
+  },
+  "tolerances": {
+    "J_relative": 2e-10,
+    "J_prime_relative": 2e-09,
+    "K_relative": 2e-10,
+    "F_relative": 3e-10,
+    "F_prime_relative": 3e-09,
+    "G_relative": 2e-10,
+    "tiny_reference_absolute_floor": 1e-280
+  },
+  "error_interpretation": [
+    "The 49 integer-J cases test values and argument derivatives, including exponentially small tails and both sides of x=n.",
+    "K uses80 logarithmic points for each of three orders; the finite sweep does not prove uniform accuracy between points.",
+    "F's reference uses a separate SciPy K integral with upper frequency x+80. Its reported quad estimate excludes that reference's remaining upper tail and roundoff.",
+    "The public K/F positive-tail bounds control their finite integration limit only; quadrature and floating-point error require separate validation.",
+    "Reference physics, PDF closure, support exclusions, statistics uncertainty and observation/inference errors are not tested by this numerical-kernel audit."
+  ],
+  "summary": {
+    "passed": true,
+    "scalar_comparisons": 359,
+    "max_J_relative_error": 1.3636869411470798e-12,
+    "max_J_prime_relative_error": 5.568767669217323e-12,
+    "max_K_relative_error": 2.3159252293680765e-13,
+    "max_F_relative_error": 1.9984014443252818e-14,
+    "max_F_prime_relative_error": 2.6867397195928788e-14,
+    "max_G_relative_error": 2.7533531010703882e-14
+  },
+  "integer_J_cases": [
+    {
+      "n": 1,
+      "x": 0.1,
+      "J": {
+        "value": 0.049937526036242,
+        "reference": 0.049937526036242005,
+        "absolute_error": 6.938893903907228e-18,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 9.987505207248401e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.49812630170362004,
+        "reference": 0.4981263017036201,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 9.962526034072402e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 0.5,
+      "J": {
+        "value": 0.24226845767487387,
+        "reference": 0.2422684576748739,
+        "absolute_error": 2.7755575615628914e-17,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 4.845369153497478e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.4539328918910652,
+        "reference": 0.45393289189106517,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 9.078657837821304e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 0.9,
+      "J": {
+        "value": 0.40594954607880573,
+        "reference": 0.4059495460788057,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 8.118990921576114e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.3564687469238718,
+        "reference": 0.35646874692387187,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 7.129374938477437e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 0.999,
+      "J": {
+        "value": 0.43972527610888235,
+        "reference": 0.4397252761088824,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 8.794505522177648e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.32547213296554656,
+        "reference": 0.3254721329655466,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 6.509442659310932e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 1.0,
+      "J": {
+        "value": 0.4400505857449335,
+        "reference": 0.44005058574493355,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 1.1102230246251565e-16,
+        "criterion": 8.801011714898672e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.32514710081303305,
+        "reference": 0.32514710081303305,
+        "absolute_error": 0.0,
+        "relative_error": 0.0,
+        "criterion": 6.502942016260661e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 1.01,
+      "J": {
+        "value": 0.44328576120907176,
+        "reference": 0.44328576120907176,
+        "absolute_error": 0.0,
+        "relative_error": 0.0,
+        "criterion": 8.865715224181435e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.32188418435588,
+        "reference": 0.32188418435587995,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 6.4376836871176e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 1,
+      "x": 1.5,
+      "J": {
+        "value": 0.5579365079100997,
+        "reference": 0.5579365079100995,
+        "absolute_error": 2.220446049250313e-16,
+        "relative_error": 4.440892098500626e-16,
+        "criterion": 1.115873015820199e-10,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.1398699997958517,
+        "reference": 0.13986999979585168,
+        "absolute_error": 2.7755575615628914e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 2.797399995917034e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 0.5,
+      "J": {
+        "value": 8.05362724135747e-06,
+        "reference": 8.053627241357477e-06,
+        "absolute_error": 6.776263578034403e-21,
+        "relative_error": 8.881784197001252e-16,
+        "criterion": 1.6107254482714954e-15,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 8.020020395071283e-05,
+        "reference": 8.020020395071284e-05,
+        "absolute_error": 1.3552527156068805e-20,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 1.604004079014257e-13,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 2.5,
+      "J": {
+        "value": 0.019501625134503188,
+        "reference": 0.01950162513450322,
+        "absolute_error": 3.122502256758253e-17,
+        "relative_error": 1.5543122344752192e-15,
+        "criterion": 3.900325026900644e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.03477862978524873,
+        "reference": 0.034778629785248795,
+        "absolute_error": 6.245004513516506e-17,
+        "relative_error": 1.7763568394002505e-15,
+        "criterion": 6.955725957049759e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 4.5,
+      "J": {
+        "value": 0.1947146586387138,
+        "reference": 0.1947146586387138,
+        "absolute_error": 0.0,
+        "relative_error": 0.0,
+        "criterion": 3.894293172774276e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.13207335957441346,
+        "reference": 0.13207335957441335,
+        "absolute_error": 1.1102230246251565e-16,
+        "relative_error": 8.881784197001252e-16,
+        "criterion": 2.6414671914882674e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 4.995,
+      "J": {
+        "value": 0.26048976377759514,
+        "reference": 0.26048976377759475,
+        "absolute_error": 3.885780586188048e-16,
+        "relative_error": 1.5543122344752192e-15,
+        "criterion": 5.209795275551895e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.13022073110110788,
+        "reference": 0.1302207311011077,
+        "absolute_error": 1.6653345369377348e-16,
+        "relative_error": 1.3322676295501878e-15,
+        "criterion": 2.6044146220221543e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 5.0,
+      "J": {
+        "value": 0.2611405461201701,
+        "reference": 0.26114054612017007,
+        "absolute_error": 5.551115123125783e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 5.2228109224034015e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.1300918143384781,
+        "reference": 0.13009181433847808,
+        "absolute_error": 2.7755575615628914e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 2.6018362867695616e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 5.05,
+      "J": {
+        "value": 0.2676106477519067,
+        "reference": 0.26761064775190657,
+        "absolute_error": 1.1102230246251565e-16,
+        "relative_error": 4.440892098500626e-16,
+        "criterion": 5.3522129550381314e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.12867279645593319,
+        "reference": 0.12867279645593319,
+        "absolute_error": 0.0,
+        "relative_error": 0.0,
+        "criterion": 2.5734559291186637e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 5,
+      "x": 7.5,
+      "J": {
+        "value": 0.28347390516255044,
+        "reference": 0.28347390516255055,
+        "absolute_error": 1.1102230246251565e-16,
+        "relative_error": 4.440892098500626e-16,
+        "criterion": 5.669478103251011e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": -0.16515792347067834,
+        "reference": -0.16515792347067831,
+        "absolute_error": 2.7755575615628914e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 3.3031584694135666e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 2.0,
+      "J": {
+        "value": 3.9189728050907457e-19,
+        "reference": 3.918972805090754e-19,
+        "absolute_error": 8.185202263645752e-34,
+        "relative_error": 2.1094237467877974e-15,
+        "criterion": 7.837945610181508e-29,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 3.900270468272983e-18,
+        "reference": 3.900270468272987e-18,
+        "absolute_error": 3.851859888774472e-33,
+        "relative_error": 9.992007221626409e-16,
+        "criterion": 7.800540936545974e-27,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 10.0,
+      "J": {
+        "value": 1.1513369247813442e-05,
+        "reference": 1.1513369247813391e-05,
+        "absolute_error": 5.082197683525802e-20,
+        "relative_error": 4.440892098500626e-15,
+        "criterion": 2.302673849562678e-15,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 2.0119539028935838e-05,
+        "reference": 2.011953902893575e-05,
+        "absolute_error": 8.809142651444724e-20,
+        "relative_error": 4.440892098500626e-15,
+        "criterion": 4.02390780578715e-14,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 18.0,
+      "J": {
+        "value": 0.0673059474374055,
+        "reference": 0.06730594743740596,
+        "absolute_error": 4.579669976578771e-16,
+        "relative_error": 6.772360450213455e-15,
+        "criterion": 1.3461189487481193e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.037922059990662484,
+        "reference": 0.03792205999066272,
+        "absolute_error": 2.3592239273284576e-16,
+        "relative_error": 6.217248937900877e-15,
+        "criterion": 7.584411998132545e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 19.98,
+      "J": {
+        "value": 0.16366497159417528,
+        "reference": 0.16366497159417462,
+        "absolute_error": 6.661338147750939e-16,
+        "relative_error": 3.9968028886505635e-15,
+        "criterion": 3.273299431883493e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0541650131459734,
+        "reference": 0.054165013145973384,
+        "absolute_error": 1.3877787807814457e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 1.0833002629194677e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 20.0,
+      "J": {
+        "value": 0.16474777377532696,
+        "reference": 0.1647477737753266,
+        "absolute_error": 3.608224830031759e-16,
+        "relative_error": 2.220446049250313e-15,
+        "criterion": 3.294955475506532e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.05411412974635408,
+        "reference": 0.054114129746354475,
+        "absolute_error": 3.95516952522712e-16,
+        "relative_error": 7.327471962526033e-15,
+        "criterion": 1.0822825949270896e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 20.2,
+      "J": {
+        "value": 0.17549438395134276,
+        "reference": 0.1754943839513426,
+        "absolute_error": 1.6653345369377348e-16,
+        "relative_error": 8.881784197001252e-16,
+        "criterion": 3.509887679026852e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0532390287506212,
+        "reference": 0.053239028750621406,
+        "absolute_error": 2.0816681711721685e-16,
+        "relative_error": 3.885780586188048e-15,
+        "criterion": 1.0647805750124282e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 20,
+      "x": 30.0,
+      "J": {
+        "value": 0.00483101999340446,
+        "reference": 0.004831019993404042,
+        "absolute_error": 4.180683577104105e-16,
+        "relative_error": 8.659739592076221e-14,
+        "criterion": 9.662039986808084e-13,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.12570536685880943,
+        "reference": 0.1257053668588094,
+        "absolute_error": 2.7755575615628914e-17,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 2.514107337176188e-10,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 8.0,
+      "J": {
+        "value": 1.6756424879651971e-71,
+        "reference": 1.675642487965258e-71,
+        "absolute_error": 6.092616990659425e-85,
+        "relative_error": 3.6415315207705135e-14,
+        "criterion": 3.3512849759305163e-81,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 1.6673476815868546e-70,
+        "reference": 1.667347681586903e-70,
+        "absolute_error": 4.825835240126277e-84,
+        "relative_error": 2.8976820942716586e-14,
+        "criterion": 3.334695363173806e-79,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 40.0,
+      "J": {
+        "value": 1.0295630893703743e-17,
+        "reference": 1.029563089370437e-17,
+        "absolute_error": 6.27082789892484e-31,
+        "relative_error": 6.09512440519211e-14,
+        "criterion": 2.059126178740874e-27,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 1.7874602098922126e-17,
+        "reference": 1.787460209892318e-17,
+        "absolute_error": 1.0538688655686955e-30,
+        "relative_error": 5.895284260759581e-14,
+        "criterion": 3.574920419784636e-26,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 72.0,
+      "J": {
+        "value": 0.005412833797542684,
+        "reference": 0.005412833797543147,
+        "absolute_error": 4.623038063478191e-16,
+        "relative_error": 8.537615059367454e-14,
+        "criterion": 1.0825667595086294e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0027602482206098597,
+        "reference": 0.002760248220610073,
+        "absolute_error": 2.1337098754514727e-16,
+        "relative_error": 7.72715225139109e-14,
+        "criterion": 5.520496441220146e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 79.92,
+      "J": {
+        "value": 0.10205661384964075,
+        "reference": 0.10205661384963581,
+        "absolute_error": 4.9404924595819466e-15,
+        "relative_error": 4.8405723873656825e-14,
+        "criterion": 2.0411322769927162e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.02188291544110337,
+        "reference": 0.02188291544110233,
+        "absolute_error": 1.0373646386341306e-15,
+        "relative_error": 4.729550084903167e-14,
+        "criterion": 4.3765830882204665e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 80.0,
+      "J": {
+        "value": 0.10380680911312765,
+        "reference": 0.10380680911312944,
+        "absolute_error": 1.790234627208065e-15,
+        "relative_error": 1.7208456881689926e-14,
+        "criterion": 2.076136182262589e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.021869246468867627,
+        "reference": 0.02186924646886764,
+        "absolute_error": 1.3877787807814457e-17,
+        "relative_error": 6.661338147750939e-16,
+        "criterion": 4.373849293773528e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 80.8,
+      "J": {
+        "value": 0.12097774210496823,
+        "reference": 0.12097774210496808,
+        "absolute_error": 1.5265566588595902e-16,
+        "relative_error": 1.3322676295501878e-15,
+        "criterion": 2.4195548420993615e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.02074225075688574,
+        "reference": 0.020742250756885752,
+        "absolute_error": 1.3877787807814457e-17,
+        "relative_error": 6.661338147750939e-16,
+        "criterion": 4.148450151377151e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 80,
+      "x": 120.0,
+      "J": {
+        "value": -0.06853223388095099,
+        "reference": -0.06853223388095357,
+        "absolute_error": 2.581268532253489e-15,
+        "relative_error": 3.7636560534792807e-14,
+        "criterion": 1.3706446776190715e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": -0.036157839669665334,
+        "reference": -0.036157839669666,
+        "absolute_error": 6.661338147750939e-16,
+        "relative_error": 1.84297022087776e-14,
+        "criterion": 7.231567933933201e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 51.2,
+      "J": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 256.0,
+      "J": {
+        "value": 1.0199144097328883e-102,
+        "reference": 1.0199144097328893e-102,
+        "absolute_error": 9.913835302014255e-118,
+        "relative_error": 9.992007221626409e-16,
+        "criterion": 2.0398288194657787e-112,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 1.7672054721083377e-102,
+        "reference": 1.7672054721082957e-102,
+        "absolute_error": 4.203466168054044e-116,
+        "relative_error": 2.375877272697835e-14,
+        "criterion": 3.534410944216591e-111,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 460.8,
+      "J": {
+        "value": 2.984255855072636e-09,
+        "reference": 2.984255855072047e-09,
+        "absolute_error": 5.889525961377557e-22,
+        "relative_error": 1.9739765377835283e-13,
+        "criterion": 5.968511710144095e-19,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 1.4587766299965737e-09,
+        "reference": 1.4587766299961556e-09,
+        "absolute_error": 4.181397996455555e-22,
+        "relative_error": 2.866595849582154e-13,
+        "criterion": 2.9175532599923115e-18,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 511.488,
+      "J": {
+        "value": 0.052640724305632436,
+        "reference": 0.052640724305647126,
+        "absolute_error": 1.4689638394571602e-14,
+        "relative_error": 2.7911006839076435e-13,
+        "criterion": 1.0528144861129426e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.006376550645792921,
+        "reference": 0.006376550645794791,
+        "absolute_error": 1.870031907102998e-15,
+        "relative_error": 2.9332092310596636e-13,
+        "criterion": 1.2753101291589583e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 512.0,
+      "J": {
+        "value": 0.05591323473517769,
+        "reference": 0.05591323473517867,
+        "absolute_error": 9.783840404509192e-16,
+        "relative_error": 1.7541523789077473e-14,
+        "criterion": 1.1182646947035734e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.00639769328120097,
+        "reference": 0.006397693281201676,
+        "absolute_error": 7.060324547225605e-16,
+        "relative_error": 1.1035616864774056e-13,
+        "criterion": 1.2795386562403353e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 517.12,
+      "J": {
+        "value": 0.08235854112620988,
+        "reference": 0.08235854112620747,
+        "absolute_error": 2.4147350785597155e-15,
+        "relative_error": 2.930988785010413e-14,
+        "criterion": 1.6471708225241494e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.002530927796407769,
+        "reference": 0.0025309277964071855,
+        "absolute_error": 5.833007687972014e-16,
+        "relative_error": 2.304822999121825e-13,
+        "criterion": 5.0618555928143716e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 512,
+      "x": 768.0,
+      "J": {
+        "value": -0.031311424651499886,
+        "reference": -0.031311424651497874,
+        "absolute_error": 2.0122792321330962e-15,
+        "relative_error": 6.417089082333405e-14,
+        "criterion": 6.262284930299575e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": -0.008517732818642229,
+        "reference": -0.008517732818639705,
+        "absolute_error": 2.5240226575462543e-15,
+        "relative_error": 2.964295475749168e-13,
+        "criterion": 1.703546563727941e-11,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 100.0,
+      "J": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 500.0,
+      "J": {
+        "value": 1.9704922060100357e-198,
+        "reference": 1.970492206010041e-198,
+        "absolute_error": 5.1982972515883276e-213,
+        "relative_error": 2.6645352591003757e-15,
+        "criterion": 3.940984412020082e-208,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 3.413648375548223e-198,
+        "reference": 3.4136483755478115e-198,
+        "absolute_error": 4.114080967685619e-211,
+        "relative_error": 1.20570220474292e-13,
+        "criterion": 6.827296751095624e-207,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 900.0,
+      "J": {
+        "value": 5.084110085043978e-16,
+        "reference": 5.084110085041682e-16,
+        "absolute_error": 2.2965713103246706e-28,
+        "relative_error": 4.516387264175137e-13,
+        "criterion": 1.0168220170083364e-25,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 2.47421871612812e-16,
+        "reference": 2.4742187161267983e-16,
+        "absolute_error": 1.321835054310958e-28,
+        "relative_error": 5.342393194496253e-13,
+        "criterion": 4.948437432253597e-25,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 999.0,
+      "J": {
+        "value": 0.04064330787538518,
+        "reference": 0.040643307875358727,
+        "absolute_error": 2.6451063561694355e-14,
+        "relative_error": 6.508127370352668e-13,
+        "criterion": 8.128661575071746e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.004061601174171118,
+        "reference": 0.004061601174168494,
+        "absolute_error": 2.624636619152909e-15,
+        "relative_error": 6.461498003318411e-13,
+        "criterion": 8.123202348336988e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 1000.0,
+      "J": {
+        "value": 0.04473067294796778,
+        "reference": 0.044730672947964054,
+        "absolute_error": 3.726186026398182e-15,
+        "relative_error": 8.326672684688674e-14,
+        "criterion": 8.946134589592811e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.004099555822254849,
+        "reference": 0.004099555822257673,
+        "absolute_error": 2.824129818890242e-15,
+        "relative_error": 6.888933867799096e-13,
+        "criterion": 8.199111644515346e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 1010.0,
+      "J": {
+        "value": 0.06528181800221339,
+        "reference": 0.06528181800221508,
+        "absolute_error": 1.6930901125533637e-15,
+        "relative_error": 2.5979218776228663e-14,
+        "criterion": 1.3056363600443017e-11,
+        "passed": true
+      },
+      "J_prime": {
+        "value": -0.002266413017075413,
+        "reference": -0.002266413017073865,
+        "absolute_error": 1.5478070214403061e-15,
+        "relative_error": 6.830092047493963e-13,
+        "criterion": 4.5328260341477305e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 1000,
+      "x": 1500.0,
+      "J": {
+        "value": 0.02292973350915074,
+        "reference": 0.022929733509151694,
+        "absolute_error": 9.54097911787244e-16,
+        "relative_error": 4.163336342344337e-14,
+        "criterion": 4.585946701830339e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0049099333568057985,
+        "reference": 0.004909933356808314,
+        "absolute_error": 2.5153490401663703e-15,
+        "relative_error": 5.122569035620472e-13,
+        "criterion": 9.819866713616628e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 320.0,
+      "J": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 1600.0,
+      "J": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0,
+        "reference": 0.0,
+        "absolute_error": 0.0,
+        "relative_error": null,
+        "criterion": 1e-280,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 2880.0,
+      "J": {
+        "value": 3.902777389669077e-46,
+        "reference": 3.902777389674399e-46,
+        "absolute_error": 5.3222338163907414e-58,
+        "relative_error": 1.3636869411470798e-12,
+        "criterion": 7.805554779348798e-56,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 1.8930769515299913e-46,
+        "reference": 1.893076951531515e-46,
+        "absolute_error": 1.5234719277113808e-58,
+        "relative_error": 8.04800670550776e-13,
+        "criterion": 3.78615390306303e-55,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 3196.8,
+      "J": {
+        "value": 0.024396610287453244,
+        "reference": 0.024396610287441306,
+        "absolute_error": 1.1938366961672386e-14,
+        "relative_error": 4.89386309254769e-13,
+        "criterion": 4.8793220574882615e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0018075158463263397,
+        "reference": 0.0018075158463250248,
+        "absolute_error": 1.3149203947904198e-15,
+        "relative_error": 7.274181257344026e-13,
+        "criterion": 3.61503169265005e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 3200.0,
+      "J": {
+        "value": 0.030354463167659114,
+        "reference": 0.030354463167660495,
+        "absolute_error": 1.3808398868775384e-15,
+        "relative_error": 4.551914400963142e-14,
+        "criterion": 6.0708926335320995e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.0018900841660740358,
+        "reference": 0.0018900841660845612,
+        "absolute_error": 1.0525434690489277e-14,
+        "relative_error": 5.568767669217323e-12,
+        "criterion": 3.7801683321691225e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 3232.0,
+      "J": {
+        "value": -0.021850402099972827,
+        "reference": -0.021850402099961794,
+        "absolute_error": 1.1032841307212493e-14,
+        "relative_error": 5.049294315995212e-13,
+        "criterion": 4.370080419992359e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": -0.0041126636422525046,
+        "reference": -0.004112663642252963,
+        "absolute_error": 4.588343593958655e-16,
+        "relative_error": 1.1157741397482823e-13,
+        "criterion": 8.225327284505927e-12,
+        "passed": true
+      }
+    },
+    {
+      "n": 3200,
+      "x": 4800.0,
+      "J": {
+        "value": 0.012149498993107202,
+        "reference": 0.012149498993104507,
+        "absolute_error": 2.6957602816679582e-15,
+        "relative_error": 2.2182256032010628e-13,
+        "criterion": 2.4298997986209016e-12,
+        "passed": true
+      },
+      "J_prime": {
+        "value": 0.004102617405167354,
+        "reference": 0.004102617405173823,
+        "absolute_error": 6.468783841917514e-15,
+        "relative_error": 1.5767387395726473e-12,
+        "criterion": 8.205234810347645e-12,
+        "passed": true
+      }
+    }
+  ],
+  "modified_K_cases": [
+    {
+      "order": 0.0,
+      "x": 1e-12,
+      "value": 27.746952631586833,
+      "reference": 27.74695263158696,
+      "absolute_error": 1.2789769243681803e-13,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 5.5493905263173924e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.5348393019225807e-12,
+      "value": 27.31852694532923,
+      "reference": 27.318526945329356,
+      "absolute_error": 1.2789769243681803e-13,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 5.4637053890658714e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.3557316827262044e-12,
+      "value": 26.890101259071624,
+      "reference": 26.890101259071752,
+      "absolute_error": 1.2789769243681803e-13,
+      "relative_error": 4.773959005888173e-15,
+      "criterion": 5.3780202518143504e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 3.615669571432394e-12,
+      "value": 26.46167557281402,
+      "reference": 26.461675572814148,
+      "absolute_error": 1.2789769243681803e-13,
+      "relative_error": 4.884981308350689e-15,
+      "criterion": 5.2923351145628295e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 5.549471761000035e-12,
+      "value": 26.03324988655642,
+      "reference": 26.03324988655654,
+      "absolute_error": 1.2079226507921703e-13,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 5.2066499773113085e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 8.517547363692369e-12,
+      "value": 25.604824200298822,
+      "reference": 25.60482420029894,
+      "absolute_error": 1.1723955140041653e-13,
+      "relative_error": 4.551914400963142e-15,
+      "criterion": 5.120964840059788e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.3073066449782113e-11,
+      "value": 25.17639851404122,
+      "reference": 25.176398514041335,
+      "absolute_error": 1.1368683772161603e-13,
+      "relative_error": 4.551914400963142e-15,
+      "criterion": 5.035279702808267e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.0065056183771173e-11,
+      "value": 24.747972827783617,
+      "reference": 24.747972827783727,
+      "absolute_error": 1.1013412404281553e-13,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.9495945655567455e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 3.079663682613671e-11,
+      "value": 24.319547141526012,
+      "reference": 24.319547141526126,
+      "absolute_error": 1.1368683772161603e-13,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 4.863909428305225e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.7267888567790903e-11,
+      "value": 23.891121455268415,
+      "reference": 23.89112145526852,
+      "absolute_error": 1.0658141036401503e-13,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.778224291053704e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 7.254861309274282e-11,
+      "value": 23.462695769010807,
+      "reference": 23.462695769010917,
+      "absolute_error": 1.1013412404281553e-13,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 4.692539153802183e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.1135046267471679e-10,
+      "value": 23.03427008275321,
+      "reference": 23.034270082753313,
+      "absolute_error": 1.0302869668521453e-13,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.6068540165506624e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.709050664004187e-10,
+      "value": 22.605844396495613,
+      "reference": 22.605844396495712,
+      "absolute_error": 9.947598300641403e-14,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.521168879299142e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.6231181280905205e-10,
+      "value": 22.177418710238005,
+      "reference": 22.177418710238104,
+      "absolute_error": 9.947598300641403e-14,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.435483742047621e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.026064796578921e-10,
+      "value": 21.748993023980407,
+      "reference": 21.7489930239805,
+      "absolute_error": 9.237055564881302e-14,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 4.3497986047961e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 6.179362481876293e-10,
+      "value": 21.320567337722803,
+      "reference": 21.320567337722895,
+      "absolute_error": 9.237055564881302e-14,
+      "relative_error": 4.3298697960381105e-15,
+      "criterion": 4.264113467544579e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 9.484328398009595e-10,
+      "value": 20.8921416514652,
+      "reference": 20.89214165146529,
+      "absolute_error": 9.237055564881302e-14,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.178428330293058e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.4556919977605557e-09,
+      "value": 20.4637159652076,
+      "reference": 20.46371596520769,
+      "absolute_error": 8.881784197001252e-14,
+      "relative_error": 4.3298697960381105e-15,
+      "criterion": 4.092743193041538e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.2342532896571074e-09,
+      "value": 20.035290278949994,
+      "reference": 20.035290278950082,
+      "absolute_error": 8.881784197001252e-14,
+      "relative_error": 4.440892098500626e-15,
+      "criterion": 4.007058055790016e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 3.429219759415544e-09,
+      "value": 19.606864592692396,
+      "reference": 19.606864592692478,
+      "absolute_error": 8.171241461241152e-14,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 3.921372918538495e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 5.263301261680496e-09,
+      "value": 19.178438906434792,
+      "reference": 19.178438906434874,
+      "absolute_error": 8.171241461241152e-14,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 3.835687781286975e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 8.07832163428593e-09,
+      "value": 18.750013220177188,
+      "reference": 18.75001322017727,
+      "absolute_error": 8.171241461241152e-14,
+      "relative_error": 4.3298697960381105e-15,
+      "criterion": 3.750002644035454e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.2398925537873498e-08,
+      "value": 18.32158753391959,
+      "reference": 18.321587533919665,
+      "absolute_error": 7.460698725481052e-14,
+      "relative_error": 4.107825191113079e-15,
+      "criterion": 3.6643175067839332e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.9030358217139858e-08,
+      "value": 17.893161847661993,
+      "reference": 17.89316184766206,
+      "absolute_error": 6.750155989720952e-14,
+      "relative_error": 3.774758283725532e-15,
+      "criterion": 3.5786323695324123e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.9208541721331646e-08,
+      "value": 17.46473616140439,
+      "reference": 17.46473616140446,
+      "absolute_error": 7.105427357601002e-14,
+      "relative_error": 4.107825191113079e-15,
+      "criterion": 3.492947232280892e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.483041778574533e-08,
+      "value": 17.03631047514679,
+      "reference": 17.036310475146863,
+      "absolute_error": 7.105427357601002e-14,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 3.4072620950293728e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 6.880748713917115e-08,
+      "value": 16.607884788889205,
+      "reference": 16.60788478888927,
+      "absolute_error": 6.394884621840902e-14,
+      "relative_error": 3.885780586188048e-15,
+      "criterion": 3.321576957777854e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.0560843552773241e-07,
+      "value": 16.179459102631625,
+      "reference": 16.17945910263169,
+      "absolute_error": 6.394884621840902e-14,
+      "relative_error": 3.9968028886505635e-15,
+      "criterion": 3.235891820526338e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.62091977462521e-07,
+      "value": 15.751033416374092,
+      "reference": 15.751033416374149,
+      "absolute_error": 5.684341886080802e-14,
+      "relative_error": 3.6637359812630166e-15,
+      "criterion": 3.15020668327483e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.4878513753582694e-07,
+      "value": 15.322607730116633,
+      "reference": 15.322607730116687,
+      "absolute_error": 5.3290705182007514e-14,
+      "relative_error": 3.4416913763379853e-15,
+      "criterion": 3.0645215460233376e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 3.8184520682420183e-07,
+      "value": 14.894182043859349,
+      "reference": 14.894182043859411,
+      "absolute_error": 6.217248937900877e-14,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 2.9788364087718824e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 5.860710306845426e-07,
+      "value": 14.465756357602503,
+      "reference": 14.465756357602556,
+      "absolute_error": 5.3290705182007514e-14,
+      "relative_error": 3.6637359812630166e-15,
+      "criterion": 2.8931512715205116e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 8.995248516129127e-07,
+      "value": 14.037330671346615,
+      "reference": 14.037330671346664,
+      "absolute_error": 4.973799150320701e-14,
+      "relative_error": 3.552713678800501e-15,
+      "criterion": 2.807466134269333e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.3806260953115786e-06,
+      "value": 13.608904985092929,
+      "reference": 13.60890498509298,
+      "absolute_error": 5.1514348342607263e-14,
+      "relative_error": 3.774758283725532e-15,
+      "criterion": 2.7217809970185962e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.119039192344126e-06,
+      "value": 13.180479298844283,
+      "reference": 13.18047929884433,
+      "absolute_error": 4.796163466380676e-14,
+      "relative_error": 3.6637359812630166e-15,
+      "criterion": 2.636095859768866e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 3.252384634724048e-06,
+      "value": 12.752053612607135,
+      "reference": 12.752053612607178,
+      "absolute_error": 4.263256414560601e-14,
+      "relative_error": 3.3306690738754696e-15,
+      "criterion": 2.5504107225214355e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.991887762343595e-06,
+      "value": 12.323627926396163,
+      "reference": 12.323627926396208,
+      "absolute_error": 4.440892098500626e-14,
+      "relative_error": 3.552713678800501e-15,
+      "criterion": 2.464725585279242e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 7.661745528431333e-06,
+      "value": 11.895202240244803,
+      "reference": 11.895202240244846,
+      "absolute_error": 4.263256414560601e-14,
+      "relative_error": 3.552713678800501e-15,
+      "criterion": 2.379040448048969e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.1759548158366002e-05,
+      "value": 11.466776554228959,
+      "reference": 11.466776554228996,
+      "absolute_error": 3.730349362740526e-14,
+      "relative_error": 3.219646771412954e-15,
+      "criterion": 2.2933553108457992e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.804901668631148e-05,
+      "value": 11.03835086852078,
+      "reference": 11.038350868520817,
+      "absolute_error": 3.730349362740526e-14,
+      "relative_error": 3.3306690738754696e-15,
+      "criterion": 2.2076701737041634e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.770234017120738e-05,
+      "value": 10.609925183510176,
+      "reference": 10.60992518351021,
+      "absolute_error": 3.375077994860476e-14,
+      "relative_error": 3.219646771412954e-15,
+      "criterion": 2.121985036702042e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.2518640449997894e-05,
+      "value": 10.18149950007873,
+      "reference": 10.18149950007876,
+      "absolute_error": 3.019806626980426e-14,
+      "relative_error": 2.9976021664879227e-15,
+      "criterion": 2.036299900015752e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 6.52592804269721e-05,
+      "value": 9.753073820216276,
+      "reference": 9.753073820216306,
+      "absolute_error": 3.019806626980426e-14,
+      "relative_error": 3.1086244689504383e-15,
+      "criterion": 1.950614764043261e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0001001625084145038,
+      "value": 9.324648148405531,
+      "reference": 9.324648148405558,
+      "absolute_error": 2.6645352591003757e-14,
+      "relative_error": 2.886579864025407e-15,
+      "criterion": 1.864929629681112e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.00015373335449373162,
+      "value": 8.89622249472404,
+      "reference": 8.896222494724066,
+      "absolute_error": 2.6645352591003757e-14,
+      "relative_error": 2.9976021664879227e-15,
+      "criterion": 1.7792444989448132e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.00023595599449337666,
+      "value": 8.46779688177519,
+      "reference": 8.467796881775211,
+      "absolute_error": 2.1316282072803006e-14,
+      "relative_error": 2.55351295663786e-15,
+      "criterion": 1.6935593763550423e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0003621545338726625,
+      "value": 8.039371360128873,
+      "reference": 8.039371360128893,
+      "absolute_error": 1.9539925233402755e-14,
+      "relative_error": 2.4424906541753444e-15,
+      "criterion": 1.6078742720257787e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0005558490119572172,
+      "value": 7.610946042606464,
+      "reference": 7.610946042606482,
+      "absolute_error": 1.7763568394002505e-14,
+      "relative_error": 2.3314683517128287e-15,
+      "criterion": 1.5221892085212965e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0008531389094867715,
+      "value": 7.182521180125566,
+      "reference": 7.1825211801255815,
+      "absolute_error": 1.509903313490213e-14,
+      "relative_error": 2.1094237467877974e-15,
+      "criterion": 1.4365042360251163e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0013094311282796681,
+      "value": 6.754097328776265,
+      "reference": 6.754097328776279,
+      "absolute_error": 1.4210854715202004e-14,
+      "relative_error": 2.1094237467877974e-15,
+      "criterion": 1.350819465755256e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0020097663588444716,
+      "value": 6.325675716096839,
+      "reference": 6.325675716096849,
+      "absolute_error": 9.769962616701378e-15,
+      "relative_error": 1.5543122344752192e-15,
+      "criterion": 1.2651351432193699e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.0030846683952363355,
+      "value": 5.89725903958435,
+      "reference": 5.897259039584358,
+      "absolute_error": 7.993605777301127e-15,
+      "relative_error": 1.3322676295501878e-15,
+      "criterion": 1.1794518079168717e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.004734470286407204,
+      "value": 5.468853196217025,
+      "reference": 5.46885319621703,
+      "absolute_error": 5.329070518200751e-15,
+      "relative_error": 9.992007221626409e-16,
+      "criterion": 1.093770639243406e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.007266651069362433,
+      "value": 5.040470999752742,
+      "reference": 5.040470999752746,
+      "absolute_error": 4.440892098500626e-15,
+      "relative_error": 8.881784197001252e-16,
+      "criterion": 1.0080941999505494e-09,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.011153141654615211,
+      "value": 4.612140096857433,
+      "reference": 4.612140096857435,
+      "absolute_error": 1.7763568394002505e-15,
+      "relative_error": 3.3306690738754696e-16,
+      "criterion": 9.22428019371487e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.01711828015141334,
+      "value": 4.1839196353650365,
+      "reference": 4.183919635365037,
+      "absolute_error": 8.881784197001252e-16,
+      "relative_error": 2.220446049250313e-16,
+      "criterion": 8.367839270730076e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.02627380915771042,
+      "value": 3.7559348696345634,
+      "reference": 3.7559348696345607,
+      "absolute_error": 2.6645352591003757e-15,
+      "relative_error": 6.661338147750939e-16,
+      "criterion": 7.511869739269122e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.04032607490646737,
+      "value": 3.3284477212591796,
+      "reference": 3.328447721259176,
+      "absolute_error": 3.552713678800501e-15,
+      "relative_error": 1.1102230246251565e-15,
+      "criterion": 6.656895442518352e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.061894044658720324,
+      "value": 2.901997274534087,
+      "reference": 2.9019972745340814,
+      "absolute_error": 5.773159728050814e-15,
+      "relative_error": 1.9984014443252818e-15,
+      "criterion": 5.803994549068163e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.09499741229715535,
+      "value": 2.477670589047808,
+      "reference": 2.477670589047801,
+      "absolute_error": 7.105427357601002e-15,
+      "relative_error": 2.886579864025407e-15,
+      "criterion": 4.955341178095602e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.1458057619746175,
+      "value": 2.057601066248575,
+      "reference": 2.057601066248568,
+      "absolute_error": 7.105427357601002e-15,
+      "relative_error": 3.552713678800501e-15,
+      "criterion": 4.115202132497136e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.2237884139254128,
+      "value": 1.6458233556154347,
+      "reference": 1.645823355615427,
+      "absolute_error": 7.771561172376096e-15,
+      "relative_error": 4.6629367034256575e-15,
+      "criterion": 3.291646711230854e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.3434792530076421,
+      "value": 1.2495785865292812,
+      "reference": 1.2495785865292734,
+      "absolute_error": 7.771561172376096e-15,
+      "relative_error": 6.217248937900877e-15,
+      "criterion": 2.499157173058547e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.527185456911141,
+      "value": 0.8808997798840101,
+      "reference": 0.8808997798840034,
+      "absolute_error": 6.772360450213455e-15,
+      "relative_error": 7.771561172376096e-15,
+      "criterion": 1.761799559768007e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 0.8091449586692325,
+      "value": 0.5575342935636797,
+      "reference": 0.5575342935636743,
+      "absolute_error": 5.329070518200751e-15,
+      "relative_error": 9.547918011776346e-15,
+      "criterion": 1.1150685871273487e-10,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.2419074835180604,
+      "value": 0.3008776660246285,
+      "reference": 0.3008776660246251,
+      "absolute_error": 3.3861802251067274e-15,
+      "relative_error": 1.1324274851176597e-14,
+      "criterion": 6.017553320492503e-11,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 1.9061284150552964,
+      "value": 0.12787150107581097,
+      "reference": 0.12787150107580933,
+      "absolute_error": 1.6375789613221059e-15,
+      "relative_error": 1.2878587085651816e-14,
+      "criterion": 2.5574300215161868e-11,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 2.925600805938266,
+      "value": 0.03786457269493876,
+      "reference": 0.03786457269493815,
+      "absolute_error": 6.106226635438361e-16,
+      "relative_error": 1.6209256159527285e-14,
+      "criterion": 7.57291453898763e-12,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 4.490327098690447,
+      "value": 0.006468697334455854,
+      "reference": 0.006468697334455737,
+      "absolute_error": 1.1709383462843448e-16,
+      "relative_error": 1.8207657603852567e-14,
+      "criterion": 1.2937394668911474e-12,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 6.891930509558092,
+      "value": 0.0004768541290245196,
+      "reference": 0.0004768541290245095,
+      "absolute_error": 1.0083080204115191e-17,
+      "relative_error": 2.1094237467877974e-14,
+      "criterion": 9.53708258049019e-14,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 10.578005812189078,
+      "value": 9.704610220278952e-06,
+      "reference": 9.704610220278739e-06,
+      "absolute_error": 2.1345230270808369e-19,
+      "relative_error": 2.19824158875781e-14,
+      "criterion": 1.9409220440557477e-15,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 16.235539056513353,
+      "value": 2.7452050532904204e-08,
+      "reference": 2.745205053290359e-08,
+      "absolute_error": 6.121136532892405e-22,
+      "relative_error": 2.220446049250313e-14,
+      "criterion": 5.490410106580718e-18,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 24.91894343183575,
+      "value": 3.762694462522407e-12,
+      "reference": 3.7626944625223025e-12,
+      "absolute_error": 1.0420537013607478e-25,
+      "relative_error": 2.7755575615628914e-14,
+      "criterion": 7.525388925044606e-22,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 38.24657374156706,
+      "value": 4.955487931935843e-18,
+      "reference": 4.955487931935752e-18,
+      "absolute_error": 9.090389337507753e-32,
+      "relative_error": 1.84297022087776e-14,
+      "criterion": 9.910975863871505e-28,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 58.70234454243754,
+      "value": 5.232519616033582e-27,
+      "reference": 5.2325196160333835e-27,
+      "absolute_error": 1.9873775340440286e-40,
+      "relative_error": 3.7969627442180354e-14,
+      "criterion": 1.0465039232066767e-36,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 90.09866551873364,
+      "value": 9.78922424315208e-41,
+      "reference": 9.789224243151632e-41,
+      "absolute_error": 4.4861468217489856e-54,
+      "relative_error": 4.574118861455645e-14,
+      "criterion": 1.9578448486303264e-50,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 138.28697288892923,
+      "value": 9.332734288296279e-62,
+      "reference": 9.332734288295668e-62,
+      "absolute_error": 6.114407337006867e-75,
+      "relative_error": 6.550315845288424e-14,
+      "criterion": 1.8665468576591334e-71,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 212.24828093383186,
+      "value": 5.7032902490998e-94,
+      "reference": 5.703290249099403e-94,
+      "absolute_error": 3.9705475508076005e-107,
+      "relative_error": 6.972200594645983e-14,
+      "criterion": 1.1406580498198805e-103,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 325.7670033427503,
+      "value": 2.304772514054576e-143,
+      "reference": 2.3047725140542433e-143,
+      "absolute_error": 3.3276654507491157e-156,
+      "relative_error": 1.4432899320127035e-13,
+      "criterion": 4.609545028108487e-153,
+      "passed": true
+    },
+    {
+      "order": 0.0,
+      "x": 500.0,
+      "value": 3.992321609118486e-219,
+      "reference": 3.9923216091177934e-219,
+      "absolute_error": 6.92549296418598e-232,
+      "relative_error": 1.7341683644644945e-13,
+      "criterion": 7.984643218235587e-229,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1e-12,
+      "value": 107476412.07672246,
+      "reference": 107476412.0767239,
+      "absolute_error": 1.4454126358032227e-06,
+      "relative_error": 1.3433698597964394e-14,
+      "criterion": 0.02149528241534478,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.5348393019225807e-12,
+      "value": 80773930.95533362,
+      "reference": 80773930.95533459,
+      "absolute_error": 9.685754776000977e-07,
+      "relative_error": 1.199040866595169e-14,
+      "criterion": 0.01615478619106692,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.3557316827262044e-12,
+      "value": 60705672.95565729,
+      "reference": 60705672.95565803,
+      "absolute_error": 7.450580596923828e-07,
+      "relative_error": 1.2323475573339238e-14,
+      "criterion": 0.012141134591131607,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 3.615669571432394e-12,
+      "value": 45623367.40844094,
+      "reference": 45623367.4084416,
+      "absolute_error": 6.631016731262207e-07,
+      "relative_error": 1.454392162258955e-14,
+      "criterion": 0.009124673481688321,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 5.549471761000035e-12,
+      "value": 34288255.97907509,
+      "reference": 34288255.979075536,
+      "absolute_error": 4.470348358154297e-07,
+      "relative_error": 1.2989609388114332e-14,
+      "criterion": 0.006857651195815107,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 8.517547363692369e-12,
+      "value": 25769349.455539305,
+      "reference": 25769349.455539647,
+      "absolute_error": 3.427267074584961e-07,
+      "relative_error": 1.3322676295501878e-14,
+      "criterion": 0.00515386989110793,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.3073066449782113e-11,
+      "value": 19366962.605708428,
+      "reference": 19366962.605708655,
+      "absolute_error": 2.2724270820617676e-07,
+      "relative_error": 1.176836406102666e-14,
+      "criterion": 0.003873392521141731,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.0065056183771173e-11,
+      "value": 14555246.775555676,
+      "reference": 14555246.775555879,
+      "absolute_error": 2.0302832126617432e-07,
+      "relative_error": 1.3988810110276972e-14,
+      "criterion": 0.002911049355111176,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 3.079663682613671e-11,
+      "value": 10939000.2454427,
+      "reference": 10939000.24544285,
+      "absolute_error": 1.5087425708770752e-07,
+      "relative_error": 1.3766765505351941e-14,
+      "criterion": 0.00218780004908857,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.7267888567790903e-11,
+      "value": 8221209.039942707,
+      "reference": 8221209.039942815,
+      "absolute_error": 1.0803341865539551e-07,
+      "relative_error": 1.3100631690576847e-14,
+      "criterion": 0.001644241807988563,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 7.254861309274282e-11,
+      "value": 6178652.213358605,
+      "reference": 6178652.213358688,
+      "absolute_error": 8.288770914077759e-08,
+      "relative_error": 1.3433698597964394e-14,
+      "criterion": 0.0012357304426717376,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.1135046267471679e-10,
+      "value": 4643567.994459729,
+      "reference": 4643567.994459786,
+      "absolute_error": 5.774199962615967e-08,
+      "relative_error": 1.2434497875801753e-14,
+      "criterion": 0.0009287135988919574,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.709050664004187e-10,
+      "value": 3489874.9718507193,
+      "reference": 3489874.9718507645,
+      "absolute_error": 4.516914486885071e-08,
+      "relative_error": 1.2989609388114332e-14,
+      "criterion": 0.0006979749943701529,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.6231181280905205e-10,
+      "value": 2622816.6215463374,
+      "reference": 2622816.6215463732,
+      "absolute_error": 3.585591912269592e-08,
+      "relative_error": 1.3655743202889425e-14,
+      "criterion": 0.0005245633243092747,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.026064796578921e-10,
+      "value": 1971178.6484463147,
+      "reference": 1971178.6484463396,
+      "absolute_error": 2.491287887096405e-08,
+      "relative_error": 1.2656542480726785e-14,
+      "criterion": 0.00039423572968926793,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 6.179362481876293e-10,
+      "value": 1481439.926897886,
+      "reference": 1481439.9268979044,
+      "absolute_error": 1.83936208486557e-08,
+      "relative_error": 1.2434497875801753e-14,
+      "criterion": 0.0002962879853795809,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 9.484328398009595e-10,
+      "value": 1113376.6382547845,
+      "reference": 1113376.6382547973,
+      "absolute_error": 1.280568540096283e-08,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 0.00022267532765095948,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.4556919977605557e-09,
+      "value": 836758.559091077,
+      "reference": 836758.5590910874,
+      "absolute_error": 1.0477378964424133e-08,
+      "relative_error": 1.2545520178264269e-14,
+      "criterion": 0.0001673517118182175,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.2342532896571074e-09,
+      "value": 628866.1555798629,
+      "reference": 628866.155579871,
+      "absolute_error": 8.149072527885437e-09,
+      "relative_error": 1.2989609388114332e-14,
+      "criterion": 0.0001257732311159742,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 3.429219759415544e-09,
+      "value": 472624.55500057456,
+      "reference": 472624.55500058015,
+      "absolute_error": 5.587935447692871e-09,
+      "relative_error": 1.176836406102666e-14,
+      "criterion": 9.452491100011603e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 5.263301261680496e-09,
+      "value": 355201.13144436246,
+      "reference": 355201.13144436706,
+      "absolute_error": 4.598405212163925e-09,
+      "relative_error": 1.2989609388114332e-14,
+      "criterion": 7.104022628887342e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 8.07832163428593e-09,
+      "value": 266951.5209144104,
+      "reference": 266951.52091441373,
+      "absolute_error": 3.3178366720676422e-09,
+      "relative_error": 1.2434497875801753e-14,
+      "criterion": 5.339030418288275e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.2398925537873498e-08,
+      "value": 200627.49864641993,
+      "reference": 200627.4986464227,
+      "absolute_error": 2.764863893389702e-09,
+      "relative_error": 1.3766765505351941e-14,
+      "criterion": 4.0125499729284544e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.9030358217139858e-08,
+      "value": 150781.65906224036,
+      "reference": 150781.6590622423,
+      "absolute_error": 1.949956640601158e-09,
+      "relative_error": 1.2878587085651816e-14,
+      "criterion": 3.0156331812448463e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.9208541721331646e-08,
+      "value": 113320.00280366988,
+      "reference": 113320.00280367129,
+      "absolute_error": 1.4115357771515846e-09,
+      "relative_error": 1.2434497875801753e-14,
+      "criterion": 2.2664000560734258e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.483041778574533e-08,
+      "value": 85165.68337842017,
+      "reference": 85165.6833784212,
+      "absolute_error": 1.0331859812140465e-09,
+      "relative_error": 1.2101430968414206e-14,
+      "criterion": 1.7033136675684243e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 6.880748713917115e-08,
+      "value": 64006.29584720001,
+      "reference": 64006.29584720074,
+      "absolute_error": 7.275957614183426e-10,
+      "relative_error": 1.1324274851176597e-14,
+      "criterion": 1.2801259169440147e-05,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.0560843552773241e-07,
+      "value": 48103.9515578088,
+      "reference": 48103.951557809436,
+      "absolute_error": 6.330083124339581e-10,
+      "relative_error": 1.3211653993039363e-14,
+      "criterion": 9.620790311561888e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.62091977462521e-07,
+      "value": 36152.53975240254,
+      "reference": 36152.53975240298,
+      "absolute_error": 4.43833414465189e-10,
+      "relative_error": 1.2323475573339238e-14,
+      "criterion": 7.230507950480597e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.4878513753582694e-07,
+      "value": 27170.452483976846,
+      "reference": 27170.452483977195,
+      "absolute_error": 3.4924596548080444e-10,
+      "relative_error": 1.2878587085651816e-14,
+      "criterion": 5.434090496795439e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 3.8184520682420183e-07,
+      "value": 20419.961993926456,
+      "reference": 20419.961993926718,
+      "absolute_error": 2.6193447411060333e-10,
+      "relative_error": 1.2878587085651816e-14,
+      "criterion": 4.0839923987853435e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 5.860710306845426e-07,
+      "value": 15346.628755013979,
+      "reference": 15346.628755014155,
+      "absolute_error": 1.7644197214394808e-10,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 3.069325751002831e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 8.995248516129127e-07,
+      "value": 11533.763567151776,
+      "reference": 11533.763567151906,
+      "absolute_error": 1.291482476517558e-10,
+      "relative_error": 1.1213252548714081e-14,
+      "criterion": 2.3067527134303812e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.3806260953115786e-06,
+      "value": 8668.203531245397,
+      "reference": 8668.203531245492,
+      "absolute_error": 9.458744898438454e-11,
+      "relative_error": 1.0880185641326534e-14,
+      "criterion": 1.7336407062490985e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.119039192344126e-06,
+      "value": 6514.590971595375,
+      "reference": 6514.590971595456,
+      "absolute_error": 8.094502845779061e-11,
+      "relative_error": 1.2434497875801753e-14,
+      "criterion": 1.3029181943190913e-06,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 3.252384634724048e-06,
+      "value": 4896.042751906838,
+      "reference": 4896.042751906898,
+      "absolute_error": 6.002665031701326e-11,
+      "relative_error": 1.2212453270876722e-14,
+      "criterion": 9.792085503813797e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.991887762343595e-06,
+      "value": 3679.6222935668334,
+      "reference": 3679.622293566876,
+      "absolute_error": 4.274625098332763e-11,
+      "relative_error": 1.1657341758564144e-14,
+      "criterion": 7.359244587133753e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 7.661745528431333e-06,
+      "value": 2765.421066256412,
+      "reference": 2765.4210662564424,
+      "absolute_error": 3.0468072509393096e-11,
+      "relative_error": 1.099120794378905e-14,
+      "criterion": 5.530842132512885e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.1759548158366002e-05,
+      "value": 2078.3527785532674,
+      "reference": 2078.3527785532883,
+      "absolute_error": 2.091837814077735e-11,
+      "relative_error": 1.0103029524088925e-14,
+      "criterion": 4.156705557106577e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.804901668631148e-05,
+      "value": 1561.9862989692067,
+      "reference": 1561.986298969226,
+      "absolute_error": 1.9326762412674725e-11,
+      "relative_error": 1.2323475573339238e-14,
+      "criterion": 3.1239725979384524e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.770234017120738e-05,
+      "value": 1173.910785364682,
+      "reference": 1173.910785364696,
+      "absolute_error": 1.4097167877480388e-11,
+      "relative_error": 1.199040866595169e-14,
+      "criterion": 2.3478215707293923e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.2518640449997894e-05,
+      "value": 882.2523458928599,
+      "reference": 882.2523458928697,
+      "absolute_error": 9.777068044058979e-12,
+      "relative_error": 1.1102230246251565e-14,
+      "criterion": 1.7645046917857395e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 6.52592804269721e-05,
+      "value": 663.0561336215982,
+      "reference": 663.0561336216052,
+      "absolute_error": 7.048583938740194e-12,
+      "relative_error": 1.0658141036401503e-14,
+      "criterion": 1.3261122672432106e-07,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0001001625084145038,
+      "value": 498.3188578406683,
+      "reference": 498.31885784067373,
+      "absolute_error": 5.4569682106375694e-12,
+      "relative_error": 1.099120794378905e-14,
+      "criterion": 9.966377156813475e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.00015373335449373162,
+      "value": 374.5101158854514,
+      "reference": 374.5101158854561,
+      "absolute_error": 4.718003765447065e-12,
+      "relative_error": 1.2545520178264269e-14,
+      "criterion": 7.490202317709123e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.00023595599449337666,
+      "value": 281.46109772323376,
+      "reference": 281.4610977232372,
+      "absolute_error": 3.410605131648481e-12,
+      "relative_error": 1.2101430968414206e-14,
+      "criterion": 5.629221954464744e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0003621545338726625,
+      "value": 211.5293890767153,
+      "reference": 211.5293890767177,
+      "absolute_error": 2.4158453015843406e-12,
+      "relative_error": 1.1435297153639112e-14,
+      "criterion": 4.2305877815343544e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0005558490119572172,
+      "value": 158.9712757572827,
+      "reference": 158.97127575728464,
+      "absolute_error": 1.9326762412674725e-12,
+      "relative_error": 1.2212453270876722e-14,
+      "criterion": 3.179425515145693e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0008531389094867715,
+      "value": 119.46999468661149,
+      "reference": 119.46999468661286,
+      "absolute_error": 1.3784529073745944e-12,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 2.3893998937322575e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0013094311282796681,
+      "value": 89.78118560091009,
+      "reference": 89.78118560091112,
+      "absolute_error": 1.0231815394945443e-12,
+      "relative_error": 1.1435297153639112e-14,
+      "criterion": 1.7956237120182224e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0020097663588444716,
+      "value": 67.46642369973172,
+      "reference": 67.46642369973247,
+      "absolute_error": 7.531752999057062e-13,
+      "relative_error": 1.1213252548714081e-14,
+      "criterion": 1.3493284739946496e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.0030846683952363355,
+      "value": 50.69294822278123,
+      "reference": 50.69294822278176,
+      "absolute_error": 5.258016244624741e-13,
+      "relative_error": 1.0325074129013956e-14,
+      "criterion": 1.0138589644556352e-08,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.004734470286407204,
+      "value": 38.08313944013592,
+      "reference": 38.08313944013632,
+      "absolute_error": 3.979039320256561e-13,
+      "relative_error": 1.0436096431476471e-14,
+      "criterion": 7.616627888027264e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.007266651069362433,
+      "value": 28.60138362465558,
+      "reference": 28.601383624655856,
+      "absolute_error": 2.7711166694643907e-13,
+      "relative_error": 9.658940314238862e-15,
+      "criterion": 5.720276724931171e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.011153141654615211,
+      "value": 21.46903827238775,
+      "reference": 21.46903827238795,
+      "absolute_error": 2.0250467969162855e-13,
+      "relative_error": 9.43689570931383e-15,
+      "criterion": 4.293807654477591e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.01711828015141334,
+      "value": 16.100521103310026,
+      "reference": 16.100521103310165,
+      "absolute_error": 1.3855583347321954e-13,
+      "relative_error": 8.659739592076221e-15,
+      "criterion": 3.220104220662033e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.02627380915771042,
+      "value": 12.055286991314311,
+      "reference": 12.055286991314418,
+      "absolute_error": 1.0658141036401503e-13,
+      "relative_error": 8.881784197001252e-15,
+      "criterion": 2.4110573982628836e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.04032607490646737,
+      "value": 9.001771322018453,
+      "reference": 9.001771322018516,
+      "absolute_error": 6.394884621840902e-14,
+      "relative_error": 7.105427357601002e-15,
+      "criterion": 1.8003542644037035e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.061894044658720324,
+      "value": 6.690376075527303,
+      "reference": 6.690376075527347,
+      "absolute_error": 4.3520742565306136e-14,
+      "relative_error": 6.5503158452884236e-15,
+      "criterion": 1.3380752151054693e-09,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.09499741229715535,
+      "value": 4.933339149509774,
+      "reference": 4.933339149509798,
+      "absolute_error": 2.398081733190338e-14,
+      "relative_error": 4.884981308350689e-15,
+      "criterion": 9.866678299019596e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.1458057619746175,
+      "value": 3.589917053335436,
+      "reference": 3.5899170533354487,
+      "absolute_error": 1.2878587085651816e-14,
+      "relative_error": 3.552713678800501e-15,
+      "criterion": 7.179834106670898e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.2237884139254128,
+      "value": 2.5557542230489148,
+      "reference": 2.555754223048921,
+      "absolute_error": 6.217248937900877e-15,
+      "relative_error": 2.4424906541753444e-15,
+      "criterion": 5.111508446097842e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.3434792530076421,
+      "value": 1.755581228249367,
+      "reference": 1.7555812282493675,
+      "absolute_error": 4.440892098500626e-16,
+      "relative_error": 2.220446049250313e-16,
+      "criterion": 3.511162456498735e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.527185456911141,
+      "value": 1.1383504234114052,
+      "reference": 1.138350423411404,
+      "absolute_error": 1.3322676295501878e-15,
+      "relative_error": 1.1102230246251565e-15,
+      "criterion": 2.276700846822808e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 0.8091449586692325,
+      "value": 0.6733432439491458,
+      "reference": 0.6733432439491452,
+      "absolute_error": 5.551115123125783e-16,
+      "relative_error": 8.881784197001252e-16,
+      "criterion": 1.3466864878982905e-10,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.2419074835180604,
+      "value": 0.3446189562990356,
+      "reference": 0.34461895629903705,
+      "absolute_error": 1.4432899320127035e-15,
+      "relative_error": 4.218847493575595e-15,
+      "criterion": 6.892379125980742e-11,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 1.9061284150552964,
+      "value": 0.14069370769481196,
+      "reference": 0.14069370769481773,
+      "absolute_error": 5.773159728050814e-15,
+      "relative_error": 4.107825191113079e-14,
+      "criterion": 2.8138741538963548e-11,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 2.925600805938266,
+      "value": 0.040449170642190634,
+      "reference": 0.04044917064219004,
+      "absolute_error": 5.967448757360216e-16,
+      "relative_error": 1.4654943925052066e-14,
+      "criterion": 8.089834128438008e-12,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 4.490327098690447,
+      "value": 0.006765913448512584,
+      "reference": 0.00676591344851247,
+      "absolute_error": 1.1362438767648086e-16,
+      "relative_error": 1.687538997430238e-14,
+      "criterion": 1.353182689702494e-12,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 6.891930509558092,
+      "value": 0.0004914690055500271,
+      "reference": 0.0004914690055500168,
+      "absolute_error": 1.0299920638612292e-17,
+      "relative_error": 2.0872192862952943e-14,
+      "criterion": 9.829380111000338e-14,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 10.578005812189078,
+      "value": 9.901629002375278e-06,
+      "reference": 9.901629002375066e-06,
+      "absolute_error": 2.1175823681357508e-19,
+      "relative_error": 2.1316282072803006e-14,
+      "criterion": 1.9803258004750133e-15,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 16.235539056513353,
+      "value": 2.7819320414088512e-08,
+      "reference": 2.7819320414087907e-08,
+      "absolute_error": 6.054962083888163e-22,
+      "relative_error": 2.1760371282653068e-14,
+      "criterion": 5.5638640828175814e-18,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 24.91894343183575,
+      "value": 3.79574620144451e-12,
+      "reference": 3.795746201444404e-12,
+      "absolute_error": 1.0662875083691372e-25,
+      "relative_error": 2.8199664825478976e-14,
+      "criterion": 7.591492402888808e-22,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 38.24657374156706,
+      "value": 4.983995399892682e-18,
+      "reference": 4.98399539989257e-18,
+      "absolute_error": 1.1170393677445968e-31,
+      "relative_error": 2.2426505097428162e-14,
+      "criterion": 9.967990799785141e-28,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 58.70234454243754,
+      "value": 5.252198745166317e-27,
+      "reference": 5.252198745166166e-27,
+      "absolute_error": 1.5066761088420433e-40,
+      "relative_error": 2.864375403532904e-14,
+      "criterion": 1.0504397490332333e-36,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 90.09866551873364,
+      "value": 9.813265658791754e-41,
+      "reference": 9.813265658791177e-41,
+      "absolute_error": 5.770816138886195e-54,
+      "relative_error": 5.88418203051333e-14,
+      "criterion": 1.9626531317582353e-50,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 138.28697288892923,
+      "value": 9.347689794790534e-62,
+      "reference": 9.347689794789826e-62,
+      "absolute_error": 7.081658215177445e-75,
+      "relative_error": 7.571721027943568e-14,
+      "criterion": 1.8695379589579654e-71,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 212.24828093383186,
+      "value": 5.709250659592183e-94,
+      "reference": 5.709250659591816e-94,
+      "absolute_error": 3.67249036200703e-107,
+      "relative_error": 6.439293542825908e-14,
+      "criterion": 1.1418501319183632e-103,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 325.7670033427503,
+      "value": 2.30634284555539e-143,
+      "reference": 2.3063428455550808e-143,
+      "absolute_error": 3.090950534963953e-156,
+      "relative_error": 1.341149413747189e-13,
+      "criterion": 4.612685691110162e-153,
+      "passed": true
+    },
+    {
+      "order": 0.6666666666666666,
+      "x": 500.0,
+      "value": 3.994094597058944e-219,
+      "reference": 3.9940945970580194e-219,
+      "absolute_error": 9.24657098760526e-232,
+      "relative_error": 2.3159252293680765e-13,
+      "criterion": 7.98818919411604e-229,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1e-12,
+      "value": 1.4330188276896316e+20,
+      "reference": 1.433018827689656e+20,
+      "absolute_error": 2441216.0,
+      "relative_error": 1.6986412276764895e-14,
+      "criterion": 28660376553.79312,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.5348393019225807e-12,
+      "value": 7.016928382808889e+19,
+      "reference": 7.016928382809002e+19,
+      "absolute_error": 1130496.0,
+      "relative_error": 1.609823385706477e-14,
+      "criterion": 14033856765.618004,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.3557316827262044e-12,
+      "value": 3.4359132607385694e+19,
+      "reference": 3.435913260738632e+19,
+      "absolute_error": 626688.0,
+      "relative_error": 1.8207657603852567e-14,
+      "criterion": 6871826521.477264,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 3.615669571432394e-12,
+      "value": 1.6824312991767278e+19,
+      "reference": 1.6824312991767658e+19,
+      "absolute_error": 380928.0,
+      "relative_error": 2.2648549702353193e-14,
+      "criterion": 3364862598.353532,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 5.549471761000035e-12,
+      "value": 8.238202951145081e+18,
+      "reference": 8.238202951145206e+18,
+      "absolute_error": 124928.0,
+      "relative_error": 1.5210055437364645e-14,
+      "criterion": 1647640590.229041,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 8.517547363692369e-12,
+      "value": 4.0339232809961155e+18,
+      "reference": 4.0339232809961907e+18,
+      "absolute_error": 75264.0,
+      "relative_error": 1.865174681370263e-14,
+      "criterion": 806784656.1992382,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.3073066449782113e-11,
+      "value": 1.9752532358650757e+18,
+      "reference": 1.9752532358651087e+18,
+      "absolute_error": 33024.0,
+      "relative_error": 1.6764367671839864e-14,
+      "criterion": 395050647.17302173,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.0065056183771173e-11,
+      "value": 9.672036560972882e+17,
+      "reference": 9.672036560973053e+17,
+      "absolute_error": 17152.0,
+      "relative_error": 1.7763568394002505e-14,
+      "criterion": 193440731.21946108,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 3.079663682613671e-11,
+      "value": 4.7360150859758746e+17,
+      "reference": 4.736015085975976e+17,
+      "absolute_error": 10112.0,
+      "relative_error": 2.1316282072803006e-14,
+      "criterion": 94720301.71951951,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.7267888567790903e-11,
+      "value": 2.3190399202063254e+17,
+      "reference": 2.319039920206369e+17,
+      "absolute_error": 4352.0,
+      "relative_error": 1.8762769116165146e-14,
+      "criterion": 46380798.40412738,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 7.254861309274282e-11,
+      "value": 1.1355424452585659e+17,
+      "reference": 1.1355424452585874e+17,
+      "absolute_error": 2144.0,
+      "relative_error": 1.887379141862766e-14,
+      "criterion": 22710848.90517175,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.1135046267471679e-10,
+      "value": 5.5603037867027896e+16,
+      "reference": 5.560303786702876e+16,
+      "absolute_error": 864.0,
+      "relative_error": 1.554312234475219e-14,
+      "criterion": 11120607.573405752,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.709050664004187e-10,
+      "value": 2.7226616080723772e+16,
+      "reference": 2.7226616080724216e+16,
+      "absolute_error": 444.0,
+      "relative_error": 1.63202784619898e-14,
+      "criterion": 5445323.216144843,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.6231181280905205e-10,
+      "value": 1.3331800772826076e+16,
+      "reference": 1.3331800772826328e+16,
+      "absolute_error": 252.0,
+      "relative_error": 1.887379141862766e-14,
+      "criterion": 2666360.154565266,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.026064796578921e-10,
+      "value": 6528057372952954.0,
+      "reference": 6528057372953060.0,
+      "absolute_error": 106.0,
+      "relative_error": 1.6209256159527285e-14,
+      "criterion": 1305611.474590612,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 6.179362481876293e-10,
+      "value": 3196532395790615.0,
+      "reference": 3196532395790670.0,
+      "absolute_error": 55.0,
+      "relative_error": 1.7208456881689926e-14,
+      "criterion": 639306.479158134,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 9.484328398009595e-10,
+      "value": 1565215924675152.8,
+      "reference": 1565215924675175.8,
+      "absolute_error": 23.0,
+      "relative_error": 1.4654943925052066e-14,
+      "criterion": 313043.1849350352,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.4556919977605557e-09,
+      "value": 766424546199768.0,
+      "reference": 766424546199781.0,
+      "absolute_error": 13.0,
+      "relative_error": 1.6986412276764895e-14,
+      "criterion": 153284.9092399562,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.2342532896571074e-09,
+      "value": 375287892077527.75,
+      "reference": 375287892077534.94,
+      "absolute_error": 7.1875,
+      "relative_error": 1.9206858326015208e-14,
+      "criterion": 75057.57841550699,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 3.429219759415544e-09,
+      "value": 183763688987181.66,
+      "reference": 183763688987184.53,
+      "absolute_error": 2.875,
+      "relative_error": 1.5654144647214707e-14,
+      "criterion": 36752.73779743691,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 5.263301261680496e-09,
+      "value": 89981835553599.88,
+      "reference": 89981835553601.27,
+      "absolute_error": 1.390625,
+      "relative_error": 1.5432100042289676e-14,
+      "criterion": 17996.367110720254,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 8.07832163428593e-09,
+      "value": 44060558286680.73,
+      "reference": 44060558286681.234,
+      "absolute_error": 0.5078125,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 8812.111657336247,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.2398925537873498e-08,
+      "value": 21574718770629.81,
+      "reference": 21574718770630.117,
+      "absolute_error": 0.30859375,
+      "relative_error": 1.432187701766452e-14,
+      "criterion": 4314.943754126024,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.9030358217139858e-08,
+      "value": 10564289426456.822,
+      "reference": 10564289426456.977,
+      "absolute_error": 0.154296875,
+      "relative_error": 1.4654943925052066e-14,
+      "criterion": 2112.857885291395,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.9208541721331646e-08,
+      "value": 5172916146553.774,
+      "reference": 5172916146553.834,
+      "absolute_error": 0.0595703125,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 1034.583229310767,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.483041778574533e-08,
+      "value": 2532973149359.4126,
+      "reference": 2532973149359.4395,
+      "absolute_error": 0.02685546875,
+      "relative_error": 1.0547118733938987e-14,
+      "criterion": 506.5946298718879,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 6.880748713917115e-08,
+      "value": 1240297115515.7969,
+      "reference": 1240297115515.809,
+      "absolute_error": 0.01220703125,
+      "relative_error": 9.880984919163893e-15,
+      "criterion": 248.05942310316183,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.0560843552773241e-07,
+      "value": 607324611848.2738,
+      "reference": 607324611848.2815,
+      "absolute_error": 0.0076904296875,
+      "relative_error": 1.2656542480726785e-14,
+      "criterion": 121.4649223696563,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.62091977462521e-07,
+      "value": 297382925060.8764,
+      "reference": 297382925060.8796,
+      "absolute_error": 0.003173828125,
+      "relative_error": 1.0658141036401503e-14,
+      "criterion": 59.47658501217592,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.4878513753582694e-07,
+      "value": 145616697219.99625,
+      "reference": 145616697219.9981,
+      "absolute_error": 0.001861572265625,
+      "relative_error": 1.27675647831893e-14,
+      "criterion": 29.123339443999622,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 3.8184520682420183e-07,
+      "value": 71302757227.63556,
+      "reference": 71302757227.63638,
+      "absolute_error": 0.000823974609375,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 14.260551445527277,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 5.860710306845426e-07,
+      "value": 34914149855.918785,
+      "reference": 34914149855.91914,
+      "absolute_error": 0.00035858154296875,
+      "relative_error": 1.0325074129013956e-14,
+      "criterion": 6.982829971183829,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 8.995248516129127e-07,
+      "value": 17096083062.675354,
+      "reference": 17096083062.675488,
+      "absolute_error": 0.000133514404296875,
+      "relative_error": 7.771561172376096e-15,
+      "criterion": 3.419216612535098,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.3806260953115786e-06,
+      "value": 8371278043.199376,
+      "reference": 8371278043.199432,
+      "absolute_error": 5.626678466796875e-05,
+      "relative_error": 6.772360450213455e-15,
+      "criterion": 1.6742556086398865,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.119039192344126e-06,
+      "value": 4099084908.4904943,
+      "reference": 4099084908.49054,
+      "absolute_error": 4.57763671875e-05,
+      "relative_error": 1.1213252548714081e-14,
+      "criterion": 0.819816981698108,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 3.252384634724048e-06,
+      "value": 2007160316.5352445,
+      "reference": 2007160316.535265,
+      "absolute_error": 2.0503997802734375e-05,
+      "relative_error": 1.021405182655144e-14,
+      "criterion": 0.401432063307053,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.991887762343595e-06,
+      "value": 982827295.8963816,
+      "reference": 982827295.8963908,
+      "absolute_error": 9.179115295410156e-06,
+      "relative_error": 9.325873406851315e-15,
+      "criterion": 0.19656545917927817,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 7.661745528431333e-06,
+      "value": 481251789.2040482,
+      "reference": 481251789.20405257,
+      "absolute_error": 4.351139068603516e-06,
+      "relative_error": 8.992806499463768e-15,
+      "criterion": 0.09625035784081051,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.1759548158366002e-05,
+      "value": 235650032.89503512,
+      "reference": 235650032.89503694,
+      "absolute_error": 1.817941665649414e-06,
+      "relative_error": 7.66053886991358e-15,
+      "criterion": 0.047130006579007386,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.804901668631148e-05,
+      "value": 115388533.08582537,
+      "reference": 115388533.08582652,
+      "absolute_error": 1.1473894119262695e-06,
+      "relative_error": 9.992007221626409e-15,
+      "criterion": 0.023077706617165305,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.770234017120738e-05,
+      "value": 56501216.66802492,
+      "reference": 56501216.668025434,
+      "absolute_error": 5.140900611877441e-07,
+      "relative_error": 9.103828801926284e-15,
+      "criterion": 0.011300243333605088,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.2518640449997894e-05,
+      "value": 27666418.827560704,
+      "reference": 27666418.82756095,
+      "absolute_error": 2.4586915969848633e-07,
+      "relative_error": 8.881784197001252e-15,
+      "criterion": 0.00553328376551219,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 6.52592804269721e-05,
+      "value": 13547154.830920786,
+      "reference": 13547154.830920897,
+      "absolute_error": 1.1175870895385742e-07,
+      "relative_error": 8.215650382226158e-15,
+      "criterion": 0.0027094309661841796,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0001001625084145038,
+      "value": 6633507.752779156,
+      "reference": 6633507.752779213,
+      "absolute_error": 5.681067705154419e-08,
+      "relative_error": 8.548717289613705e-15,
+      "criterion": 0.0013267015505558427,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.00015373335449373162,
+      "value": 3248167.273956297,
+      "reference": 3248167.2739563393,
+      "absolute_error": 4.237517714500427e-08,
+      "relative_error": 1.3100631690576847e-14,
+      "criterion": 0.0006496334547912678,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.00023595599449337666,
+      "value": 1590499.4702425587,
+      "reference": 1590499.4702425757,
+      "absolute_error": 1.6996636986732483e-08,
+      "relative_error": 1.0658141036401503e-14,
+      "criterion": 0.00031809989404851514,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0003621545338726625,
+      "value": 778804.8798835253,
+      "reference": 778804.8798835338,
+      "absolute_error": 8.498318493366241e-09,
+      "relative_error": 1.0880185641326534e-14,
+      "criterion": 0.00015576097597670677,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0005558490119572172,
+      "value": 381350.028091327,
+      "reference": 381350.02809133136,
+      "absolute_error": 4.3655745685100555e-09,
+      "relative_error": 1.1435297153639112e-14,
+      "criterion": 7.627000561826627e-05,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0008531389094867715,
+      "value": 186732.04872789935,
+      "reference": 186732.04872790133,
+      "absolute_error": 1.979060471057892e-09,
+      "relative_error": 1.0547118733938987e-14,
+      "criterion": 3.734640974558027e-05,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0013094311282796681,
+      "value": 91435.29049246524,
+      "reference": 91435.29049246626,
+      "absolute_error": 1.0186340659856796e-09,
+      "relative_error": 1.1102230246251565e-14,
+      "criterion": 1.8287058098493254e-05,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0020097663588444716,
+      "value": 44772.218863983355,
+      "reference": 44772.21886398381,
+      "absolute_error": 4.5838532969355583e-10,
+      "relative_error": 1.021405182655144e-14,
+      "criterion": 8.954443772796763e-06,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.0030846683952363355,
+      "value": 21923.145904779052,
+      "reference": 21923.14590477929,
+      "absolute_error": 2.3646862246096134e-10,
+      "relative_error": 1.0769163338864018e-14,
+      "criterion": 4.384629180955858e-06,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.004734470286407204,
+      "value": 10734.848568515637,
+      "reference": 10734.848568515758,
+      "absolute_error": 1.2005330063402653e-10,
+      "relative_error": 1.1213252548714081e-14,
+      "criterion": 2.1469697137031518e-06,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.007266651069362433,
+      "value": 5256.372410769491,
+      "reference": 5256.372410769552,
+      "absolute_error": 6.093614501878619e-11,
+      "relative_error": 1.1546319456101628e-14,
+      "criterion": 1.0512744821539103e-06,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.011153141654615211,
+      "value": 2573.7694510091,
+      "reference": 2573.7694510091274,
+      "absolute_error": 2.7284841053187847e-11,
+      "relative_error": 1.0547118733938987e-14,
+      "criterion": 5.147538902018255e-07,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.01711828015141334,
+      "value": 1260.1940674315297,
+      "reference": 1260.194067431543,
+      "absolute_error": 1.3415046851150692e-11,
+      "relative_error": 1.0658141036401503e-14,
+      "criterion": 2.520388134863086e-07,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.02627380915771042,
+      "value": 616.9760612341569,
+      "reference": 616.9760612341638,
+      "absolute_error": 6.934897101018578e-12,
+      "relative_error": 1.1213252548714081e-14,
+      "criterion": 1.2339521224683276e-07,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.04032607490646737,
+      "value": 302.004082616578,
+      "reference": 302.0040826165813,
+      "absolute_error": 3.296918293926865e-12,
+      "relative_error": 1.0880185641326534e-14,
+      "criterion": 6.040081652331626e-08,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.061894044658720324,
+      "value": 147.75970832709092,
+      "reference": 147.7597083270926,
+      "absolute_error": 1.6768808563938364e-12,
+      "relative_error": 1.1324274851176597e-14,
+      "criterion": 2.9551941665418522e-08,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.09499741229715535,
+      "value": 72.21602628519071,
+      "reference": 72.21602628519145,
+      "absolute_error": 7.389644451905042e-13,
+      "relative_error": 1.021405182655144e-14,
+      "criterion": 1.444320525703829e-08,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.1458057619746175,
+      "value": 35.20840220889701,
+      "reference": 35.20840220889736,
+      "absolute_error": 3.481659405224491e-13,
+      "relative_error": 9.880984919163893e-15,
+      "criterion": 7.041680441779473e-09,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.2237884139254128,
+      "value": 17.071307433003433,
+      "reference": 17.071307433003597,
+      "absolute_error": 1.6342482922482304e-13,
+      "relative_error": 9.547918011776346e-15,
+      "criterion": 3.4142614866007194e-09,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.3434792530076421,
+      "value": 8.178064851187397,
+      "reference": 8.178064851187468,
+      "absolute_error": 7.105427357601002e-14,
+      "relative_error": 8.659739592076221e-15,
+      "criterion": 1.6356129702374936e-09,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.527185456911141,
+      "value": 3.8192213079687924,
+      "reference": 3.819221307968818,
+      "absolute_error": 2.5757174171303632e-14,
+      "relative_error": 6.772360450213455e-15,
+      "criterion": 7.638442615937637e-10,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 0.8091449586692325,
+      "value": 1.6942983516829886,
+      "reference": 1.694298351682996,
+      "absolute_error": 7.327471962526033e-15,
+      "relative_error": 4.3298697960381105e-15,
+      "criterion": 3.388596703365992e-10,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.2419074835180604,
+      "value": 0.6813137411077153,
+      "reference": 0.6813137411077156,
+      "absolute_error": 3.3306690738754696e-16,
+      "relative_error": 4.440892098500626e-16,
+      "criterion": 1.3626274822154312e-10,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 1.9061284150552964,
+      "value": 0.229388433849406,
+      "reference": 0.229388433849404,
+      "absolute_error": 1.9984014443252818e-15,
+      "relative_error": 8.659739592076221e-15,
+      "criterion": 4.58776867698808e-11,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 2.925600805938266,
+      "value": 0.05693050989199281,
+      "reference": 0.056930509891992366,
+      "absolute_error": 4.440892098500626e-16,
+      "relative_error": 7.771561172376096e-15,
+      "criterion": 1.1386101978398473e-11,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 4.490327098690447,
+      "value": 0.008550853248332392,
+      "reference": 0.008550853248332296,
+      "absolute_error": 9.540979117872439e-17,
+      "relative_error": 1.1102230246251565e-14,
+      "criterion": 1.7101706496664594e-12,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 6.891930509558092,
+      "value": 0.0005755492043240065,
+      "reference": 0.0005755492043239968,
+      "absolute_error": 9.64939933512099e-18,
+      "relative_error": 1.687538997430238e-14,
+      "criterion": 1.1510984086479936e-13,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 10.578005812189078,
+      "value": 1.100158176516355e-05,
+      "reference": 1.1001581765163331e-05,
+      "absolute_error": 2.185345003916095e-19,
+      "relative_error": 1.9761969838327786e-14,
+      "criterion": 2.200316353032666e-15,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 16.235539056513353,
+      "value": 2.98280633055169e-08,
+      "reference": 2.98280633055163e-08,
+      "absolute_error": 6.0218748593860415e-22,
+      "relative_error": 2.020605904817785e-14,
+      "criterion": 5.9656126611032596e-18,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 24.91894343183575,
+      "value": 3.9740289484057075e-12,
+      "reference": 3.974028948405601e-12,
+      "absolute_error": 1.0662875083691372e-25,
+      "relative_error": 2.6867397195928788e-14,
+      "criterion": 7.948057896811202e-22,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 38.24657374156706,
+      "value": 5.136349210784518e-18,
+      "reference": 5.136349210784427e-18,
+      "absolute_error": 9.090389337507753e-32,
+      "relative_error": 1.7763568394002505e-14,
+      "criterion": 1.0272698421568853e-27,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 58.70234454243754,
+      "value": 5.3567281171030886e-27,
+      "reference": 5.3567281171029214e-27,
+      "absolute_error": 1.6716930160009338e-40,
+      "relative_error": 3.1308289294429414e-14,
+      "criterion": 1.0713456234205843e-36,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 90.09866551873364,
+      "value": 9.940451598072044e-41,
+      "reference": 9.94045159807154e-41,
+      "absolute_error": 5.036719386236361e-54,
+      "relative_error": 5.062616992290714e-14,
+      "criterion": 1.9880903196143082e-50,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 138.28697288892923,
+      "value": 9.426599345693614e-62,
+      "reference": 9.426599345693123e-62,
+      "absolute_error": 4.905343739293645e-75,
+      "relative_error": 5.1958437552457326e-14,
+      "criterion": 1.8853198691386246e-71,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 212.24828093383186,
+      "value": 5.740645002775478e-94,
+      "reference": 5.740645002775054e-94,
+      "absolute_error": 4.23667004080811e-107,
+      "relative_error": 7.37188088351104e-14,
+      "criterion": 1.148129000555011e-103,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 325.7670033427503,
+      "value": 2.314604638480658e-143,
+      "reference": 2.3146046384803363e-143,
+      "absolute_error": 3.218412412694425e-156,
+      "relative_error": 1.389999226830696e-13,
+      "criterion": 4.629209276960673e-153,
+      "passed": true
+    },
+    {
+      "order": 1.6666666666666667,
+      "x": 500.0,
+      "value": 4.003415701279949e-219,
+      "reference": 4.0034157012792956e-219,
+      "absolute_error": 6.535501534776779e-232,
+      "relative_error": 1.63202784619898e-13,
+      "criterion": 8.006831402558592e-229,
+      "passed": true
+    }
+  ],
+  "continuum_cases": [
+    {
+      "x": 1e-07,
+      "F": {
+        "value": 0.009977044903505268,
+        "reference": 0.009977044903505365,
+        "absolute_error": 9.71445146547012e-17,
+        "relative_error": 9.769962616701378e-15,
+        "criterion": 2.9931134710516096e-12,
+        "passed": true
+      },
+      "F_prime": {
+        "value": 33255.60714544177,
+        "reference": 33255.607145442074,
+        "absolute_error": 3.055902197957039e-10,
+        "relative_error": 9.2148511043888e-15,
+        "criterion": 9.976682143632622e-05,
+        "passed": true
+      },
+      "G": {
+        "value": 0.004988613138993947,
+        "reference": 0.004988613138994008,
+        "absolute_error": 6.158268339717665e-17,
+        "relative_error": 1.2323475573339238e-14,
+        "criterion": 9.977226277988018e-13,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 2.392797409267889e-16,
+      "reference_upper_frequency": 80.0000001
+    },
+    {
+      "x": 0.0099,
+      "F": {
+        "value": 0.44360483593514394,
+        "reference": 0.4436048359351486,
+        "absolute_error": 4.6629367034256575e-15,
+        "relative_error": 1.0547118733938987e-14,
+        "criterion": 1.3308145078054457e-10,
+        "passed": true
+      },
+      "F_prime": {
+        "value": 13.72870160690617,
+        "reference": 13.728701606906306,
+        "absolute_error": 1.3500311979441904e-13,
+        "relative_error": 9.880984919163893e-15,
+        "criterion": 4.118610482071892e-08,
+        "passed": true
+      },
+      "G": {
+        "value": 0.23021570657763324,
+        "reference": 0.2302157065776354,
+        "absolute_error": 2.1649348980190553e-15,
+        "relative_error": 9.43689570931383e-15,
+        "criterion": 4.604314131552708e-11,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 8.709530699490891e-14,
+      "reference_upper_frequency": 80.0099
+    },
+    {
+      "x": 0.01,
+      "F": {
+        "value": 0.44497250411420625,
+        "reference": 0.44497250411421074,
+        "absolute_error": 4.496403249731884e-15,
+        "relative_error": 1.0103029524088925e-14,
+        "criterion": 1.3349175123426322e-10,
+        "passed": true
+      },
+      "F_prime": {
+        "value": 13.624951708454724,
+        "reference": 13.624951708454823,
+        "absolute_error": 9.947598300641403e-14,
+        "relative_error": 7.327471962526033e-15,
+        "criterion": 4.0874855125364467e-08,
+        "passed": true
+      },
+      "G": {
+        "value": 0.2309807734222607,
+        "reference": 0.23098077342226306,
+        "absolute_error": 2.3592239273284576e-15,
+        "relative_error": 1.021405182655144e-14,
+        "criterion": 4.6196154684452616e-11,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 9.555864115945966e-14,
+      "reference_upper_frequency": 80.01
+    },
+    {
+      "x": 0.0101,
+      "F": {
+        "value": 0.4463298834556616,
+        "reference": 0.4463298834556662,
+        "absolute_error": 4.6074255521944e-15,
+        "relative_error": 1.0325074129013956e-14,
+        "criterion": 1.3389896503669987e-10,
+        "passed": true
+      },
+      "F_prime": {
+        "value": 13.522917230717116,
+        "reference": 13.522917230717223,
+        "absolute_error": 1.0658141036401503e-13,
+        "relative_error": 7.882583474838611e-15,
+        "criterion": 4.056875169215167e-08,
+        "passed": true
+      },
+      "G": {
+        "value": 0.23174063461753366,
+        "reference": 0.23174063461753602,
+        "absolute_error": 2.3592239273284576e-15,
+        "relative_error": 1.021405182655144e-14,
+        "criterion": 4.634812692350721e-11,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 1.0397120497789902e-13,
+      "reference_upper_frequency": 80.0101
+    },
+    {
+      "x": 0.1,
+      "F": {
+        "value": 0.818185534872848,
+        "reference": 0.8181855348728535,
+        "absolute_error": 5.551115123125783e-15,
+        "relative_error": 6.772360450213455e-15,
+        "criterion": 2.4545566046185604e-10,
+        "passed": true
+      },
+      "F_prime": {
+        "value": 1.554588980473989,
+        "reference": 1.55458898047398,
+        "absolute_error": 8.881784197001252e-15,
+        "relative_error": 5.773159728050814e-15,
+        "criterion": 4.66376694142194e-09,
+        "passed": true
+      },
+      "G": {
+        "value": 0.4752962677620802,
+        "reference": 0.47529626776208256,
+        "absolute_error": 2.3314683517128287e-15,
+        "relative_error": 4.884981308350689e-15,
+        "criterion": 9.505925355241651e-11,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 1.530857563278736e-14,
+      "reference_upper_frequency": 80.1
+    },
+    {
+      "x": 1.0,
+      "F": {
+        "value": 0.6514228153553661,
+        "reference": 0.6514228153553632,
+        "absolute_error": 2.886579864025407e-15,
+        "relative_error": 4.440892098500626e-15,
+        "criterion": 1.9542684460660895e-10,
+        "passed": true
+      },
+      "F_prime": {
+        "value": -0.44630790089177896,
+        "reference": -0.4463079008917825,
+        "absolute_error": 3.552713678800501e-15,
+        "relative_error": 7.993605777301127e-15,
+        "criterion": 1.3389237026753475e-09,
+        "passed": true
+      },
+      "G": {
+        "value": 0.49447506210421194,
+        "reference": 0.4944750621042118,
+        "absolute_error": 1.1102230246251565e-16,
+        "relative_error": 2.220446049250313e-16,
+        "criterion": 9.889501242084237e-11,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 7.233309316713809e-15,
+      "reference_upper_frequency": 81.0
+    },
+    {
+      "x": 20.0,
+      "F": {
+        "value": 1.196863445609777e-08,
+        "reference": 1.196863445609753e-08,
+        "absolute_error": 2.3988237764037803e-22,
+        "relative_error": 1.9984014443252818e-14,
+        "criterion": 3.590590336829259e-18,
+        "passed": true
+      },
+      "F_prime": {
+        "value": -1.168907038371262e-08,
+        "reference": -1.1689070383712306e-08,
+        "absolute_error": 3.143286327701505e-22,
+        "relative_error": 2.6867397195928788e-14,
+        "criterion": 3.506721115113692e-17,
+        "passed": true
+      },
+      "G": {
+        "value": 1.1607696854385482e-08,
+        "reference": 1.1607696854385163e-08,
+        "absolute_error": 3.192917164454687e-22,
+        "relative_error": 2.7533531010703882e-14,
+        "criterion": 2.3215393708770325e-18,
+        "passed": true
+      },
+      "reference_quad_error_estimate": 2.010689672765644e-13,
+      "reference_upper_frequency": 100.0
+    }
+  ]
+}

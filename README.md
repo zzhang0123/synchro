@@ -1,190 +1,204 @@
 # synchro
 
-A differentiable JAX implementation of a perturbative statistical model of
-synchrotron emission — the reference implementation for *A perturbative
-statistical model for synchrotron emission* (Zhang & Chluba).
+Differentiable JAX/Equinox synchrotron kernels, finite statistical contractions,
+and polarised radiative transfer for *A statistical framework for synchrotron
+emission* (Zhang & Chluba).
 
-The idea it implements: the **deterministic** half of the model (the radiation
-from one electron of given energy, pitch angle and local field) is treated
-exactly, from the Schott harmonic decomposition; the **statistical** half (the
-distribution of those conditions) is never modelled at all, only summarised by
-a truncated hierarchy of statistics. Physics lives in the *derivative spectra*, which are
-precomputed once by automatic differentiation; statistics enter afterwards as a
-cheap tensor contraction.
+This research implementation keeps four operations explicit: physical kernel
+approximation, finite kernel Taylor expansion, statistical closure, and numerical
+solution. Passing a kernel or regression test does not certify a Galactic
+foreground model at 21-cm precision. All relevant discrepancies and uncertainties
+must be propagated to the chosen scientific quantity.
 
-## Requirements
+The positive finite-cumulant PDF reconstruction and the independent 21-cm
+assessment live in the manuscript repository's `validation/` directory. They do
+not import this package. `CumulantExpansion` here is the historical name of a
+quadratic kernel average; it is not that PDF reconstruction.
 
-Python 3.12 (developed against 3.12.9). The package itself needs only:
+## Install and verify
 
-| package | version used |
-|---|---|
-| `jax` | 0.10.0 |
-| `equinox` | 0.13.7 |
-| `numpy` | 2.3.5 |
-
-`scipy` (1.16.3) and `matplotlib` (3.10.8) are needed only for the validation
-layer and the figure scripts. `scipy` is deliberately kept out of `synchro/`:
-it serves as an **independent** reference against which the differentiable
-kernels are checked, so no benchmark shares a code path with the quantity it
-validates.
-
-## Install
-
-There is no packaging step — put the repository root on `PYTHONPATH`:
+Python 3.12 is the tested runtime. From this checkout:
 
 ```bash
-export PYTHONPATH=/path/to/this/repo
+python -m pip install -e '.[validation]'
+python -m pytest tests -q
 ```
 
-or prefix each command with `PYTHONPATH=.` as below.
+The tested environment uses JAX 0.10.0, Equinox 0.13.7, NumPy 2.3.5,
+SciPy 1.16.3, Matplotlib 3.10.8 and pytest 9.0.2. The dependency ranges in
+`pyproject.toml` do not imply every version combination has been tested.
+SciPy is confined to validation; it supplies independent special-function,
+integration and matrix-exponential references.
 
-Importing `synchro` enables `jax_enable_x64` as a global side effect. The
-Bessel quadrature and the likelihood-style sums need float64, so import it
-before creating any array.
+Importing `synchro` enables JAX float64 globally for scientific accuracy. Import
+it before creating arrays; this is a documented compatibility side effect.
+For a source checkout without installation, `PYTHONPATH=.` remains supported.
 
-## Quick start
-
-### Exact single-particle Stokes at one harmonic
-
-Valid for arbitrary β, not just the ultra-relativistic limit.
-
-```python
-from synchro.stokes import stokes_harmonic, larmor_power
-
-I, Q, V = stokes_harmonic(n=10, gamma=5.0, alpha=0.785, theta=1.047)
-# n=10: I=1.4359  Q=-0.7514  V=-1.2236
-
-abs(I**2 - Q**2 - V**2)      # 2.2e-16 -- a single harmonic is fully polarised
-larmor_power(5.0, 0.785, 1e-6)   # 1.903e-26 erg/s
+```bash
+PYTHONPATH=. python scripts/run_all.py                 # pytest, diagnostics, figures
+PYTHONPATH=. python scripts/run_all.py --no-figures    # pytest and diagnostics
 ```
 
-Without `B` the Stokes parameters are normalised by `e^2 w_B^2 / (2 pi c)`;
-pass `B` in Gauss for physical `dP_n/dOmega` in erg/s/sr.
+Printed diagnostics alone are not pass/fail physics tests. The runner first
+executes pytest, then reports script completion. Generated companion figures
+are package demonstrations; the manuscript uses its separate independent figure
+generators and captions. Do not substitute one set without checking assumptions.
 
-### Moment and cumulant expansion
-
-`build_expansion` does the expensive part once (autodiff of the Bessel-based
-Stokes parameters at the reference point). The returned `CumulantExpansion` is
-an `eqx.Module`: jittable, and differentiable with respect to the moments.
-
-The two names are both deliberate. The **interface is raw moments** —
-`__call__(mu, cov)` takes the mean and covariance, which is what an observer
-measures — but the expansion is **organised in cumulants**, which is what makes
-the truncation principled: for a Gaussian the `K=2` cumulant truncation is
-exact to all Taylor orders, while the raw-moment series is not.
+## Harmonic radiation and derivatives
 
 ```python
+from synchro.stokes import stokes_harmonic
+from synchro.derivatives import derivative_spectra
+
+I, Q, V = stokes_harmonic(10, 5.0, 0.785, 1.047, B=5e-6)
+value, gradient, hessian = derivative_spectra(10, 5.0, 0.785, 1.047, B=5e-6)
+```
+
+`B` is in Gauss; harmonic power is per source time in erg/s/sr. The reference is
+vacuum radiation from a prescribed helical orbit, not a plasma-corrected or
+self-consistent particle trajectory. Without `B`, the API preserves its legacy
+dimensionless normalization. Differentiating that normalized response is a
+different operation: physical fixed-B energy derivatives must include the
+Lorentz-factor dependence of the gyrofrequency. These are fixed-harmonic
+quantities. Fixed-frequency predictions also need the moving harmonic line
+positions and a declared frequency/channel response.
+
+The natural basis uses `Q=parallel-perpendicular` to the projected magnetic
+field and `V=-2 Im(E_parallel E_perpendicular*)`. A fixed sky azimuth `phi` gives
+`Q_sky=Q*cos(2phi)`, `U_sky=Q*sin(2phi)`. The recurrence implementation includes
+the viewing-axis limit. Isotropic pitch angles alone do not force V to vanish.
+
+Integer Bessel J uses a periodic integral with a contour shift to resolve
+exponentially small values. A concrete harmonic sets its static resolution;
+for traced orders the default is 2048 nodes. `bessel_jn(..., n_nodes=...)`
+exposes that static choice. Unresolved `n+abs(x)>n_nodes/2` returns NaN instead
+of an aliased answer. This guard is not an accuracy certificate: validate
+resolution and derivatives over the actual domain. Modified K and continuum
+F/G use continuous hyperbolic integrals. Their public tail-bound helpers bound
+only the finite integral tail, excluding quadrature and roundoff. F(0)=G(0)=0;
+the continuum slopes diverge there, so derivative tests concern positive x.
+
+`sed.power_law_emissivity_abs(..., theta=...)` gives directional ordered-field
+continuum emissivity. Its `theta=None` default additionally averages viewing
+angles/random field axes with the normalized sin(theta)/2 measure. Isotropic
+electron pitch angles alone do not perform that viewing-direction average.
+
+## Finite statistical response
+
+```python
+import equinox as eqx
 import jax.numpy as jnp
 from synchro.expansion import build_expansion
 
-exp = build_expansion([1, 2, 5, 10, 20], gamma0=5.0, alpha0=0.785, theta0=1.047)
-
-mu  = jnp.zeros(3)                                # <dgamma>, <dalpha>, <dtheta>
-cov = jnp.diag(jnp.array([0.09, 0.0025, 0.0]))    # sigma_gamma=0.3, sigma_alpha=0.05
-S = exp(mu, cov)                                  # (5, 3) -> I, Q, V per harmonic
-# I at n=1,2,5,10,20: 0.2426 0.4623 0.9379 1.3845 1.6383
-
-# the field magnitude is exact, not expanded: S scales by <(B/B0)^2>
-S_B = exp.apply_B(S, B0=5e-6, mu_B=0.0, var_B=(2.5e-6)**2)   # ratio 1.2500
+response = build_expansion([1, 2, 5, 10], 5.0, 0.785, 1.047, B=5e-6)
+mean_deviation = jnp.zeros(3)                    # gamma, alpha, theta
+covariance = jnp.diag(jnp.array([0.01, 1e-4, 0.0]))
+stokes = eqx.filter_jit(response)(mean_deviation, covariance)
 ```
 
-The reference point is baked into the precomputed spectra and is *not* a field
-of the module, so it never enters the jit cache or the gradient.
+`build_expansion` precomputes values, gradients and Hessians; repeated calls
+contract the same arrays with the supplied mean and covariance. Construction
+choices are fixed harmonic orders/reference/units; model arrays are ordinary
+Equinox leaves, so callers decide which parameters to differentiate. Runtime
+array shapes should remain stable when reusing a compiled response.
 
-**Domain of validity** (Sec. 4.7 of the paper): for a Gaussian the error is
-fourth order in the fractional width, and the *angular* width is what binds —
-`sigma_alpha <= 0.05 rad` keeps the second-order expansion under 1% out to
-`n ~ 20`, while `sigma_gamma/gamma0` may be an order of magnitude larger at the
-same accuracy. A genuinely isotropic pitch-angle distribution is far outside
-this range and must be integrated exactly.
+At the same Taylor degree and with the same statistics, moment and cumulant
+contractions are equal. A Gaussian has no cumulants beyond second order, but
+still has fourth and higher moments: a quadratic kernel average leaves those
+kernel terms out. The general scalar Bell helper can construct additional
+moments by setting unprovided cumulants to zero; that is an explicit closure,
+not a guarantee of a legal PDF. Vector contractions support at most four orders
+and reject higher orders. No universal pitch or energy width is safe: assess
+the kernel remainder at the actual reference, frequency and science precision.
 
-### Polarised radiative transfer
+`apply_B` uses the exact B-squared factor at fixed harmonic only when the
+remaining population parameters are fixed or B is independent of them.
+Correlated populations require conditional or mixed statistics. It does not
+supply physical units to a normalized spectrum or account for frequency shifts.
 
-Moments in, observed Stokes out. With `polarised_absorption=True` the
-emissivity and the absorption both come from the same moments through the
-Kirchhoff closure, so the slab reproduces the correct self-absorbed
-polarisation fraction.
+## Physical transfer and reduced demonstrations
 
 ```python
-import numpy as np
-from synchro.los_moments import moment_driven_slab
+from synchro.los_moments import moment_driven_slab_cgs
 
-g  = np.linspace(1.0, 200.0, 2000)
-N  = np.exp(-0.5 * (g - 30.0)**2 / 3.0**2)
-dg = g - 30.0
-M0, M1, M2 = np.trapezoid(N, g), np.trapezoid(N*dg, g), np.trapezoid(N*dg**2, g)
-inv_gamma  = np.trapezoid(N/g, g)
-
-S = moment_driven_slab(100.0, 30.0, 1.0, M0, M1, M2, inv_gamma,
-                       L=1e4, polarised_absorption=True)
-# I=5.0498e+04  Q/I=+0.5275
+# Local electron-number moments M_k=int N(gamma)(gamma-gamma0)^k dgamma.
+# This narrow-population illustration does not certify an energy PDF closure.
+gamma0, number_density = 2500.0, 1e-12
+S = moment_driven_slab_cgs(
+    1e8, gamma0, 5e-6,
+    number_density, 0.0, number_density*50.0**2,
+    number_density/gamma0,                 # illustrative inverse moment approximation
+    3.0856775814913673e21,
+    n_e=0.03, B_par=2e-6, phi=0.2,
+)
 ```
 
-Pass `n_e`, `B_par`, `B_perp` to add cold-plasma Faraday rotation and
-conversion. Circular absorption `alpha_V` is omitted throughout — it is
-suppressed by O(1/gamma) ~ 1e-4 for the diffuse foreground.
+The physical interface requires frequency Hz, fields Gauss, length cm and
+thermal/electron densities cm^-3. Output is erg/s/cm²/Hz/sr. It restores the
+separate emission and absorption prefactors; they do not cancel in a physical
+source function. Supply a measured or independently computed inverse moment
+when precision requires it. For finite support, pass the three endpoint terms
+`[N(gamma)*(gamma-gamma0)^k]_lower^upper` through `boundary_terms`; zero defaults
+assert that these vanish or are separately represented. Distributional jumps at
+physical hard cutoffs must be treated consistently.
 
-## Running the checks
+The wrapper assumes isotropic ultra-relativistic electrons and a second-order
+local energy-kernel Taylor approximation. It uses h=gamma² for absorption;
+`derivative_weighted(..., relativistic=True)` evaluates the exact radial
+h=gamma*sqrt(gamma²-1) on a NumPy grid, with its own discretization error. The
+wrapper omits intrinsic V and alphaV; their propagated error is not bounded by
+this illustration. Generic `mueller_matrix` retains all Stokes absorption terms.
 
-```bash
-PYTHONPATH=. python3 -m pytest tests/ -q
-```
+Cold-plasma `mueller_rotation` is the signed Stokes rV, twice the position-angle
+rate returned by `rotation_coefficient`. `mueller_conversion` and
+`conversion_coefficient` both return signed natural rQ, with no further factor
+two. Natural conversion mixes U and V; sky azimuth rotates rQ/rU. These leading
+high-frequency cold-dielectric coefficients need distribution-dependent
+replacements for hot or non-thermal plasma. The Gaussian Burn formula is an
+external-screen average, not internal emission and rotation; a uniform emitting
+slab has sinc depolarisation at finite Faraday depth.
 
-50 tests, ~2 minutes. Every analytic identity quoted in the paper is asserted
-here, together with boundary tests at each dispatch limit (optically thin and
-thick, the Magnus convergence orders, the fourth-order convergence law).
+`moment_driven_slab` remains a reduced-unit teaching interface and rejects
+physical Faraday arguments. Use the CGS wrapper to combine those effects.
+A uniform slab uses one augmented exponential. `transfer_los` handles ordered,
+nonuniform slabs; varying-medium discretization must be checked separately.
+A source-column coordinate rescaling preserves zero-emissivity derivatives.
+`max_squarings=32` is the static exponential budget; tests include scalar optical
+depth 10^6, but do not guarantee arbitrary matrix depth, conditioning or gain.
+Exceeding the budget may produce NaN; extreme gain may overflow.
 
-```bash
-PYTHONPATH=. python3 scripts/run_all.py
-```
+Magnus order two uses a running-prefix commutator, O(N) matrix work instead of
+an explicit O(N²) pair sum. It supports unequal slab widths and rejects orders
+other than 1 or 2. The commutator is deterministic ordering information, not a
+statistical cumulant. Ensemble transfer also needs source–propagator dependence.
 
-Runs the seven validation scripts with printed diagnostics *and* regenerates
-all four figures, so `figures/*.pdf` cannot drift out of step with the physics.
-Add `--no-figures` to skip the plotting. Individual scripts run standalone,
-e.g. `PYTHONPATH=. python3 scripts/validate_kirchhoff.py`.
+## Module boundaries
 
-Coverage:
-
-```bash
-PYTHONPATH=. python3 -m pytest tests/ -q --cov=synchro --cov-report=term-missing
-```
-
-## Module map
-
-| module | contents | paper |
+| Layer | Modules | Output / responsibility |
 |---|---|---|
-| `bessel.py` | differentiable `J_n`, `J_n'`, `K_nu` via integral representations | App. C |
-| `stokes.py` | exact Schott harmonic Stokes `(I, Q, V)`; Larmor power | Sec. 2.3–2.4 |
-| `ultrarel.py` | ultra-relativistic `F(x)`, `G(x)` | Sec. 2.5 |
-| `derivatives.py` | derivative spectra by autodiff | Sec. 4.4 |
-| `expansion.py` | `CumulantExpansion`, `build_expansion`, exact `B` moments | Sec. 4.1–4.3 |
-| `cumulants.py` | general-order cumulant expansion (Bell / Faà di Bruno) | Sec. 4.2 |
-| `sed.py` | spectral index, curvature, LOS cumulants, absolute emissivity | Sec. 4.6 |
-| `kirchhoff.py` | emissivity/absorption moments + Kirchhoff closure | Sec. 6.1 |
-| `rm.py` | rotation measure, Burn depolarisation | Sec. 6.2 |
-| `conversion.py` | cold-plasma Faraday rotation/conversion coefficients | App. D |
-| `transfer.py` | Mueller matrix, exact slab and LOS chain | Sec. 6 |
-| `magnus.py` | Magnus `Omega_1`, `Omega_2` | Sec. 6.3 |
-| `solutions.py` | thin / self-absorbed / rotation limits | Sec. 6 |
-| `los_moments.py` | end-to-end: moments → coefficients → transfer | Sec. 6 |
+| Shared constants | `constants` | Common SI-to-CGS constants aligned with the manuscript |
+| Numerical reference functions | `bessel`, `ultrarel` | Values, derivatives and finite-tail controls; physical continuum error remains separate |
+| Physical response | `stokes`, `sed`, `derivatives` | Declared normalization and coordinates; power-law/curvature hypotheses explicit |
+| Statistical contraction | `expansion`, `cumulants` | Finite kernel average; no automatic positive-PDF closure |
+| Population precompute | Grid functions in `kirchhoff`, practical RM integral | NumPy integrations; not traced or differentiable |
+| Online coefficients / propagation | Moment contractions in `kirchhoff`, `conversion`, `rm`, `transfer`, `los_moments` | JAX scalars/arrays; CGS and reduced paths explicit |
+| Ordered approximation / limits | `magnus`, `solutions` | Declared finite Magnus order and analytic limits |
+| Independent checks | `tests/`, diagnostic scripts | SciPy/analytic/finite-difference oracles and explicit finite test ranges |
 
-## Citation
+## Compatibility and scientific scope
 
-If you use this package, please cite the accompanying paper (Zhang & Chluba,
-*A perturbative statistical model for synchrotron emission*).
+This review corrects signed Q, the conversion sign/factor/axis, fixed-B physical
+derivatives, and absolute isotropically averaged emissivity (an omitted angular
+probability factor made the legacy result twice too large). Physical predictions
+using those APIs will change. Dimensionless harmonic defaults are preserved.
+Invalid PDF/moment assumptions are not made valid by the corrected numerics.
 
-## License
+The accompanying manuscript supplies a total-error propagation interface and
+bounded independent PDF benchmarks. A complete Galactic angular/field/energy-tail,
+plasma and instrument error budget is still an input to scientific sufficiency.
+Population identifiability remains future work.
 
-MIT — see [LICENSE](LICENSE).
+## Citation and license
 
-## Performance notes
-
-The Bessel functions are evaluated eagerly from a 512-point Gauss–Legendre
-quadrature on every call, which is the right trade for the precompute path but
-slow in a loop. The fast path for repeated evaluation is
-`build_expansion` once, then `CumulantExpansion.__call__` (a single `einsum`,
-jittable) — not repeated `stokes_harmonic`.
-
-`transfer_slab` uses an augmented 5×5 matrix exponential with a normalised
-source column; it is accurate up to roughly `tau ~ 1e3` per slab. Beyond that
-the scaling-and-squaring in `expm` loses precision — discretise more finely.
+Please cite Zhang & Chluba, *A statistical framework for synchrotron emission*.
+MIT license; see [LICENSE](LICENSE).

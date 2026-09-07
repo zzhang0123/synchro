@@ -1,54 +1,48 @@
-"""Ultra-relativistic synchrotron functions F(x), G(x).
+"""Ultra-relativistic continuum kernels F and G with explicit tail control.
 
-In the limit gamma >> 1 the harmonic sum collapses to the standard continuum
-result in terms of modified Bessel functions:
-
-    F(x) = x int_x^inf K_{5/3}(xi) dxi,   G(x) = x K_{2/3}(x),
-
-with x = nu / nu_c and nu_c = (3/2) gamma^3 w_B sin(alpha) / (2 pi).
-
-These are used as (i) a fast path for the emissivity in the ultra-relativistic
-regime and (ii) a cross-check of the exact harmonic sum in that limit.
+F(x)=x integral_x^infinity K_(5/3)(u) du and G(x)=x K_(2/3)(x).
+Interchanging the two positive integrals gives the single-integral form
+F=x integral_0^infinity exp(-x cosh t) cosh(5t/3)/cosh(t) dt. This avoids nested
+quadrature and the former switched small-x approximation. These are continuum
+kernels; agreement with their integral definitions does not bound the physical
+error of replacing finite-gamma, directional harmonic radiation by a continuum.
 """
 
 from __future__ import annotations
 
 import jax.numpy as jnp
-import numpy as np
 
-from .bessel import bessel_kn
-
-_N_F = 256
-_xg, _wg = np.polynomial.legendre.leggauss(_N_F)
-_XG = jnp.asarray(_xg)
-_WG = jnp.asarray(_wg)
+from .bessel import _modified_integral, _modified_tail_bound, bessel_kn
 
 
-def _kn53(x):
-    return bessel_kn(5.0 / 3.0, x)
+def G(x, *, n_nodes=128, tail_cutoff=50.0):
+    """G(x)=x K_(2/3)(x); G(0)=0, autodiff is intended for x > 0."""
+    x = jnp.asarray(x)
+    safe_x = jnp.where(x > 0, x, 1.0)
+    value = safe_x * bessel_kn(
+        2.0 / 3.0, safe_x, n_nodes=n_nodes, tail_cutoff=tail_cutoff
+    )
+    return jnp.where(x > 0, value, jnp.where(x == 0, 0.0, jnp.nan))
 
 
-def _kn23(x):
-    return bessel_kn(2.0 / 3.0, x)
+def F(x, *, n_nodes=128, tail_cutoff=50.0):
+    """F(x); node count/cutoff are static under JIT. F(0)=0.
 
-
-def G(x):
-    """G(x) = x K_{2/3}(x)."""
-    return x * _kn23(x)
-
-
-def F(x):
-    """F(x) = x int_x^inf K_{5/3}(xi) dxi.
-
-    Gauss--Legendre in u = ln(xi) over [ln x, ln(x + 40)]; the upper tail is
-    ~e^-40 and negligible.
+    ``F_tail_bound`` controls the finite upper limit only. Compare node counts
+    and independent references to assess quadrature and floating-point error.
+    The continuum kernel has a divergent slope at zero, so differentiability
+    claims and tests concern positive arguments.
     """
     x = jnp.asarray(x)
-    lo = jnp.log(x)
-    hi = jnp.log(x + 40.0)
-    mid = 0.5 * (hi + lo)
-    half = 0.5 * (hi - lo)
-    u = mid[..., None] + half[..., None] * _XG[None, ...]
-    xi = jnp.exp(u)
-    integrand = xi * _kn53(xi)  # K_{5/3}(xi) dxi = xi K_{5/3} d(ln xi)
-    return (x * jnp.sum(_WG * integrand, axis=-1) * half).reshape(jnp.shape(x))
+    safe_x = jnp.where(x > 0, x, 1.0)
+    value = safe_x * _modified_integral(
+        5.0 / 3.0, safe_x, divide_cosh=True, n_nodes=n_nodes, tail_cutoff=tail_cutoff
+    )
+    return jnp.where(x > 0, value, jnp.where(x == 0, 0.0, jnp.nan))
+
+
+def F_tail_bound(x, *, tail_cutoff=50.0):
+    """Bound F's omitted positive-t tail; excludes quadrature/roundoff errors."""
+    return jnp.asarray(x) * _modified_tail_bound(
+        5.0 / 3.0, x, divide_cosh=True, tail_cutoff=tail_cutoff
+    )

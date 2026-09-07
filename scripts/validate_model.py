@@ -112,8 +112,15 @@ def test_derivatives(n=10, gamma0=5.0, alpha0=np.pi / 4, theta0=np.pi / 3, h=1e-
     return val, grad, gerr
 
 
-def test_cumulant_expansion(ns=(1, 2, 3, 5, 10, 20), gamma0=5.0, alpha0=np.pi / 4,
-                          theta0=np.pi / 3, sigma_g=0.3, sigma_a=0.1, n_samples=200000):
+def test_cumulant_expansion(
+    ns=(1, 2, 3, 5, 10, 20),
+    gamma0=5.0,
+    alpha0=np.pi / 4,
+    theta0=np.pi / 3,
+    sigma_g=0.3,
+    sigma_a=0.1,
+    n_samples=200000,
+):
     exp = build_expansion(ns, gamma0, alpha0, theta0)
     mu = jnp.zeros(3)
     cov = jnp.diag(jnp.array([sigma_g**2, sigma_a**2, 0.0]))

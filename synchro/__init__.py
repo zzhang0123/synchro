@@ -11,17 +11,16 @@ bessel           : differentiable J_n, J_n', K_nu (integral representations)
 stokes           : exact Schott harmonic Stokes (I, Q, V) with correct
                    normalisation
 derivatives      : derivative spectra dS/dp, d^2S/dp^2 via autodiff
-expansion         : eqx.Module realising the strict cumulant expansion of the
-                    harmonic Stokes spectra (moments in, cumulant-organised)
-cumulants        : general-order cumulant expansion (Bell/Faà di Bruno)
+expansion         : eqx.Module for quadratic Taylor averaging (mean/covariance)
+cumulants        : finite Bell moment contractions from supplied cumulants
 ultrarel         : ultra-relativistic F(x), G(x) fast path
 rm               : rotation measure (RM) constants + Burn depolarisation
-transfer         : Mueller matrix + exact slab/LOS polarised transfer
+transfer         : Mueller matrix + numerical slab/LOS matrix exponentials
 solutions        : analytic limiting solutions (thin/rotation/self-absorbed)
 kirchhoff        : emissivity/absorption moment expansion + Kirchhoff closure
 conversion       : cold-plasma Faraday rotation/conversion coefficients + moments
 magnus           : Magnus expansion (Omega1, Omega2) of the LOS transfer
-los_moments      : moment-driven LOS (coefficients from moments -> transfer)
+los_moments      : explicit reduced-units and physical-CGS moment-driven slabs
 sed              : frequency-domain SED (spectral index, curvature, abs. emissivity)
 """
 
@@ -32,7 +31,22 @@ import jax
 # Enable float64 for accuracy of Bessel quadrature and likelihood-style sums.
 jax.config.update("jax_enable_x64", True)
 
-from . import bessel, conversion, cumulants, derivatives, kirchhoff, los_moments, magnus, expansion, rm, sed, solutions, stokes, transfer, ultrarel  # noqa: E402,F401
+from . import (  # noqa: E402
+    bessel,
+    conversion,
+    cumulants,
+    derivatives,
+    kirchhoff,
+    los_moments,
+    magnus,
+    expansion,
+    rm,
+    sed,
+    solutions,
+    stokes,
+    transfer,
+    ultrarel,
+)  # noqa: E402,F401
 from .stokes import larmor_power, stokes_harmonic  # noqa: E402,F401
 from .derivatives import derivative_spectra  # noqa: E402,F401
 from .expansion import CumulantExpansion, build_expansion  # noqa: E402,F401

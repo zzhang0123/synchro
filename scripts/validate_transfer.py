@@ -12,19 +12,20 @@ Checks:
 from __future__ import annotations
 
 import numpy as np
-import jax
 import jax.numpy as jnp
 
 from synchro.rm import (
-    C_RM_CGS, RM_PER_UNIT, rotation_measure_rad_m2, rotation_angle,
+    RM_PER_UNIT,
+    rotation_measure_rad_m2,
     burn_depolarisation,
 )
 from synchro.transfer import (
-    mueller_matrix, transfer_slab, transfer_los,
-    faraday_rotation_matrix, conversion_matrix,
+    mueller_matrix,
+    transfer_slab,
+    transfer_los,
 )
 from synchro.solutions import (
-    uniform_source_intensity, power_law_emissivity, power_law_absorption,
+    uniform_source_intensity,
 )
 
 
@@ -60,15 +61,22 @@ def test_transfer_limits():
     S0 = jnp.array([0.0, 1.0, 0.0, 0.0])  # pure Q
     S = transfer_slab(S0, jnp.zeros(4), K, ds)
     P_expected = 1.0 * np.exp(1j * rV * ds)  # Q+iU rotates by rV*ds
-    rot_err = float(jnp.max(jnp.abs(jnp.array([S[1], S[2]])
-                                     - jnp.array([P_expected.real, P_expected.imag]))))
+    rot_err = float(
+        jnp.max(
+            jnp.abs(
+                jnp.array([S[1], S[2]]) - jnp.array([P_expected.real, P_expected.imag])
+            )
+        )
+    )
 
     # pure conversion: rU = 0.5 over ds=1  ->  Q<->V rotation
     K = mueller_matrix(0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0)
     S = transfer_slab(jnp.array([0.0, 1.0, 0.0, 0.0]), jnp.zeros(4), K, 1.0)
     # (Q, V) rotated by angle -rU*ds (see K matrix): Q->cos, V->-sin
-    conv_q = float(S[1]); conv_v = float(S[3])
-    exp_q = np.cos(0.5); exp_v = -np.sin(0.5)
+    conv_q = float(S[1])
+    conv_v = float(S[3])
+    exp_q = np.cos(0.5)
+    exp_v = -np.sin(0.5)
     conv_err = abs(conv_q - exp_q) + abs(conv_v - exp_v)
 
     return thin_err, rot_err, conv_err
@@ -122,8 +130,12 @@ if __name__ == "__main__":
 
     print("=== 4. LOS chain (const-K == single slab; non-commutativity) ===")
     chain_err, noncomm = test_los_chain()
-    print(f"  chain vs single-slab err={chain_err:.2e}  |rot*conv - conv*rot|={noncomm:.2e}")
+    print(
+        f"  chain vs single-slab err={chain_err:.2e}  |rot*conv - conv*rot|={noncomm:.2e}"
+    )
 
     print("=== 5. Self-absorption turnover slopes ===")
     s_lo, s_hi, exp_lo, exp_hi = test_self_absorption()
-    print(f"  thick slope={s_lo:.3f} (expect {exp_lo})   thin slope={s_hi:.3f} (expect {exp_hi})")
+    print(
+        f"  thick slope={s_lo:.3f} (expect {exp_lo})   thin slope={s_hi:.3f} (expect {exp_hi})"
+    )

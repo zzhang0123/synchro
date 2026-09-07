@@ -1,23 +1,16 @@
-"""Faraday rotation + conversion coefficients (cold plasma) and their moments.
+"""Leading cold-plasma coefficients in CGS and the paper's Stokes convention.
 
-Physical (position-angle / conversion-angle) rates, CGS:
+Inputs: frequency Hz, thermal density cm^-3, magnetic field Gauss. The
+``mueller_*`` functions return signed Stokes rates cm^-1 for dS/ds=eps-K S,
+Q=parallel-minus-perpendicular to projected B, and V=-2 Im(E_parallel E_perp*).
+In that natural basis conversion is rQ (U--V mixing); rU=0. At sky azimuth
+phi its components are rQ*cos(2phi), rQ*sin(2phi).
 
-    rho_V = e^3 n_e B_par / (2 pi m_e^2 c^2 nu^2)     [rotation, ~ nu^-2]
-    rho_Q = e^4 n_e B_perp^2 / (4 pi^2 m_e^3 c^3 nu^3) [conversion, ~ nu^-3]
-
-In the Mueller matrix (synchro.transfer) the Stokes-space rotation rates are
-TWICE the physical rates (rV = 2 rho_V, rU = 2 rho_Q), because Stokes Q,U,V
-rotate by twice the physical polarisation-ellipse angle.  The rotation measure
-RM = int rho_V ds / lam^2 reproduces the standard 0.812 rad/m^2 constant.
-
-The conversion/rotation ratio is convention-independent:
-
-    rho_Q / rho_V = (nu_B / nu) (sin^2 theta / cos theta) / (2 pi) ... see
-    conversion_rotation_ratio().
-
-Cold-plasma, quasi-longitudinal limit.  Relativistic (thermal) corrections are
-an order-unity function of the electron temperature (cf. Huang & Shcherbakov
-2011) and are deferred.
+``rotation_coefficient`` retains the position-angle rate for compatibility;
+``conversion_coefficient`` returns rQ itself. There is no additional factor
+of two on the latter. These leading high-frequency cold-dielectric terms
+require plasma and cyclotron frequencies small compared with nu. Hot and
+non-thermal corrections are distribution dependent and are not bounded here.
 """
 
 from __future__ import annotations
@@ -38,13 +31,13 @@ def rotation_coefficient(nu, n_e, B_par):
 
 
 def conversion_coefficient(nu, n_e, B_perp):
-    """Physical Faraday conversion rate rho_Q [rad/cm] (conversion angle)."""
-    return C_CONV * n_e * B_perp**2 / nu**3
+    """Natural-basis Stokes conversion rate rQ [cm^-1], signed."""
+    return -C_CONV * n_e * B_perp**2 / nu**3
 
 
 def conversion_rotation_ratio(nu, B_perp, B_par):
-    """rho_Q / rho_V  (dimensionless; independent of n_e)."""
-    return (E_ESU * B_perp**2) / (2.0 * np.pi * M_E * C_CGS * nu * B_par)
+    """Signed rQ/rV, independent of n_e; undefined when B_par=0."""
+    return -(E_ESU * B_perp**2) / (4.0 * np.pi * M_E * C_CGS * nu * B_par)
 
 
 def mueller_rotation(nu, n_e, B_par):
@@ -53,5 +46,5 @@ def mueller_rotation(nu, n_e, B_par):
 
 
 def mueller_conversion(nu, n_e, B_perp):
-    """Stokes-space conversion coefficient rQ = 2 rho_Q for synchro.transfer."""
-    return 2.0 * conversion_coefficient(nu, n_e, B_perp)
+    """Natural-basis Stokes conversion coefficient rQ for synchro.transfer."""
+    return conversion_coefficient(nu, n_e, B_perp)

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synchro"
+version = "0.1.0"
+description = "Differentiable synchrotron kernels and explicitly scoped statistical approximations"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+dependencies = ["jax>=0.10,<0.11", "equinox>=0.13.7,<0.14", "numpy>=2.3,<3"]
+
+[project.optional-dependencies]
+validation = ["scipy>=1.16,<2", "matplotlib>=3.10,<4", "pytest>=8,<10"]
+dev = ["black>=25", "ruff>=0.12"]
+
+[tool.setuptools.packages.find]
+include = ["synchro*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "scripts"]
+
+[tool.ruff.lint]
+# I is the physical Stokes-I symbol throughout this package.
+ignore = ["E741"]
+
+[tool.black]
+target-version = ["py312"]

@@ -6,9 +6,9 @@ must reproduce, expressed in the moment/cumulant language of the paper.
 
 from __future__ import annotations
 
-import jax.numpy as jnp
 
 from .rm import burn_depolarisation
+from .transfer import optical_depth_factor
 
 
 def thin_limit(eps, ds):
@@ -27,12 +27,12 @@ def self_absorbed_source_function(nu, p, B):
 
 def power_law_emissivity(nu, p, B):
     """Optically-thin emissivity scaling ~ nu^(-(p-1)/2) B^((p+1)/2)."""
-    return nu**(-(p - 1.0) / 2.0) * B**((p + 1.0) / 2.0)
+    return nu ** (-(p - 1.0) / 2.0) * B ** ((p + 1.0) / 2.0)
 
 
 def power_law_absorption(nu, p, B):
     """Synchrotron self-absorption scaling ~ nu^(-(p+4)/2) B^((p+2)/2)."""
-    return nu**(-(p + 4.0) / 2.0) * B**((p + 2.0) / 2.0)
+    return nu ** (-(p + 4.0) / 2.0) * B ** ((p + 2.0) / 2.0)
 
 
 def uniform_source_intensity(nu, p, B, L, eps0=1.0, alpha0=1.0):
@@ -44,9 +44,7 @@ def uniform_source_intensity(nu, p, B, L, eps0=1.0, alpha0=1.0):
     eps = eps0 * power_law_emissivity(nu, p, B)
     alpha = alpha0 * power_law_absorption(nu, p, B)
     tau = alpha * L
-    S = eps / alpha
-    # -expm1(-tau) is accurate as tau -> 0, where 1-exp(-tau) underflows
-    return S * (-jnp.expm1(-tau))
+    return eps * L * optical_depth_factor(tau)
 
 
 def thin_rotation_depolarisation(Q0, U0, mean_rm, var_rm, lam):

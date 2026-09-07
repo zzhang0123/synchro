@@ -1,17 +1,11 @@
-"""Compare raw-moment (Taylor-N) vs cumulant (cumulant-K) truncation.
+"""Compare two different truncations of one Gamma-distribution MGF.
 
-Demonstrates the truncation-philosophy point of Sec 4.2 with a NON-Gaussian
-distribution: a Gamma(k, theta) whose cumulants kappa_n = (n-1)! k theta^n are
-all non-zero.  For S(dp) = exp(dp) the exact answer is the moment-generating
-function (1 - theta)^-k, so both series are exact when summed to infinity; the
-comparison is which *truncation* converges faster.
-
-  raw-moment Taylor-N : <S> ~ sum_{n=0}^N S^(n)(0) m_n / n!       (true m_n)
-  cumulant-K          : <S> ~ sum_{n=0}^M S^(n)(0) m_n^(K) / n!   (m_n^(K) from
-                          Bell(kappa_1..kappa_K, 0, ...), M large so the Taylor
-                          sum is converged; only the cumulant hierarchy is cut)
-
-Generates figures/moment_vs_cumulant.pdf.
+For S(x)=exp(x), exponentiating a truncated CGF and Taylor-expanding the MGF
+organise the same target differently. The displayed advantage is specific to
+this analytic example, not an information advantage of cumulants. At a common
+Taylor degree, true moments and their Bell-coordinate equivalents coincide.
+An exponentiated nonquadratic CGF polynomial is not asserted to define a legal
+PDF; this scalar MGF calculation is distinct from positive-PDF reconstruction.
 """
 
 from __future__ import annotations
@@ -20,6 +14,7 @@ import math
 
 import numpy as np
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import rc
@@ -79,28 +74,42 @@ def main():
 
     # figure
     fig, ax = plt.subplots(figsize=(5.5, 4))
-    ax.semilogy(list(Ns), raw_err, "C0-o", lw=1.4, ms=4,
-                label="raw-moment Taylor-$N$")
-    ax.semilogy(list(Ks), cumul_err, "C1-s", lw=1.4, ms=4,
-                label="cumulant $K$")
+    ax.semilogy(list(Ns), raw_err, "C0-o", lw=1.4, ms=4, label="raw-moment Taylor-$N$")
+    ax.semilogy(
+        list(Ks), cumul_err, "C1-s", lw=1.4, ms=4, label="exponentiated CGF $K$"
+    )
     ax.set_xlabel("Truncation order ($N$ or $K$)")
+    ax.set_xticks([1, 4, 8, 12, 16, 20])
     ax.set_ylabel(r"relative error in $\langle e^{\delta p}\rangle$")
-    ax.set_title(rf"Gamma($k={k}$, $\theta={theta}$): moment vs cumulant truncation")
+    ax.set_title(rf"Gamma($k={k}$, $\theta={theta}$): two MGF truncations")
     ax.legend(fontsize=9)
     ax.grid(True, which="both", ls=":", alpha=0.5)
     plt.tight_layout()
 
     import os
-    out = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                       "figures", "moment_vs_cumulant.pdf")
+
+    out = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "figures",
+        "moment_vs_cumulant.pdf",
+    )
+    os.makedirs(os.path.dirname(out), exist_ok=True)
     fig.savefig(out, bbox_inches="tight")
     print(f"Saved {out}")
     plt.close()
 
-    # assert cumulant converges at least as fast as raw-moment (at K=N)
+    # This inequality is only this Gamma-MGF example. Check the equal-
+    # information, equal-degree moment/Bell identity independently as well.
+    for N in range(1, 9):
+        direct = gamma_raw_moments(k, theta, N)
+        bell = raw_moments_from_cumulants(gamma_cumulants(k, theta, N), N)
+        np.testing.assert_allclose(bell, direct, rtol=2e-14)
+    # Different operations: CGF degree K versus kernel Taylor degree N.
     for K in range(1, 9):
         assert cumul_err[K - 1] <= raw_err[K - 1] * 1.01
-    print("cumulant-K converges no slower than raw Taylor-N at equal order")
+    print(
+        "This Gamma MGF favours CGF resummation; equal-degree true moment/Bell sums coincide."
+    )
 
 
 if __name__ == "__main__":

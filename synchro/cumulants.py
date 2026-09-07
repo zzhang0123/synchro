@@ -1,33 +1,24 @@
-"""Strict cumulant expansion of the ensemble average.
+"""Finite Bell/moment algebra and finite kernel Taylor contraction.
 
-The exact ensemble average of S(p) = S(p0 + dp) over a distribution with
-cumulants kappa_1, kappa_2, ... is
+First K moments and cumulants are invertible coordinate descriptions of the
+same statistics, assuming the moments exist. The scalar helper can optionally
+set unprovided higher cumulants to zero while constructing moments through N;
+this is an additional closure, not a general positive-PDF reconstruction.
+It must not be identified with a legal polynomial log-characteristic function:
+Marcinkiewicz excludes non-Gaussian exact finite polynomial log CFs of degree>2.
 
-    <S> = [ exp( sum_{k>=1} (1/k!) kappa_k d^k/dp^k ) S(p) ]_{p=p0} .
-
-Truncating the *cumulant hierarchy* at order K (kappa_k = 0 for k > K) is
-principled, unlike truncating the raw-moment Taylor series:
-
-  * a Gaussian is exactly kappa_k = 0 for k >= 3, so the K = 2 cumulant
-    expansion is EXACT (to all Taylor orders) for a Gaussian;
-  * the raw moments m_n = <dp^n> = B_n(kappa_1, ..., kappa_n) (complete Bell
-    polynomials) are in general non-zero to arbitrarily high order for a
-    Gaussian, so a raw-moment Taylor truncation silently drops non-vanishing
-    terms;
-  * for independent parameters the cross-cumulants vanish (additivity).
-
-Numerically we evaluate the cumulant expansion by converting cumulants to raw
-moments with the Bell recursion and summing the Taylor series to order N >= K:
-
-    m_0 = 1,   m_n = sum_{j=1}^{min(n,K)} C(n-1, j-1) kappa_j m_{n-j},
-    <S> = sum_{n=0}^{N} S^(n)(p0) m_n / n! .
+Gaussian K=2 specifies the full Gaussian distribution, but evaluating a kernel
+from only N derivatives still leaves its Taylor remainder. Equality with an
+infinite differential-operator series requires convergence and interchange
+conditions. For a given finite polynomial and the same supplied information,
+moment and cumulant contractions are identical.
 """
 
 from __future__ import annotations
 
 import math
 
-import numpy as np
+import jax.numpy as jnp
 
 
 def raw_moments_from_cumulants(kappa, N):
@@ -36,6 +27,8 @@ def raw_moments_from_cumulants(kappa, N):
     Complete Bell polynomial recursion, with kappa_j = 0 for j > K.  Returns a
     list of length N+1 with m_n = <dp^n>.
     """
+    if not isinstance(N, int) or N < 0:
+        raise ValueError("N must be a nonnegative static integer")
     K = len(kappa)
     m = [1.0]  # m_0 = 1
     for n in range(1, N + 1):
@@ -60,7 +53,9 @@ def cumulant_expansion(S_derivs, kappa):
     """
     N = len(S_derivs) - 1
     m = raw_moments_from_cumulants(kappa, N)
-    return float(sum(S_derivs[n] * m[n] / math.factorial(n) for n in range(N + 1)))
+    return jnp.asarray(
+        sum(S_derivs[n] * m[n] / math.factorial(n) for n in range(N + 1))
+    )
 
 
 def gaussian_cumulants(mu, sigma):
@@ -70,7 +65,7 @@ def gaussian_cumulants(mu, sigma):
     kappa_1 = mu, kappa_2 = sigma^2, kappa_{k>=3} = 0.  For a reference at the
     mean p0 = mu, the deviation cumulants are instead [0, sigma^2].
     """
-    return np.array([mu, sigma**2])
+    return jnp.asarray([mu, sigma**2])
 
 
 def raw_moments_gaussian(mu, sigma, N):
@@ -79,7 +74,7 @@ def raw_moments_gaussian(mu, sigma, N):
 
 
 def vector_cumulant_expansion(S_derivs, kappas):
-    """Vector (multi-parameter) cumulant expansion, truncated at total order K.
+    """Vector (multi-parameter) cumulant expansion, truncated at Taylor degree K <= 4.
 
     Generalises :class:`synchro.expansion.CumulantExpansion` beyond second
     order by adding the non-Gaussian cumulants kappa_3, kappa_4.  Parameters:
@@ -90,7 +85,7 @@ def vector_cumulant_expansion(S_derivs, kappas):
         [kappa1(P), kappa2(P,P), kappa3(P,P,P), kappa4(P,P,P,P)] (up to the
         desired order K = len(kappas)).
 
-    Returns <S> = S0 + sum of terms to total cumulant order K:
+    Returns the degree-K kernel average expressed through cumulants:
 
         K=1: kappa_i S^(i)
         K=2: (1/2) kappa_ij S^(ij) + (1/2) kappa_i kappa_j S^(ij)
@@ -105,9 +100,11 @@ def vector_cumulant_expansion(S_derivs, kappas):
     moment expansion; the coefficients are the multivariate Faà di Bruno
     (complete Bell) weights.  JAX-native, so it is jittable/differentiable.
     """
-    import jax.numpy as jnp
-
     K = len(kappas)
+    if K > 4:
+        raise ValueError("vector_cumulant_expansion supports at most four orders")
+    if len(S_derivs) < K + 1:
+        raise ValueError("need derivative tensors through the requested Taylor order")
     out = S_derivs[0]
     if K < 1:
         return out

@@ -15,22 +15,19 @@ Expressions (corrected absolute normalisation, cf. Legg & Westfold 1968):
     x_n = n b_perp sinT / D,
     b_par  = beta cos(alpha),  b_perp = beta sin(alpha).
 
-Stokes:  I = || + _|,  Q = || - _|,  V = 2 Im(E_x E_y^*) (see code for sign).
+Stokes:  I = || + _|,  Q = || - _|,  V = -2 Im(E_parallel E_perp^*) for the exp(+i omega t) Fourier convention.
 
 The frequency of the n-th harmonic is w_n = n w_B / D.
 """
 
 from __future__ import annotations
 
-import jax
 import jax.numpy as jnp
 
-from .bessel import bessel_jn_and_prime
+from .bessel import bessel_jn, bessel_jn_and_prime
 
-# CGS constants
-E_ESU = 4.80320427e-10  # elementary charge [esu]
-C_CGS = 2.99792458e10  # speed of light [cm/s]
-M_E = 9.1093837e-28  # electron mass [g]
+# Imported aliases preserve the public constant names used by older callers.
+from .constants import C_CGS, E_ESU, M_E
 
 
 def beta_of_gamma(gamma):
@@ -55,20 +52,17 @@ def _harmonic(n, gamma, alpha, theta):
     D = doppler(b_par, theta)
     x = n * b_perp * st / D
 
-    jn, jnp_ = bessel_jn_and_prime(n, x)
+    _, jnp_ = bessel_jn_and_prime(n, x)
 
-    g_par = (ct - b_par) ** 2 / st**2
-    # dP/dOmega divided by [e^2 w_B^2 / (2 pi c)]
-    P_par = n**2 * g_par * jn**2 / D**3
-    P_perp = n**2 * b_perp**2 * jnp_**2 / D**3
-
-    I = P_par + P_perp
-    Q = P_par - P_perp
-    # V is defined up to an overall handedness convention: V = 2 Im(E_x E_y*)
-    # (IAU) yields the opposite sign for an electron.  Magnitude and parameter
-    # dependence are unambiguous; the full-polarisation identity I^2 = Q^2 + V^2
-    # is sign-independent.
-    V = 2.0 * n**2 * b_perp * (ct - b_par) / (st * D**3) * jn * jnp_
+    # J_n(x)/sin(theta) = beta_perp [J_(n-1)(x)+J_(n+1)(x)]/(2D).
+    # This exact recurrence removes the removable viewing-axis singularity.
+    neighbours = bessel_jn(n - 1, x) + bessel_jn(n + 1, x)
+    amplitude_par = (ct - b_par) * b_perp * neighbours / (2.0 * D)
+    amplitude_perp = b_perp * jnp_
+    factor = n**2 / D**3
+    I = factor * (amplitude_par**2 + amplitude_perp**2)
+    Q = factor * (amplitude_par**2 - amplitude_perp**2)
+    V = 2.0 * factor * amplitude_par * amplitude_perp
     return I, Q, V
 
 
@@ -76,8 +70,12 @@ def stokes_harmonic(n, gamma, alpha, theta, B=None):
     """Stokes (I, Q, V) power per unit solid angle at harmonic ``n``.
 
     If ``B`` (Gauss) is given, returns physical ``dP_n/dOmega`` [erg/s/sr];
-    otherwise returns the value normalised by e^2 w_B^2/(2 pi c) (which is
-    B-independent and convenient for derivative spectra).
+    otherwise returns the value normalised by e^2 w_B^2/(2 pi c). That
+    normalisation depends on gamma; derivatives of this dimensionless output
+    are not physical fixed-B derivatives. Harmonic n >= 1, gamma >= 1,
+    alpha/theta in [0, pi]. Angular endpoints use their analytic limits.
+    Numerical quadrature errors remain separate from the vacuum helical-orbit
+    reference physics. Differentiation is intended for interior parameters.
     """
     I, Q, V = _harmonic(n, gamma, alpha, theta)
     if B is None:
