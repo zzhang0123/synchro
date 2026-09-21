@@ -87,6 +87,82 @@ class CumulantExpansion(eqx.Module):
         factor = 1.0 + 2.0 * mu_B / B0 + (var_B + mu_B**2) / B0**2
         return S * factor
 
+    def checked_average(self, mean, covariance, *, absolute_error):
+        """Validate statistics and return ``(prediction, absolute_error)``.
+
+        This opt-in fitting boundary accepts real finite (P,) means and (P,P)
+        covariances. Symmetry and PSD checks use a relative floating-point
+        tolerance of 32*P*eps in correlation coordinates; negative variances
+        and nonzero covariance with a zero-variance coordinate are rejected
+        outright. No eigenvalues are clipped. Zero covariance is valid. The low-level
+        ``__call__`` remains available without this eigensolver overhead.
+
+        ``absolute_error`` is a required, finite nonnegative envelope in the
+        output's units, broadcastable to (N,3). It is supplied by the caller,
+        NOT inferred from covariance validity. It must cover the omitted
+        kernel terms and any other model errors the caller claims to control.
+        Physical support and the validity of this envelope are not certified
+        here; zero is justified only for an exact quadratic response or other
+        independently established zero remainder. Numerical roundoff is not
+        bounded by this routine. For a later linear map A, propagate this
+        componentwise envelope as abs(A) @ envelope.
+        """
+        mean, covariance = jnp.asarray(mean), jnp.asarray(covariance)
+        p = self.dS.shape[-1]
+        if mean.shape != (p,) or covariance.shape != (p, p):
+            raise ValueError("mean and covariance must have shapes (P,) and (P,P)")
+        if jnp.iscomplexobj(mean) or jnp.iscomplexobj(covariance):
+            raise ValueError("mean and covariance must be real")
+        dtype = jnp.result_type(mean, covariance, 1.0)
+        mean, covariance = mean.astype(dtype), covariance.astype(dtype)
+        mean = eqx.error_if(mean, jnp.any(~jnp.isfinite(mean)), "mean must be finite")
+        covariance = eqx.error_if(
+            covariance, jnp.any(~jnp.isfinite(covariance)), "covariance must be finite"
+        )
+        diagonal = jnp.diag(covariance)
+        zero_pair = (diagonal[:, None] == 0) | (diagonal[None, :] == 0)
+        covariance = eqx.error_if(
+            covariance,
+            jnp.any(diagonal < 0) | jnp.any(zero_pair & (covariance != 0)),
+            "covariance requires nonnegative variances and zero covariance for zero variance",
+        )
+        # Congruence scaling makes the check insensitive to parameter units.
+        # A large independent variance must not hide an indefinite small block.
+        std = jnp.sqrt(jnp.where(diagonal > 0, diagonal, 1.0))
+        scaled = covariance / std[:, None] / std[None, :]
+        tol = 32 * p * jnp.finfo(dtype).eps
+        scaled = eqx.error_if(
+            scaled,
+            jnp.any(~jnp.isfinite(scaled)) | jnp.any(jnp.abs(scaled) > 1 + tol),
+            "covariance violates the Cauchy-Schwarz bound",
+        )
+        invalid = (jnp.max(jnp.abs(scaled - scaled.T)) > tol) | (
+            jnp.min(jnp.linalg.eigvalsh((scaled + scaled.T) / 2)) < -tol
+        )
+        covariance = eqx.error_if(
+            covariance, invalid, "covariance must be symmetric positive semidefinite"
+        )
+        prediction = self(mean, covariance)
+        prediction = eqx.error_if(
+            prediction,
+            jnp.any(~jnp.isfinite(prediction)),
+            "quadratic response overflowed",
+        )
+        error = jnp.asarray(absolute_error)
+        if jnp.iscomplexobj(error):
+            raise ValueError("absolute_error must be real")
+        error = jnp.broadcast_to(error, prediction.shape)
+        error = eqx.error_if(
+            error,
+            jnp.any(~jnp.isfinite(error)) | jnp.any(error < 0),
+            "absolute_error must be finite and nonnegative",
+        )
+        return prediction, error
+
+
+# Descriptive name without breaking existing Equinox trees or imports.
+QuadraticTaylorExpansion = CumulantExpansion
+
 
 def build_expansion(harmonics, gamma0, alpha0, theta0, *, B=None):
     """Build a quadratic response; B [G] selects physical fixed-B derivatives.

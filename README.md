@@ -15,6 +15,71 @@ assessment live in the manuscript repository's `validation/` directory. They do
 not import this package. `CumulantExpansion` here is the historical name of a
 quadratic kernel average; it is not that PDF reconstruction.
 
+The main paper covers radiation kernels, population averages, moment/cumulant
+representations and their error control, including external Faraday screens.
+General ordered transfer, Magnus, absorption/conversion and the 21-cm examples
+belong to its separate extended discussion. These exploratory modules remain
+available here; they are not prerequisites for the main statistical framework.
+
+## Statistical interfaces
+
+`QuadraticTaylorExpansion` is the descriptive alias for `CumulantExpansion`;
+existing imports and Equinox trees retain their identity. Its low-level call
+continues to contract supplied tensors. For a validated entry point, use
+`model.checked_average(mean, covariance, absolute_error=...)`: it checks finite
+real inputs, shapes, symmetry and positive semidefiniteness and returns
+`(prediction, envelope)`. The check uses correlation coordinates so a large
+independent variance cannot hide a small invalid block. Its numerical tolerance
+is `32 * P * eps`; no covariance projection or eigenvalue clipping is performed.
+
+The required `absolute_error` is a caller-established componentwise envelope in
+the prediction's units, broadcastable to its shape. The routine validates and
+returns it; it does **not** derive a remainder from two moments, certify physical
+support or bound floating-point error. For a downstream linear response `A`,
+propagate it as `abs(A) @ envelope` (flattening the Stokes/harmonic axes as needed).
+For example, zero is justified for this exactly quadratic synthetic kernel:
+
+```python
+import synchro
+import jax.numpy as jnp
+
+model = synchro.QuadraticTaylorExpansion(
+    harmonics=(1,), S0=jnp.zeros((1, 3)),
+    dS=jnp.zeros((1, 3, 1)), ddS=2*jnp.ones((1, 3, 1, 1)),
+)
+prediction, error = model.checked_average([0.3], [[0.25]], absolute_error=0.)
+# Each synthetic output is E[x**2] = 0.3**2 + 0.25 = 0.34.
+```
+
+`rm_moments` is the descriptive alias for `gaussian_rm_cumulants`. Neither name
+establishes Gaussianity. Use `burn_depolarisation` for a declared Gaussian screen,
+or `screen_polarisation` for a discrete weighted screen without that closure:
+
+```python
+from synchro.rm import screen_polarisation, rm_moments
+
+mean_rm, var_rm = rm_moments([-1., 1.])
+P = screen_polarisation([1., -1.], [-1., 1.], jnp.sqrt(jnp.pi / 4))
+# P is -1j: incident polarisation and RM are correlated across the two rays.
+```
+
+RM is in rad/m² and wavelength in metres. Incident complex `P0 = Q + iU` is a
+scalar or a vector matching the 1D RM samples; wavelengths have any shape, which
+is also the output shape. Optional weights are nonnegative relative masses.
+Forward evaluation scans rays, avoiding a samples-by-wavelengths phase array;
+reverse-mode differentiation can still retain per-ray intermediates. JIT and
+gradients are supported. Invalid inputs and arithmetic overflow raise errors.
+Finite phase values alone do not guarantee accurate argument reduction for
+arbitrarily large phases; floating-point and sampling accuracy need separate
+checks in such regimes.
+
+For fixed normalized weights, perturbing incident polarisation and RM gives
+`|delta P| <= sum(w*|delta P0|) + 2*lambda²*sum(w*|P0|*|delta RM|)`.
+Use consistent intermediate values when also changing weights; their additional
+bound is `max(|P0|)*sum(|delta w|)`. Sampling/quadrature uncertainty remains an
+external input. This discrete-screen API does not model internally distributed
+emission, absorption or conversion.
+
 ## Install and verify
 
 Python 3.12 is the tested runtime. From this checkout:

@@ -116,6 +116,22 @@ def gaussian_rm_cumulants(
     optional weights are finite matching 1D arrays; weights are nonnegative
     with positive total mass. This function supports JIT and differentiation.
     """
+    rms, w = _screen_samples(rms, weights)
+    mean = jnp.sum(w * rms)
+    var = jnp.sum(w * (rms - mean) ** 2)
+    moments = jnp.stack([mean, var])
+    moments = eqx.error_if(
+        moments, jnp.any(~jnp.isfinite(moments)), "RM moment arithmetic overflowed"
+    )
+    return moments[0], moments[1]
+
+
+# Descriptive name; preserve the historical API and function identity.
+rm_moments = gaussian_rm_cumulants
+
+
+def _screen_samples(rms, weights):
+    """Shared real-sample validation and overflow-safe relative weights."""
     rms = jnp.asarray(rms)
     if rms.ndim != 1 or rms.size == 0:
         raise ValueError("RM samples must be a nonempty 1D array")
@@ -147,10 +163,63 @@ def gaussian_rm_cumulants(
             weights / jax.lax.stop_gradient(jnp.max(weights))
         )
         w = scaled / jnp.sum(scaled)
-    mean = jnp.sum(w * rms)
-    var = jnp.sum(w * (rms - mean) ** 2)
-    moments = jnp.stack([mean, var])
-    moments = eqx.error_if(
-        moments, jnp.any(~jnp.isfinite(moments)), "RM moment arithmetic overflowed"
+    return rms, w
+
+
+def screen_polarisation(
+    P0: ArrayLike,
+    rms: ArrayLike,
+    lam: ArrayLike,
+    weights: ArrayLike | None = None,
+) -> jax.Array:
+    """Average ``P0 * exp(2j * RM * lam**2)`` over a discrete external screen.
+
+    RM samples are a nonempty 1D array in rad/m^2, wavelengths in metres.
+    ``P0`` is a complex scalar shared by rays or a matching 1D array allowing
+    correlation with RM. Wavelengths can have any shape; the output has that
+    shape, with no implicit ray/frequency broadcasting. Weights are finite,
+    nonnegative relative masses, normalized internally. All inputs must be
+    finite; RM and wavelengths must be real. JIT and differentiation are
+    supported. A scan uses O(number of wavelengths) working storage in forward
+    evaluation; reverse-mode AD may retain per-ray intermediates.
+
+    This is the supplied discrete-screen average, not a Gaussian closure or
+    a cumulant truncation. Sampling/quadrature error and physical screen-model
+    error remain external inputs. It excludes internal emission, absorption
+    and conversion. For fixed normalized weights w, perturbations obey
+    |delta P| <= sum(w*|delta P0|)
+                + 2*lam^2*sum(w*|P0|*|delta RM|).
+    Changed normalized weights additionally contribute
+    max(|P0|)*sum(|delta w|), evaluated consistently at the intermediate screen.
+    These are input-error bounds, not floating-point or sampling certificates.
+    """
+    rms, w = _screen_samples(rms, weights)
+    incident, lam = jnp.asarray(P0), jnp.asarray(lam)
+    if incident.ndim != 0 and incident.shape != rms.shape:
+        raise ValueError("P0 must be scalar or match the 1D RM samples")
+    if jnp.iscomplexobj(lam):
+        raise ValueError("wavelengths must be real")
+    incident = eqx.error_if(
+        incident, jnp.any(~jnp.isfinite(incident)), "P0 must be finite"
     )
-    return moments[0], moments[1]
+    lam = lam.astype(jnp.result_type(lam, 1.0))
+    lam = eqx.error_if(lam, jnp.any(~jnp.isfinite(lam)), "wavelengths must be finite")
+    lam2 = lam**2
+    lam2 = eqx.error_if(lam2, jnp.any(~jnp.isfinite(lam2)), "screen phase overflowed")
+    incident = jnp.broadcast_to(incident, rms.shape)
+    dtype = jnp.result_type(incident, rms, lam, 1j)
+
+    def accumulate(total, ray):
+        rm, amplitude, weight = ray
+        phase = (2 * lam2) * rm
+        phase = eqx.error_if(
+            phase, jnp.any(~jnp.isfinite(phase)), "screen phase overflowed"
+        )
+        return total + weight * amplitude * jnp.exp(1j * phase), None
+
+    result, _ = jax.lax.scan(
+        accumulate, jnp.zeros(lam.shape, dtype=dtype), (rms, incident, w)
+    )
+    return eqx.error_if(
+        result, jnp.any(~jnp.isfinite(result)), "screen average overflowed"
+    )

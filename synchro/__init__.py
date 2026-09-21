@@ -49,7 +49,11 @@ from . import (  # noqa: E402
 )  # noqa: E402,F401
 from .stokes import larmor_power, stokes_harmonic  # noqa: E402,F401
 from .derivatives import derivative_spectra  # noqa: E402,F401
-from .expansion import CumulantExpansion, build_expansion  # noqa: E402,F401
+from .expansion import (  # noqa: E402,F401
+    CumulantExpansion,
+    QuadraticTaylorExpansion,
+    build_expansion,
+)
 from .ultrarel import F, G  # noqa: E402,F401
 
 __all__ = [
@@ -71,6 +75,7 @@ __all__ = [
     "larmor_power",
     "derivative_spectra",
     "CumulantExpansion",
+    "QuadraticTaylorExpansion",
     "build_expansion",
     "F",
     "G",
