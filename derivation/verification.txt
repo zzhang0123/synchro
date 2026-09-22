@@ -1,0 +1,55 @@
+PASS local basis orthonormal
+PASS local basis right handed
+PASS sky basis right handed
+PASS sky perpendicular equals e_phi
+PASS Lorentz equation
+PASS constant speed
+PASS no magnetic work
+PASS trajectory derivative
+PASS retarded arrival time
+PASS arrival-time Jacobian
+PASS observed orbit period
+PASS harmonic phase
+arrivalTime = t - bl*t*Cos[theta] + (bp*Sin[phase0 + omegaB*t]*Sin[theta])/omegaB
+lineFrequency = (m*omegaB)/(1 - bl*Cos[theta])
+PASS general radiation integration-by-parts identity
+PASS time-domain field components
+PASS projected velocity
+projectedVelocity = {-(bp*Cos[phase0 + omegaB*t]*Cos[theta]) - bl*Sin[theta], -(bp*Sin[phase0 + omegaB*t])}
+electricField = {(bp*charge*omegaB*(bl - Cos[theta])*Sin[phase0 + omegaB*t])/(light*radius*(1 - bl*Cos[theta] + bp*Cos[phase0 + omegaB*t]*Sin[theta])^3), (bp*charge*omegaB*(Cos[phase0 + omegaB*t]*(-1 + bl*Cos[theta]) - bp*Sin[theta]))/(light*radius*(-1 + bl*Cos[theta] - bp*Cos[phase0 + omegaB*t]*Sin[theta])^3)}
+PASS Fourier zero mode
+PASS Fourier nonzero integer modes
+PASS Bessel coefficient from exponential series
+PASS both complex harmonic amplitudes
+harmonicAmplitudes = {(-1)^m*BesselJ[m, (bp*m*Sin[theta])/(1 - bl*Cos[theta])]*(-bl + Cos[theta])*Csc[theta], (I/2)*(-1)^m*bp*(BesselJ[-1 + m, (bp*m*Sin[theta])/(1 - bl*Cos[theta])] - BesselJ[1 + m, (bp*m*Sin[theta])/(1 - bl*Cos[theta])])}
+PASS axis-safe amplitude recurrence
+PASS finite-time line mass
+PASS line-kernel tail vanishes
+PASS delta Jacobian with frequency-squared weight
+PASS absolute harmonic power prefactor
+sourceTimePowerPrefactor = -1/2*(charge^2*m^2*omegaB^2)/(light*Pi*(-1 + bl*Cos[theta])^3)
+PASS natural-basis I Q U V
+PASS complete single-harmonic polarisation
+PASS general Jones-to-sky Stokes rotation
+PASS positive-V circular state
+PASS V unchanged under consistent Fourier conjugation
+naturalStokes = {aa^2 + bb^2, (aa - bb)*(aa + bb), 0, 2*aa*bb}
+skyStokes = {aa^2 + bb^2, (aa - bb)*(aa + bb)*Cos[2*phi], (aa - bb)*(aa + bb)*Sin[2*phi], 2*aa*bb}
+PASS total power from angular Poynting integral
+totalPower = (2*acc^2*charge^2)/(3*light*(-1 + speed^2)^2)
+PASS helical total power
+PASS cooling time over gyroperiod
+coolingOrbitRatio = (3*light^4*mass^2)/(4*bp^2*charge^3*field*lorentz^2*Pi)
+PASS retarded-field Fourier case {1, 6/5, Pi/4, Pi/3, 0, 0}
+PASS retarded-field Fourier case {3, 2, Pi/4, Pi/3, Pi/7, Pi/5}
+PASS retarded-field Fourier case {7, 2, Pi/4, (2*Pi)/3, -1/5*Pi, Pi/3}
+PASS retarded-field Fourier case {5, 2, (3*Pi)/4, Pi/3, Pi/4, -1/6*Pi}
+PASS retarded-field Fourier case {25, 5, Pi/4, Pi/3, Pi/6, Pi/8}
+PASS retarded-field Fourier case {1, 2, Pi/3, 0, Pi/5, Pi/7}
+PASS retarded-field Fourier case {1, 2, Pi/3, Pi, Pi/5, Pi/7}
+PASS retarded-field Fourier case {3, 2, Pi/3, 0, Pi/5, Pi/7}
+PASS harmonic sum and angular integral vs independently integrated field
+PASS detect reversed V sign
+PASS detect omitted delta Jacobian
+PASS numerical checks completed without Wolfram messages
+44/44 checks passed.

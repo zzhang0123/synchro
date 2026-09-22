@@ -53,6 +53,7 @@ from .expansion import (  # noqa: E402,F401
     CumulantExpansion,
     QuadraticTaylorExpansion,
     build_expansion,
+    mixed_moments,
 )
 from .ultrarel import F, G  # noqa: E402,F401
 
@@ -77,6 +78,7 @@ __all__ = [
     "CumulantExpansion",
     "QuadraticTaylorExpansion",
     "build_expansion",
+    "mixed_moments",
     "F",
     "G",
 ]

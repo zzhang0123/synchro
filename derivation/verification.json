@@ -1,0 +1,382 @@
+{
+	"wolframVersion":"14.0.0 for Mac OS X ARM (64-bit) (December 13, 2023)",
+	"dateUTC":"2026-09-22T15:00:19",
+	"scope":"Classical prescribed helical orbit; vacuum far zone; source-time line powers",
+	"scriptsSHA256":{
+		"verify.wls":"0c46041d9fad916989bbb59c3bdaee965bc10277028c04c907eb75f7fb69c977",
+		"numerical_checks.wls":"e90904d0821624fb96786915fb7b5ad5a9fd07720db77242a813ef5278f0a1ea"
+	},
+	"checks":[
+		{
+			"name":"local basis orthonormal",
+			"pass":true,
+			"detail":"{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}}"
+		},
+		{
+			"name":"local basis right handed",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"sky basis right handed",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"sky perpendicular equals e_phi",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"Lorentz equation",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"constant speed",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"no magnetic work",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"trajectory derivative",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"retarded arrival time",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"arrival-time Jacobian",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"observed orbit period",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"harmonic phase",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"general radiation integration-by-parts identity",
+			"pass":true,
+			"detail":"{0, 0, 0}"
+		},
+		{
+			"name":"time-domain field components",
+			"pass":true,
+			"detail":"{0, 0}"
+		},
+		{
+			"name":"projected velocity",
+			"pass":true,
+			"detail":"{0, 0}"
+		},
+		{
+			"name":"Fourier zero mode",
+			"pass":true,
+			"detail":""
+		},
+		{
+			"name":"Fourier nonzero integer modes",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"Bessel coefficient from exponential series",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"both complex harmonic amplitudes",
+			"pass":true,
+			"detail":"{0, 0}"
+		},
+		{
+			"name":"axis-safe amplitude recurrence",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"finite-time line mass",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"line-kernel tail vanishes",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"delta Jacobian with frequency-squared weight",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"absolute harmonic power prefactor",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"natural-basis I Q U V",
+			"pass":true,
+			"detail":"{0, 0, 0, 0}"
+		},
+		{
+			"name":"complete single-harmonic polarisation",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"general Jones-to-sky Stokes rotation",
+			"pass":true,
+			"detail":"{0, 0, 0, 0}"
+		},
+		{
+			"name":"positive-V circular state",
+			"pass":true,
+			"detail":""
+		},
+		{
+			"name":"V unchanged under consistent Fourier conjugation",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"total power from angular Poynting integral",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"helical total power",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"cooling time over gyroperiod",
+			"pass":true,
+			"detail":"0"
+		},
+		{
+			"name":"retarded-field Fourier case {1, 6\/5, Pi\/4, Pi\/3, 0, 0}",
+			"pass":true,
+			"detail":"{0``40.16689217994778, 2.4369713741987129835299121355806811198119650422530018795167617`39.52287874528034*^-54}"
+		},
+		{
+			"name":"retarded-field Fourier case {3, 2, Pi\/4, Pi\/3, Pi\/7, Pi\/5}",
+			"pass":true,
+			"detail":"{0``39.88147688925925, 0``40.358252441486464}"
+		},
+		{
+			"name":"retarded-field Fourier case {7, 2, Pi\/4, (2*Pi)\/3, -1\/5*Pi, Pi\/3}",
+			"pass":true,
+			"detail":"{0``41.311748742270936, 0``43.49369815379384}"
+		},
+		{
+			"name":"retarded-field Fourier case {5, 2, (3*Pi)\/4, Pi\/3, Pi\/4, -1\/6*Pi}",
+			"pass":true,
+			"detail":"{0``40.84354349816298, 0``42.48982563254396}"
+		},
+		{
+			"name":"retarded-field Fourier case {25, 5, Pi\/4, Pi\/3, Pi\/6, Pi\/8}",
+			"pass":true,
+			"detail":"{0``39.544620092462, 0``39.66790172574961}"
+		},
+		{
+			"name":"retarded-field Fourier case {1, 2, Pi\/3, 0, Pi\/5, Pi\/7}",
+			"pass":true,
+			"detail":"{0``39.61378497577031, 0``39.647960179655136}"
+		},
+		{
+			"name":"retarded-field Fourier case {1, 2, Pi\/3, Pi, Pi\/5, Pi\/7}",
+			"pass":true,
+			"detail":"{0``40.02650654970489, 0``40.88602088870702}"
+		},
+		{
+			"name":"retarded-field Fourier case {3, 2, Pi\/3, 0, Pi\/5, Pi\/7}",
+			"pass":true,
+			"detail":"{3.568905073231508722809027806113273001546642220348383075540214639`40.*^-52, 4.96326811827649331125722442533998870328514887387117`39.52287874528032*^-104}"
+		},
+		{
+			"name":"harmonic sum and angular integral vs independently integrated field",
+			"pass":true,
+			"detail":"{0.21119999999999997750437370928273879218`25., 0.2111999999999999999999999999999981192614396977417344320964`35., 132\/625, 8.9050121226432683028783314`2.9496345150169465*^-33}"
+		},
+		{
+			"name":"detect reversed V sign",
+			"pass":true,
+			"detail":""
+		},
+		{
+			"name":"detect omitted delta Jacobian",
+			"pass":true,
+			"detail":""
+		},
+		{
+			"name":"numerical checks completed without Wolfram messages",
+			"pass":true,
+			"detail":""
+		}
+	],
+	"expressions":{
+		"arrivalTime":"t - bl*t*Cos[theta] + (bp*Sin[phase0 + omegaB*t]*Sin[theta])\/omegaB",
+		"lineFrequency":"(m*omegaB)\/(1 - bl*Cos[theta])",
+		"projectedVelocity":"{-(bp*Cos[phase0 + omegaB*t]*Cos[theta]) - bl*Sin[theta], -(bp*Sin[phase0 + omegaB*t])}",
+		"electricField":"{(bp*charge*omegaB*(bl - Cos[theta])*Sin[phase0 + omegaB*t])\/(light*radius*(1 - bl*Cos[theta] + bp*Cos[phase0 + omegaB*t]*Sin[theta])^3), (bp*charge*omegaB*(Cos[phase0 + omegaB*t]*(-1 + bl*Cos[theta]) - bp*Sin[theta]))\/(light*radius*(-1 + bl*Cos[theta] - bp*Cos[phase0 + omegaB*t]*Sin[theta])^3)}",
+		"harmonicAmplitudes":"{(-1)^m*BesselJ[m, (bp*m*Sin[theta])\/(1 - bl*Cos[theta])]*(-bl + Cos[theta])*Csc[theta], (I\/2)*(-1)^m*bp*(BesselJ[-1 + m, (bp*m*Sin[theta])\/(1 - bl*Cos[theta])] - BesselJ[1 + m, (bp*m*Sin[theta])\/(1 - bl*Cos[theta])])}",
+		"sourceTimePowerPrefactor":"-1\/2*(charge^2*m^2*omegaB^2)\/(light*Pi*(-1 + bl*Cos[theta])^3)",
+		"naturalStokes":"{aa^2 + bb^2, (aa - bb)*(aa + bb), 0, 2*aa*bb}",
+		"skyStokes":"{aa^2 + bb^2, (aa - bb)*(aa + bb)*Cos[2*phi], (aa - bb)*(aa + bb)*Sin[2*phi], 2*aa*bb}",
+		"totalPower":"(2*acc^2*charge^2)\/(3*light*(-1 + speed^2)^2)",
+		"coolingOrbitRatio":"(3*light^4*mass^2)\/(4*bp^2*charge^3*field*lorentz^2*Pi)"
+	},
+	"numericalCases":[
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{1, 6\/5, Pi\/4, Pi\/3, 0, 0}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":2.436971374198713e-54,
+			"directStokes":[
+				1.0396759037837372e-2,
+				-9.985934593056411e-3,
+				-2.436971374198713e-54,
+				2.893736130688559e-3
+			],
+			"analyticStokes":[
+				1.0396759037837372e-2,
+				-9.985934593056411e-3,
+				0.0,
+				2.893736130688559e-3
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{3, 2, Pi\/4, Pi\/3, Pi\/7, Pi\/5}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				5.373674763285423e-2,
+				-3.0627437041130034e-2,
+				-3.8405591293838616e-2,
+				-2.178551591813488e-2
+			],
+			"analyticStokes":[
+				5.373674763285423e-2,
+				-3.0627437041130034e-2,
+				-3.8405591293838616e-2,
+				-2.178551591813488e-2
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{7, 2, Pi\/4, (2*Pi)\/3, -1\/5*Pi, Pi\/3}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				4.0687595360191904e-5,
+				-1.0469669300136044e-6,
+				3.2222328844697858e-6,
+				-4.0546288260214514e-5
+			],
+			"analyticStokes":[
+				4.0687595360191904e-5,
+				-1.0469669300136044e-6,
+				3.2222328844697858e-6,
+				-4.0546288260214514e-5
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{5, 2, (3*Pi)\/4, Pi\/3, Pi\/4, -1\/6*Pi}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				3.6755342725907996e-4,
+				0.0,
+				-3.2102656270262e-5,
+				3.66148796734728e-4
+			],
+			"analyticStokes":[
+				3.6755342725907996e-4,
+				0.0,
+				-3.2102656270262e-5,
+				3.66148796734728e-4
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{25, 5, Pi\/4, Pi\/3, Pi\/6, Pi\/8}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				0.2704592136460567,
+				-5.811812986208714e-2,
+				-0.10066355376202092,
+				-0.24420753094730235
+			],
+			"analyticStokes":[
+				0.2704592136460567,
+				-5.811812986208714e-2,
+				-0.10066355376202092,
+				-0.24420753094730235
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{1, 2, Pi\/3, 0, Pi\/5, Pi\/7}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				0.2455798181902659,
+				0.0,
+				0.0,
+				0.2455798181902659
+			],
+			"analyticStokes":[
+				0.2455798181902659,
+				0.0,
+				0.0,
+				0.2455798181902659
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{1, 2, Pi\/3, Pi, Pi\/5, Pi\/7}",
+			"scaledComplexAmplitudeError":0.0,
+			"scaledStokesError":0.0,
+			"directStokes":[
+				1.5211167303964067e-2,
+				0.0,
+				0.0,
+				-1.5211167303964067e-2
+			],
+			"analyticStokes":[
+				1.5211167303964067e-2,
+				0.0,
+				0.0,
+				-1.5211167303964067e-2
+			]
+		},
+		{
+			"parameters_m_gamma_alpha_theta_phi_phase0":"{3, 2, Pi\/3, 0, Pi\/5, Pi\/7}",
+			"scaledComplexAmplitudeError":3.5689050732315086e-52,
+			"scaledStokesError":4.9632681182764934e-104,
+			"directStokes":[
+				4.9632681182764934e-104,
+				2.187402783553901e-104,
+				-3.313767042783587e-104,
+				2.9779602855917754e-104
+			],
+			"analyticStokes":[
+				0.0,
+				0.0,
+				0.0,
+				0.0
+			]
+		}
+	],
+	"allPassed":true
+}

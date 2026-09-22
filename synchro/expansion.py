@@ -20,6 +20,62 @@ import jax.numpy as jnp
 from .derivatives import derivative_spectra
 
 
+def mixed_moments(offsets, factor, weights=None):
+    """Return E[W], E[W*dq], E[W*dq*dq] for a supplied joint population.
+
+    ``offsets`` is a nonempty real (samples, P) array of deviations from the
+    kernel reference; ``factor`` is a matching real or complex (samples,)
+    array W. Optional nonnegative relative electron-number weights are
+    normalized, but W is NOT normalized. For fixed-harmonic field averaging,
+    use W=(B/B0)^2 and W=(B/B0)^2*exp(2j*phi), with B0>0 and phi in radians.
+    Keep every sample's q, B and phi paired to preserve their correlations.
+    The result is raw mixed moments, not a mean/covariance under W weights.
+
+    Shapes are (), (P,), (P,P). JIT/autodiff are supported. The routine checks
+    finite arrays and weights, not physical support or sampling/quadrature
+    accuracy. These finite statistics do not infer a joint PDF or a remainder.
+    """
+    offsets, factor = jnp.asarray(offsets), jnp.asarray(factor)
+    if offsets.ndim != 2 or min(offsets.shape) == 0:
+        raise ValueError("offsets must have nonempty shape (samples,P)")
+    if factor.shape != (offsets.shape[0],):
+        raise ValueError("factor must have shape (samples,)")
+    if jnp.iscomplexobj(offsets):
+        raise ValueError("offsets must be real")
+    offsets = offsets.astype(jnp.result_type(offsets, 1.0))
+    factor = factor.astype(jnp.result_type(factor, 1.0))
+    offsets = eqx.error_if(
+        offsets, jnp.any(~jnp.isfinite(offsets)), "offsets must be finite"
+    )
+    factor = eqx.error_if(
+        factor, jnp.any(~jnp.isfinite(factor)), "factor must be finite"
+    )
+    if weights is None:
+        w = jnp.ones(offsets.shape[0], dtype=offsets.dtype) / offsets.shape[0]
+    else:
+        w = jnp.asarray(weights)
+        if w.shape != factor.shape or jnp.iscomplexobj(w):
+            raise ValueError("weights must be real with shape (samples,)")
+        w = w.astype(jnp.result_type(w, offsets, 1.0))
+        w = eqx.error_if(
+            w,
+            jnp.any(~jnp.isfinite(w)) | jnp.any(w < 0) | (jnp.max(w) <= 0),
+            "weights must be finite, nonnegative and have positive mass",
+        )
+        scaled = jax.lax.optimization_barrier(w / jax.lax.stop_gradient(jnp.max(w)))
+        w = scaled / jnp.sum(scaled)
+    wf = w * factor
+    moments = (
+        jnp.sum(wf),
+        jnp.einsum("n,ni->i", wf, offsets),
+        jnp.einsum("n,ni,nj->ij", wf, offsets, offsets),
+    )
+    return tuple(
+        eqx.error_if(m, jnp.any(~jnp.isfinite(m)), "mixed moment arithmetic overflowed")
+        for m in moments
+    )
+
+
 class CumulantExpansion(eqx.Module):
     """Ensemble Stokes <S_n> from the statistics of (gamma, alpha, theta).
 
@@ -80,12 +136,85 @@ class CumulantExpansion(eqx.Module):
         ``S`` is physical Stokes evaluated at B0. A dimensionless S remains a
         dimensionless rescaled quantity; this operation does not add physical
         units. ``mu_B``/``var_B`` are statistics of B-B0. For correlated B and
-        other parameters, apply conditional moments before the remaining
-        average. At fixed observing frequency B also shifts the spectrum, so
+        other parameters, use ``mixed_average`` with joint mixed moments, or
+        explicitly integrate conditional moments before the remaining average.
+        At fixed observing frequency B also shifts the spectrum, so
         this multiplicative reduction is not generally valid.
         """
         factor = 1.0 + 2.0 * mu_B / B0 + (var_B + mu_B**2) / B0**2
         return S * factor
+
+    def mixed_average(self, field_moments, phase_moments, *, absolute_error):
+        """Average correlated B/q/phi using exact factors and a quadratic kernel.
+
+        Build the natural-basis response at fixed physical B0>0. Its q
+        coordinates are (gamma, alpha, theta), NOT (gamma, cos(alpha), theta).
+        ``field_moments`` and ``phase_moments`` each contain three raw mixed
+        moments with shapes (), (P,), (P,P): E[W], E[W*dq], E[W*dq*dq].
+        Use real W=(B/B0)^2 for field_moments, and complex
+        W=(B/B0)^2*exp(2j*phi) for phase_moments. Both use the same normalized
+        electron-number distribution; ``mixed_moments`` can compute them from
+        paired samples. Zero field is allowed. Do not divide by E[W], which
+        would discard amplitude and can be zero for the complex factor.
+
+        Returns (prediction, absolute_error), both (N,4), in sky (I,Q,U,V)
+        order. Exact field/phase handling preserves correlations, but only the
+        remaining q-kernel is quadratic. In all original variables the inputs
+        include higher mixed orders, not just a global covariance. Physical
+        units come from the reference response, never from this contraction.
+
+        The caller must supply a componentwise nonnegative error envelope.
+        For a pointwise natural-kernel remainder |R_s(q)|<=rho_s(q), the I,V
+        errors are bounded by E[(B/B0)^2*rho_s]; the same Q-kernel bound applies
+        separately to sky Q and U. Uncertain mixed moments add the absolute
+        coefficient contraction with their error envelopes. This API checks
+        shapes/finiteness, NOT joint-moment realizability, physical support,
+        envelope validity, sampling error or roundoff. It neither differentiates
+        unknown conditional moments nor infers them. A caller-created
+        dimensionless response stays dimensionless. Fixed-frequency channels
+        need their moving-line kernel and cannot use this B^2 factorisation.
+        """
+        p = self.dS.shape[-1]
+
+        def contract(moments, real):
+            if len(moments) != 3:
+                raise ValueError("supply three mixed moments of degree 0,1,2")
+            arrays = tuple(jnp.asarray(m) for m in moments)
+            if tuple(m.shape for m in arrays) != ((), (p,), (p, p)):
+                raise ValueError("mixed moment shapes must be (), (P,), (P,P)")
+            if real and any(jnp.iscomplexobj(m) for m in arrays):
+                raise ValueError("field moments must be real")
+            arrays = tuple(
+                eqx.error_if(
+                    m, jnp.any(~jnp.isfinite(m)), "mixed moments must be finite"
+                )
+                for m in arrays
+            )
+            m0, m1, m2 = arrays
+            return (
+                self.S0 * m0
+                + jnp.einsum("nsi,i->ns", self.dS, m1)
+                + 0.5 * jnp.einsum("nsij,ij->ns", self.ddS, m2)
+            )
+
+        natural = contract(field_moments, real=True)
+        linear = contract(phase_moments, real=False)[:, 1]
+        prediction = jnp.stack(
+            [natural[:, 0], linear.real, linear.imag, natural[:, 2]], axis=-1
+        )
+        prediction = eqx.error_if(
+            prediction, jnp.any(~jnp.isfinite(prediction)), "mixed response overflowed"
+        )
+        error = jnp.asarray(absolute_error)
+        if jnp.iscomplexobj(error):
+            raise ValueError("absolute_error must be real")
+        error = jnp.broadcast_to(error, prediction.shape)
+        error = eqx.error_if(
+            error,
+            jnp.any(~jnp.isfinite(error)) | jnp.any(error < 0),
+            "absolute_error must be finite and nonnegative",
+        )
+        return prediction, error
 
     def checked_average(self, mean, covariance, *, absolute_error):
         """Validate statistics and return ``(prediction, absolute_error)``.

@@ -1,0 +1,46 @@
+{
+	"source":"https:\/\/arxiv.org\/pdf\/1602.08749v1",
+	"sourceEquations":"3-11",
+	"wolframVersion":"14.0.0 for Mac OS X ARM (64-bit) (December 13, 2023)",
+	"scriptSHA256":"07380d32a0284004d28354ce85168688898ff5c376368eb1004b29e5af5a287f",
+	"correctionSource":"https:\/\/github.com\/AFD-Illinois\/symphony\/commit\/f63fc87ce2e6a3403a767a3eb113a1904698f343",
+	"checks":[
+		{
+			"name":"resonance mapping",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"Bessel argument on the line",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"I Q U kernels match",
+			"pass":true,
+			"residual":"{0, 0, 0}"
+		},
+		{
+			"name":"V kernels have opposite signs",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"corrected symphony kernels all match",
+			"pass":true,
+			"residual":"{0, 0, 0, 0}"
+		},
+		{
+			"name":"V difference is nonzero in general",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"absolute line-power prefactor matches",
+			"pass":true,
+			"residual":"0"
+		}
+	],
+	"conclusion":"Printed I,Q,U and line-power normalization match; printed V is opposite. All four kernels match the authors' 2017 sign correction. Physical handedness is checked separately in check_handedness.wls.",
+	"allPassed":true
+}

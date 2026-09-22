@@ -80,6 +80,15 @@ bound is `max(|P0|)*sum(|delta w|)`. Sampling/quadrature uncertainty remains an
 external input. This discrete-screen API does not model internally distributed
 emission, absorption or conversion.
 
+## Independent symbolic derivation
+
+[`derivation/`](derivation/README.md) contains local Wolfram scripts that derive
+and check the helical orbit, retarded radiation, absolute harmonic powers and
+Stokes basis conventions from the classical equations. Run
+`wolframscript -file derivation/verify.wls` to regenerate the report. It also
+compares the complex harmonic amplitudes with direct Fourier integration of the
+original electric field, independently of this package's Python implementation.
+
 ## Install and verify
 
 Python 3.12 is the tested runtime. From this checkout:
@@ -180,6 +189,97 @@ the kernel remainder at the actual reference, frequency and science precision.
 remaining population parameters are fixed or B is independent of them.
 Correlated populations require conditional or mixed statistics. It does not
 supply physical units to a normalized spectrum or account for frequency shifts.
+
+### Correlated field, energy and orientation
+
+An exact conditional B average leaves a function of the other parameters.
+`apply_B` does not infer that function: multiplying an already averaged spectrum
+by a global field factor assumes independence. The correlated alternative is
+`response.mixed_average(field_moments, phase_moments, absolute_error=...)`.
+It expands only the known natural-basis kernel at fixed B0 and contracts its
+derivatives with unnormalised mixed moments. No unknown conditional function is
+differentiated. `mixed_moments` computes these statistics from paired samples:
+
+```python
+from synchro import mixed_moments
+
+def average_joint_population(response, offsets, B_over_B0, phi, weights, envelope):
+    # response was built at B0>0; offsets use the SAME (gamma, alpha, theta)
+    # reference. Angles are in radians; alpha is not the pitch cosine mu.
+    W = B_over_B0**2
+    field = mixed_moments(offsets, W, weights)
+    phase = mixed_moments(offsets, W*jnp.exp(2j*phi), weights)
+    return response.mixed_average(field, phase, absolute_error=envelope)
+```
+
+`offsets` has shape `(samples,P)`, while B ratios, phi and optional relative
+electron-number weights have shape `(samples,)`. Keep the samples paired to
+retain correlations. The helper returns `(E[W], E[W*dq], E[W*dq*dq])`, with
+shapes `()`, `(P,)`, `(P,P)`. Weights are normalized, **W is not**. The moments
+can instead come from a specified joint model. A complex zeroth moment may be
+zero while its higher mixed moments still contribute. Ordinary covariance of q
+and marginal B moments cannot in general determine these inputs.
+
+`mixed_average` returns sky `(I,Q,U,V)` and a supplied componentwise envelope,
+both `(harmonics,4)`; the older call and `checked_average` still return natural
+`(I,Q,V)`. It keeps B-squared and the sky rotation exact, but truncates the q
+kernel at degree two. Thus `E[B²*dq_i*dq_j]` is retained even though it has total
+degree four in B and q. Moments of q must use alpha for this builder; converting
+only the mean/covariance from mu=cos(alpha) is not generally sufficient.
+
+For a pointwise kernel remainder `abs(R_s(q)) <= rho_s(q)`, use the weighted
+bound `E[(B/B0)²*rho_s]`; the natural Q bound controls each sky Q and U component.
+Uncertainty in the three supplied moment tensors adds
+`abs(S0)*epsilon0 + abs(dS)@epsilon1 + abs(ddS):epsilon2/2` componentwise.
+These are mathematical input contracts. The method requires and returns an
+externally justified `absolute_error` in output units; it does not derive it,
+validate joint-moment realizability or physical support, or bound numerical and
+sample/quadrature errors. Zero is appropriate for an exactly quadratic kernel,
+not automatically for synchrotron radiation. For a subsequent linear observation
+map propagate the envelope with the elementwise absolute response matrix.
+
+The new contraction is for fixed harmonic numbers. A frequency channel must
+also include B-dependent line positions and cannot use this simple B-squared
+factorisation. The power-law SED functions remain restricted continuum examples;
+they are not assumptions of the general kernel or mixed-moment method.
+
+### Finite statistics for a spectral fit
+
+At a fixed expansion reference the response contracts a finite vector of joint
+statistics with known spectral coefficients. The same statistics apply to all
+harmonics; correlations do not require a separate unknown function for each
+harmonic. In the current three-coordinate quadratic builder, each moment block
+contains ten distinct monomials (one constant, three linear and six symmetric
+quadratic terms). The real field block and complex phase block thus contain
+thirty real statistical components before constraints and degeneracies.
+
+These are not thirty unrestricted fit parameters. They must be consistent with
+one nonnegative joint electron-number distribution on the declared support.
+For example, `abs(E[W*exp(2j*phi)]) <= E[W]` for nonnegative W; analogous
+cross-moment constraints couple the two blocks. `mixed_average` checks neither
+their full realizability nor whether the spectral response identifies them.
+The method also does not establish the required remainder envelope from the
+retained moments. If higher moments are unknown, they must not silently be set
+to independent or Gaussian values to supply that envelope.
+
+A frequency-channel fit needs coefficients built from the channel kernel,
+including moving line positions, with a single fixed population measure.
+Chromatic observing weights belong in those coefficients. The fitting layer
+must additionally specify the admissible joint statistics, number amplitude,
+measurement likelihood and propagated model discrepancy. An absolute error
+envelope is not automatically an independent Gaussian noise covariance.
+Weak or degenerate spectral responses constrain combinations of moments rather
+than each physical statistic separately; a small residual is not a remainder
+certificate or a reconstruction of the full population PDF.
+
+For external Faraday screens, `screen_polarisation` preserves correlations in
+paired incident-polarisation and RM samples. Its finite sample list is a
+specified discrete reference, not an automatic finite-parameter closure of an
+arbitrary screen distribution. RM marginal cumulants alone cannot determine
+a correlated source-screen average. The manuscript gives a finite joint
+source-screen response and weighted remainder; this package does not yet
+implement that general channel-response fitting layer. The Gaussian
+`burn_depolarisation` helper remains a declared special model.
 
 ## Physical transfer and reduced demonstrations
 

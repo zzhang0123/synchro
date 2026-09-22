@@ -1,0 +1,62 @@
+{
+	"wolframVersion":"14.0.0 for Mac OS X ARM (64-bit) (December 13, 2023)",
+	"scriptSHA256":"ad4a6995b9b5fd716d73caa6f42ce1b21969ac3a38318677db293b1527e438f1",
+	"checks":[
+		{
+			"name":"electron Lorentz force",
+			"pass":true,
+			"residual":"{0, 0, 0}"
+		},
+		{
+			"name":"axial retarded electric field",
+			"pass":true,
+			"residual":"{0, 0, 0}"
+		},
+		{
+			"name":"rotation about forward propagation",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"rotation about backward propagation",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"forward V over I",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"backward V over I in right-handed sky basis",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"V equals right minus left circular intensity",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"conjugate Fourier convention preserves physical V",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"reversing charge reverses physical handedness",
+			"pass":true,
+			"residual":"0"
+		},
+		{
+			"name":"axial harmonic amplitudes",
+			"pass":true,
+			"residual":"{0, 0}"
+		},
+		{
+			"name":"manuscript harmonic matches real-field V over I",
+			"pass":true,
+			"residual":"0"
+		}
+	],
+	"allPassed":true
+}

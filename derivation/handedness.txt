@@ -1,0 +1,11 @@
+PASS electron Lorentz force
+PASS axial retarded electric field
+PASS rotation about forward propagation
+PASS rotation about backward propagation
+PASS forward V over I
+PASS backward V over I in right-handed sky basis
+PASS V equals right minus left circular intensity
+PASS conjugate Fourier convention preserves physical V
+PASS reversing charge reverses physical handedness
+PASS axial harmonic amplitudes
+PASS manuscript harmonic matches real-field V over I

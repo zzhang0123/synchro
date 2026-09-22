@@ -1,0 +1,7 @@
+PASS resonance mapping
+PASS Bessel argument on the line
+PASS I Q U kernels match
+PASS V kernels have opposite signs
+PASS corrected symphony kernels all match
+PASS V difference is nonzero in general
+PASS absolute line-power prefactor matches
