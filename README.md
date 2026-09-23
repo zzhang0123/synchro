@@ -16,10 +16,10 @@ not import this package. `CumulantExpansion` here is the historical name of a
 quadratic kernel average; it is not that PDF reconstruction.
 
 The main paper covers radiation kernels, population averages, moment/cumulant
-representations and their error control, including external Faraday screens.
-General ordered transfer, Magnus, absorption/conversion and the 21-cm examples
-belong to its separate extended discussion. These exploratory modules remain
-available here; they are not prerequisites for the main statistical framework.
+representations and their error control, including internally mixed emission
+and pure Faraday rotation. External screens are a special case. General ordered
+transfer, Magnus, absorption/conversion and the 21-cm examples remain exploratory
+modules beyond this main model.
 
 ## Statistical interfaces
 
@@ -77,8 +77,9 @@ For fixed normalized weights, perturbing incident polarisation and RM gives
 `|delta P| <= sum(w*|delta P0|) + 2*lambda²*sum(w*|P0|*|delta RM|)`.
 Use consistent intermediate values when also changing weights; their additional
 bound is `max(|P0|)*sum(|delta w|)`. Sampling/quadrature uncertainty remains an
-external input. This discrete-screen API does not model internally distributed
-emission, absorption or conversion.
+external input. For internally distributed emission and frequency-dependent emitter spectra,
+use `synchro.faraday.emission_polarisation` below. Absorption and conversion
+require the separate transfer interfaces.
 
 ## Independent symbolic derivation
 
@@ -272,14 +273,110 @@ Weak or degenerate spectral responses constrain combinations of moments rather
 than each physical statistic separately; a small residual is not a remainder
 certificate or a reconstruction of the full population PDF.
 
-For external Faraday screens, `screen_polarisation` preserves correlations in
-paired incident-polarisation and RM samples. Its finite sample list is a
-specified discrete reference, not an automatic finite-parameter closure of an
-arbitrary screen distribution. RM marginal cumulants alone cannot determine
-a correlated source-screen average. The manuscript gives a finite joint
-source-screen response and weighted remainder; this package does not yet
-implement that general channel-response fitting layer. The Gaussian
-`burn_depolarisation` helper remains a declared special model.
+The Faraday extension uses the joint distribution of emitting parameters and
+the intervening depth from each emitter to the observer. It includes mixed
+emission/rotation and retains spectrum-depth correlations. `joint_faraday_average`
+contracts a finite, frequency-independent moment matrix with intrinsic response
+coefficients and a finite phase series. The response and its truncation envelope
+are implemented; the application still supplies the intrinsic/channel basis,
+physical support, admissible moment set and likelihood. The Gaussian
+`burn_depolarisation` helper remains a declared factorised foreground model.
+
+### Mixed emission and Faraday rotation
+
+In the pure-rotation model, with no incident background, absorption, scattering
+or conversion, the observed polarisation is
+`P(nu) = N_src * E[K_P(nu, p) * exp(2j*lambda**2*depth)]`.
+The positive measure counts source electrons. Depth is in rad/m² and wavelength
+in metres; K_P is complex Q+iU in the observer's sky basis. Depth, source energy,
+field and orientation may all be correlated. Different emitters can have
+different spectral shapes; no common spectral factor is imposed.
+
+`emission_polarisation(emission, depths, lam, weights=None, source_column=1.)`
+computes this discrete average. Depths have shape `(n,)`. Emission is scalar,
+`(n,)` for wavelength-independent per-emitter values, or exactly
+`(n, *lam.shape)` for per-emitter spectra. The result has `lam.shape`. Relative
+nonnegative weights are normalized internally; the physical `source_column`
+is a separate finite nonnegative scalar. Complex emissivity is never normalized
+as a probability weight. A zero source column gives zero emission; the supplied
+measure must still be well defined. The original `screen_polarisation` retains
+its existing scalar/per-ray input contract and foreground interpretation.
+
+`faraday_depth_practical(n_e_cm3, B_par_uG, s_pc)` in `synchro.rm` integrates
+from **each node to the last node**, using the rounded 0.812 coefficient and
+trapezoids. Positions increase towards the observer. Field reversals are
+allowed; depth need not be monotone. Add any exterior foreground depth to all
+nodes. For spatial quadrature, use weights proportional to source density times
+path-quadrature weights and set N_src to their total. Across unresolved rays,
+include each ray's column as well as its fixed nonnegative ray weight before
+normalizing. Chromatic instrumental weights belong in the observing response.
+This NumPy preprocessing routine is not differentiable; gradients with respect
+to supplied depths in the JAX average are supported. Path quadrature error is
+not inferred from the grid spacing.
+
+For a finite spectral response, represent the intrinsic per-source kernel as
+`sum_a c_a(lam)*psi_a(p) + r`. The following **synthetic exact-basis** example
+keeps its intrinsic source error zero and bounds only the phase truncation:
+
+```python
+import jax.numpy as jnp
+from synchro.faraday import (
+    emission_polarisation, joint_faraday_moments, joint_faraday_average,
+)
+
+lam = jnp.linspace(0.0, 0.8, 9)
+x = jnp.array([-0.8, 0.2, 1.0])
+depth = jnp.array([-0.4, 0.1, 0.6])
+weights = jnp.array([1.0, 2.0, 4.0])
+psi = jnp.stack([jnp.ones_like(x), x, jnp.exp(2j*x)], axis=-1)
+c = jnp.stack([1 + lam, 0.3j*lam, -0.2 + lam**2], axis=-1)
+emission = psi @ c.T
+reference = emission_polarisation(emission, depth, lam, weights, source_column=5.)
+M, absolute_next = joint_faraday_moments(
+    psi, depth, 8, weights, reference_depth=0.1,
+)
+prediction, envelope = joint_faraday_average(
+    c, M, lam, reference_depth=0.1, source_column=5.,
+    absolute_next=absolute_next, source_error=0.,
+)
+assert jnp.all(jnp.abs(prediction-reference) <= envelope + 1e-13)
+```
+
+`joint_faraday_moments` takes basis values `(n,n_basis)` and a static nonnegative
+phase degree L, and returns `M[a,b]=E[psi_a*(depth-reference_depth)**b]` for
+`b=0..L`, plus `A[a]=E[abs(psi_a)*abs(depth-reference_depth)**(L+1)]`.
+The moment matrix can instead be fitted directly; its shape fixes the degree
+in `joint_faraday_average`. With coefficients `(*lam.shape,n_basis)`, that
+routine returns the prediction and absolute envelope, both `lam.shape`:
+
+```text
+prediction = N_src*exp(it*reference_depth) * sum_ab c_a*(it)^b/b!*M_ab
+error      = N_src*(source_error + |t|^(L+1)/(L+1)! * sum_a |c_a|*A_a)
+t          = 2*lam^2
+```
+
+`source_error` bounds E|r| per source and is required, as is `absolute_next`.
+For continuous populations they must have independent support/derivative or
+distributional justification; a sampled estimate alone is not a certificate.
+Retained moments do not determine these additional inputs. A complex zeroth
+moment can vanish while mixed moments still contribute. Joint cumulants can
+parametrise the same finite statistics; marginal depth cumulants alone cannot.
+Moment realizability and uncertainty, excluded tails, numerical error and
+physical-model discrepancy remain separate requirements. Large phase ranges
+can need more modes or direct quadrature; no universal low-order accuracy is
+claimed. Strong phases also require control of floating-point argument reduction.
+
+The real-space source/depth pairing is sufficient for pure rotation; no recovery
+of a unique spatial geometry is implied. At fixed source measure and column,
+paired perturbations give
+`|delta P| <= N_src*(E|delta K_P| + 2*lambda²*E[|K_P|*|delta depth|])`, using
+the reference K_P in the second term. Different columns or weights add their
+normalization errors. For a frequency channel, integrate the **combined**
+emitted/rotated spectrum and propagate the envelope with the absolute observing
+weights; rotating an already integrated channel generally gives a different
+answer. These functions support JIT and gradients (phase degree is static when
+collecting moments). Test cases include the sinc slab, an independent transfer
+matrix exponential, swapped layers, correlated spectra and analytic gradients.
 
 ## Physical transfer and reduced demonstrations
 
@@ -345,7 +442,7 @@ statistical cumulant. Ensemble transfer also needs source–propagator dependenc
 | Numerical reference functions | `bessel`, `ultrarel` | Values, derivatives and finite-tail controls; physical continuum error remains separate |
 | Physical response | `stokes`, `sed`, `derivatives` | Declared normalization and coordinates; power-law/curvature hypotheses explicit |
 | Statistical contraction | `expansion`, `cumulants` | Finite kernel average; no automatic positive-PDF closure |
-| Population precompute | Grid functions in `kirchhoff`, practical RM integral | NumPy integrations; not traced or differentiable |
+| Population precompute | Grid functions in `kirchhoff`, practical RM/depth integrals | NumPy integrations; not traced or differentiable |
 | Online coefficients / propagation | Moment contractions in `kirchhoff`, `conversion`, `rm`, `transfer`, `los_moments` | JAX scalars/arrays; CGS and reduced paths explicit |
 | Ordered approximation / limits | `magnus`, `solutions` | Declared finite Magnus order and analytic limits |
 | Independent checks | `tests/`, diagnostic scripts | SciPy/analytic/finite-difference oracles and explicit finite test ranges |

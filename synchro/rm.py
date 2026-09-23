@@ -14,7 +14,8 @@ For an external Gaussian RM screen with a common incident complex polarization
 (or one independent of RM), P = Q + i U is averaged as
     <P> = P_0 exp(2 i <RM> lam^2) exp(-2 Var(RM) lam^4).
 Weighted mean and variance alone do not establish that Gaussian closure.
-Distributed emission inside a rotating slab has a different transfer law.
+Distributed emission is implemented by the joint emission-depth average in
+``synchro.faraday``; its depths are measured from each emitter to the observer.
 """
 
 from __future__ import annotations
@@ -48,9 +49,30 @@ def rotation_measure_practical(
     nonnegative density. This preprocessing function is not JIT/autodiff code;
     path quadrature error and rounding of the practical coefficient remain.
     """
-    density, field, path = (
-        np.asarray(value, dtype=float) for value in (n_e_cm3, B_par_uG, s_pc)
-    )
+    return float(faraday_depth_practical(n_e_cm3, B_par_uG, s_pc)[0])
+
+
+def faraday_depth_practical(
+    n_e_cm3: ArrayLike, B_par_uG: ArrayLike, s_pc: ArrayLike
+) -> np.ndarray:
+    """Depth from each path node to the observer, in rad/m^2 (NumPy).
+
+    Positions increase towards the observer at the last node. Integrate
+    ``0.812 * n_e * B_parallel`` from each node to that endpoint by trapezoids;
+    positive field points towards the observer. Field reversals and nonmonotone
+    depth are allowed. Add a separately supplied foreground depth to every node
+    if the path stops before the observer. No monotonic-depth inversion is used.
+
+    Matching finite 1D arrays, nonnegative density and strictly increasing
+    positions are required. This is preprocessing, not JIT/autodiff code.
+    Grid quadrature and the rounded coefficient need separate error control.
+    These depths must be paired with emission at the same nodes, not treated
+    as a distribution of total sightline RMs.
+    """
+    arrays = tuple(np.asarray(value) for value in (n_e_cm3, B_par_uG, s_pc))
+    if any(np.iscomplexobj(value) for value in arrays):
+        raise ValueError("density, field and path must be real")
+    density, field, path = (value.astype(float) for value in arrays)
     if (
         path.ndim != 1
         or path.size < 2
@@ -63,7 +85,13 @@ def rotation_measure_practical(
         raise ValueError(
             "require finite matching 1D path samples, nonnegative density and increasing positions"
         )
-    return float(RM_PER_UNIT * np.trapezoid(density * field, path))
+    with np.errstate(over="ignore", invalid="ignore"):
+        integrand = density * field
+        cells = RM_PER_UNIT * (integrand[:-1] / 2 + integrand[1:] / 2) * np.diff(path)
+        depths = np.r_[np.cumsum(cells[::-1])[::-1], 0.0]
+    if not np.all(np.isfinite(depths)):
+        raise ValueError("Faraday-depth quadrature overflowed")
+    return depths
 
 
 def rotation_angle(lam: ArrayLike, path_cgs: ArrayLike) -> jax.Array:
@@ -130,15 +158,17 @@ def gaussian_rm_cumulants(
 rm_moments = gaussian_rm_cumulants
 
 
-def _screen_samples(rms, weights):
+def _screen_samples(rms, weights, *, sample_name="RM"):
     """Shared real-sample validation and overflow-safe relative weights."""
     rms = jnp.asarray(rms)
     if rms.ndim != 1 or rms.size == 0:
-        raise ValueError("RM samples must be a nonempty 1D array")
+        raise ValueError(f"{sample_name} samples must be a nonempty 1D array")
     if jnp.iscomplexobj(rms):
-        raise ValueError("RM samples must be real")
+        raise ValueError(f"{sample_name} samples must be real")
     rms = rms.astype(jnp.result_type(rms, 1.0))
-    rms = eqx.error_if(rms, jnp.any(~jnp.isfinite(rms)), "RM samples must be finite")
+    rms = eqx.error_if(
+        rms, jnp.any(~jnp.isfinite(rms)), f"{sample_name} samples must be finite"
+    )
     if weights is None:
         w = jnp.ones_like(rms) / rms.size
     else:
@@ -147,7 +177,7 @@ def _screen_samples(rms, weights):
             raise ValueError("weights must be real")
         weights = weights.astype(jnp.result_type(rms, 1.0))
         if weights.shape != rms.shape:
-            raise ValueError("weights must match the 1D RM samples")
+            raise ValueError(f"weights must match the 1D {sample_name} samples")
         weights = eqx.error_if(
             weights,
             jnp.any(~jnp.isfinite(weights))

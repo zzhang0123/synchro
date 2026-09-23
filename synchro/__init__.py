@@ -15,6 +15,7 @@ expansion         : eqx.Module for quadratic Taylor averaging (mean/covariance)
 cumulants        : finite Bell moment contractions from supplied cumulants
 ultrarel         : ultra-relativistic F(x), G(x) fast path
 rm               : rotation measure (RM) constants + Burn depolarisation
+faraday          : joint emission-depth averages and finite responses
 transfer         : Mueller matrix + numerical slab/LOS matrix exponentials
 solutions        : analytic limiting solutions (thin/rotation/self-absorbed)
 kirchhoff        : emissivity/absorption moment expansion + Kirchhoff closure
@@ -41,6 +42,7 @@ from . import (  # noqa: E402
     magnus,
     expansion,
     rm,
+    faraday,
     sed,
     solutions,
     stokes,
@@ -65,6 +67,7 @@ __all__ = [
     "cumulants",
     "ultrarel",
     "rm",
+    "faraday",
     "transfer",
     "solutions",
     "kirchhoff",
