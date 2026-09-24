@@ -4,16 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synchro"
-version = "0.1.0"
+version = "0.2.0"
 description = "Differentiable synchrotron kernels and explicitly scoped statistical approximations"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "MIT"}
 dependencies = ["jax>=0.10,<0.11", "equinox>=0.13.7,<0.14", "numpy>=2.3,<3"]
 
+[project.urls]
+Homepage = "https://github.com/zzhang0123/synchro"
+Documentation = "https://synchro.readthedocs.io"
+Changelog = "https://github.com/zzhang0123/synchro/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 validation = ["scipy>=1.16,<2", "matplotlib>=3.10,<4", "pytest>=8,<10"]
 dev = ["black>=25", "ruff>=0.12"]
+docs = ["sphinx>=8,<9", "myst-parser>=4,<5", "furo>=2024.8"]
 
 [tool.setuptools.packages.find]
 include = ["synchro*"]
@@ -21,6 +27,7 @@ include = ["synchro*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = [".", "scripts"]
+markers = ["slow: long-running tests, excluded with -m 'not slow'"]
 
 [tool.ruff.lint]
 # I is the physical Stokes-I symbol throughout this package.

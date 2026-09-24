@@ -85,7 +85,7 @@ def vector_cumulant_expansion(S_derivs, kappas):
         [kappa1(P), kappa2(P,P), kappa3(P,P,P), kappa4(P,P,P,P)] (up to the
         desired order K = len(kappas)).
 
-    Returns the degree-K kernel average expressed through cumulants:
+    Returns the degree-K kernel average expressed through cumulants::
 
         K=1: kappa_i S^(i)
         K=2: (1/2) kappa_ij S^(ij) + (1/2) kappa_i kappa_j S^(ij)

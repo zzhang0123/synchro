@@ -1,14 +1,14 @@
 """Differentiable integer J and modified K functions with explicit quadrature.
 
 Integer J uses a periodic trapezoidal rule, with an exactly equivalent complex
-contour shift for 0 < |x| < n to resolve exponentially small values without
+contour shift for ``0 < |x| < n`` to resolve exponentially small values without
 subtracting order-one oscillations. The contour is held fixed during autodiff:
 the integral is invariant under that shift, so this differentiates the same
 analytic function rather than the arbitrary contour-selection algorithm.
 
-For a concrete order the default grid resolves |x| <= n (the harmonic domain).
+For a concrete order the default grid resolves ``|x| <= n`` (the harmonic domain).
 For a traced order the default is 2048 nodes; choose a larger static ``n_nodes``
-when needed. Calls outside |n| + |x| <= n_nodes/2 return NaN, rather than silently
+when needed. Calls outside ``|n| + |x| <= n_nodes/2`` return NaN, rather than silently
 aliasing unresolved oscillations. This conservative resolution guard is not a
 roundoff or quadrature-error certificate. Compare increased resolution and an
 independent reference for a new domain, including the required derivatives.
@@ -157,7 +157,7 @@ def _modified_integral(nu, x, *, divide_cosh=False, n_nodes=128, tail_cutoff=50.
 def _modified_tail_bound(nu, x, *, divide_cosh=False, tail_cutoff=50.0):
     """Analytic upper bound for the omitted positive-t integral, x > 0.
 
-    cosh(t)>=exp(t)/2 and cosh(nu*t)<=exp(|nu|*t) reduce the tail to an
+    ``cosh(t) >= exp(t)/2`` and ``cosh(nu t) <= exp(|nu| t)`` reduce the tail to an
     incomplete Gamma integral. Bounding log(u/z)<= (u-z)/z gives the elementary
     bound below. It excludes quadrature and floating-point error.
     """

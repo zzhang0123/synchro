@@ -38,11 +38,12 @@ def doppler(beta_par, theta):
     return 1.0 - beta_par * jnp.cos(theta)
 
 
-def _harmonic(n, gamma, alpha, theta):
+def _harmonic(n, gamma, alpha, theta, *, n_nodes=None):
     """Dimensionless Stokes (I, Q, V) at harmonic ``n``.
 
     Normalised by e^2 w_B^2 / (2 pi c), i.e. the returned values equal the
-    physical dP/dOmega divided by that prefactor. ``n`` is static.
+    physical dP/dOmega divided by that prefactor. ``n`` is static unless a
+    static ``n_nodes`` fixes the Bessel resolution (see ``bessel_jn_and_prime``).
     """
     beta = beta_of_gamma(gamma)
     b_par = beta * jnp.cos(alpha)
@@ -52,11 +53,13 @@ def _harmonic(n, gamma, alpha, theta):
     D = doppler(b_par, theta)
     x = n * b_perp * st / D
 
-    _, jnp_ = bessel_jn_and_prime(n, x)
+    _, jnp_ = bessel_jn_and_prime(n, x, n_nodes=n_nodes)
 
     # J_n(x)/sin(theta) = beta_perp [J_(n-1)(x)+J_(n+1)(x)]/(2D).
     # This exact recurrence removes the removable viewing-axis singularity.
-    neighbours = bessel_jn(n - 1, x) + bessel_jn(n + 1, x)
+    neighbours = bessel_jn(n - 1, x, n_nodes=n_nodes) + bessel_jn(
+        n + 1, x, n_nodes=n_nodes
+    )
     amplitude_par = (ct - b_par) * b_perp * neighbours / (2.0 * D)
     amplitude_perp = b_perp * jnp_
     factor = n**2 / D**3
@@ -66,7 +69,7 @@ def _harmonic(n, gamma, alpha, theta):
     return I, Q, V
 
 
-def stokes_harmonic(n, gamma, alpha, theta, B=None):
+def stokes_harmonic(n, gamma, alpha, theta, B=None, *, n_nodes=None):
     """Stokes (I, Q, V) power per unit solid angle at harmonic ``n``.
 
     If ``B`` (Gauss) is given, returns physical ``dP_n/dOmega`` [erg/s/sr];
@@ -76,8 +79,14 @@ def stokes_harmonic(n, gamma, alpha, theta, B=None):
     alpha/theta in [0, pi]. Angular endpoints use their analytic limits.
     Numerical quadrature errors remain separate from the vacuum helical-orbit
     reference physics. Differentiation is intended for interior parameters.
+
+    ``n_nodes`` (static int, keyword-only) passes through to the Bessel
+    quadrature: ``None`` keeps the automatic count (identical output to the
+    historical behaviour); a static count lets ``n`` be a traced float order
+    under ``jax.jit``/``vmap`` (unresolved orders return NaN, see
+    ``synchro.bessel``). The count is a resolution choice, not an error bound.
     """
-    I, Q, V = _harmonic(n, gamma, alpha, theta)
+    I, Q, V = _harmonic(n, gamma, alpha, theta, n_nodes=n_nodes)
     if B is None:
         return I, Q, V
     wB = E_ESU * B / (gamma * M_E * C_CGS)

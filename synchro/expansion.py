@@ -164,7 +164,7 @@ class CumulantExpansion(eqx.Module):
         units come from the reference response, never from this contraction.
 
         The caller must supply a componentwise nonnegative error envelope.
-        For a pointwise natural-kernel remainder |R_s(q)|<=rho_s(q), the I,V
+        For a pointwise natural-kernel remainder ``|R_s(q)| <= rho_s(q)``, the I,V
         errors are bounded by E[(B/B0)^2*rho_s]; the same Q-kernel bound applies
         separately to sky Q and U. Uncertain mixed moments add the absolute
         coefficient contraction with their error envelopes. This API checks

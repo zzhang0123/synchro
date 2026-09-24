@@ -2,7 +2,8 @@
 
 Defines the Faraday rotation coefficient and its moment-expansion content.
 
-Conventions (CGS, Gaussian units):
+Conventions (CGS, Gaussian units)::
+
     chi  = RM * lambda^2            position-angle rotation (radians)
     RM   = C_RM * int n_e B_par ds   [rad cm^-2 in CGS; see rm_rad_per_m2]
     C_RM = e^3 / (2 pi m_e^2 c^4)
@@ -11,8 +12,10 @@ The rounded practical constant is RM[rad/m^2] = 0.812 * int n_e[cm^-3]
 B_par[uG] d(s/pc); use the CGS conversion for the unrounded coefficient.
 
 For an external Gaussian RM screen with a common incident complex polarization
-(or one independent of RM), P = Q + i U is averaged as
+(or one independent of RM), P = Q + i U is averaged as::
+
     <P> = P_0 exp(2 i <RM> lam^2) exp(-2 Var(RM) lam^4).
+
 Weighted mean and variance alone do not establish that Gaussian closure.
 Distributed emission is implemented by the joint emission-depth average in
 ``synchro.faraday``; its depths are measured from each emitter to the observer.
@@ -216,11 +219,13 @@ def screen_polarisation(
     This is the supplied discrete-screen average, not a Gaussian closure or
     a cumulant truncation. Sampling/quadrature error and physical screen-model
     error remain external inputs. It excludes internal emission, absorption
-    and conversion. For fixed normalized weights w, perturbations obey
-    |delta P| <= sum(w*|delta P0|)
-                + 2*lam^2*sum(w*|P0|*|delta RM|).
+    and conversion. For fixed normalized weights w, perturbations obey::
+
+        |delta P| <= sum(w*|delta P0|)
+                     + 2*lam^2*sum(w*|P0|*|delta RM|).
+
     Changed normalized weights additionally contribute
-    max(|P0|)*sum(|delta w|), evaluated consistently at the intermediate screen.
+    ``max(|P0|)*sum(|delta w|)``, evaluated consistently at the intermediate screen.
     These are input-error bounds, not floating-point or sampling certificates.
     """
     rms, w = _screen_samples(rms, weights)

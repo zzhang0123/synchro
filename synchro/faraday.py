@@ -64,8 +64,10 @@ def emission_polarisation(
     The supplied discrete sum has no statistical truncation, but population/path
     quadrature, numerical and physical-model errors remain external inputs.
     In particular, finite phases need not have accurate argument reduction.
-    For fixed measure and column N, paired perturbations obey
-    |delta P| <= N*(E[|delta emission|] + 2*lam^2*E[|emission|*|delta depth|]),
+    For fixed measure and column N, paired perturbations obey::
+
+        |delta P| <= N*(E[|delta emission|] + 2*lam^2*E[|emission|*|delta depth|]),
+
     using the reference emission in the second term. Source-column and weight
     uncertainties require their additional normalization terms.
     """
@@ -107,7 +109,7 @@ def joint_faraday_moments(
     real scalar in rad/m^2. Use filter_jit or mark degree static in jax.jit.
 
     Returns the ``(n_basis, degree+1)`` moments and ``(n_basis,)`` absolute next
-    moments E[|psi_a|*|depth-reference_depth|**(degree+1)]. A complex zeroth
+    moments ``E[|psi_a|*|depth-reference_depth|**(degree+1)]``. A complex zeroth
     moment may vanish; it is never divided out. These are statistics of the
     supplied discrete measure, not a continuous-population certificate. The
     next absolute moment is additional information, not inferred from the
@@ -157,11 +159,11 @@ def joint_faraday_average(
     are needed in this contraction. The same moments serve every wavelength.
 
     Required error inputs: ``absolute_next`` is a nonnegative ``(n_basis,)``
-    upper envelope for E[|psi_a|*|depth-reference_depth|**(degree+1)];
-    ``source_error`` is a nonnegative scalar or ``lam.shape`` envelope for E|r|,
+    upper envelope for ``E[|psi_a|*|depth-reference_depth|**(degree+1)]``;
+    ``source_error`` is a nonnegative scalar or ``lam.shape`` envelope for ``E|r|``,
     both per source under the same positive measure. They must be externally
     justified for the represented population; setting source_error=0 asserts
-    an exact intrinsic basis. Return (prediction, error), both ``lam.shape``:
+    an exact intrinsic basis. Return (prediction, error), both ``lam.shape``::
 
         P = N*exp(it*reference)*sum_ab c_a*(it)^b/b!*M_ab,
         error = N*(source_error + |t|^(degree+1)/(degree+1)!

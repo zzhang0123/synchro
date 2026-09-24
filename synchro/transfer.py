@@ -43,8 +43,10 @@ def mueller_matrix(aI, aQ, aU, aV, rQ, rU, rV):
 def transfer_slab(S, eps, K, ds, *, max_squarings=32):
     """Constant-coefficient propagation of shape-(4,) Stokes through ``ds``.
 
-    Uses the augmented 5x5 matrix exponential
+    Uses the augmented 5x5 matrix exponential::
+
         y(ds) = exp( [[-K, eps], [0, 0]] ds ) @ [S; 1],   S = y[:4]
+
     which is well-defined even when K is singular (pure rotation/conversion).
 
     The source column is normalised before exponentiating.  The map
@@ -115,7 +117,7 @@ def transfer_los(S0, eps_s, K_s, ds, *, max_squarings=32):
 def optical_depth_factor(tau):
     """(1-exp(-tau))/tau with value and derivatives continued through zero.
 
-    A fourth-degree series is used for |tau|<1e-4 (next term <=1.4e-23).
+    A fourth-degree series is used for ``|tau| < 1e-4`` (next term ``<= 1.4e-23``).
     Negative optical depths describe gain; overflow for extreme gain remains
     a numerical-domain limit, not a physical saturation model.
     """

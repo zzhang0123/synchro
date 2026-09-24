@@ -16,5 +16,8 @@ shared physical-constant inputs rather than independent per-module errors.
 E_ESU = 4.803204712570263e-10  # charge magnitude [statC]
 M_E = 9.1093837139e-28  # electron mass [g]
 C_CGS = 2.99792458e10  # speed of light [cm/s]
+# SI speed of light [m/s]; only for the Faraday phase 2 (c/nu)^2 varphi with the
+# wavelength in metres (synchro.model.phase), never for the emission kernels.
+C_SI_M = 2.99792458e8
 
-__all__ = ["E_ESU", "M_E", "C_CGS"]
+__all__ = ["E_ESU", "M_E", "C_CGS", "C_SI_M"]

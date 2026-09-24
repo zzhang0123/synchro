@@ -150,7 +150,7 @@ def moment_expansion_absorption(g, gamma_grid, gamma0, P0, P1, P2, nu):
 def inverse_gamma_moment(M0, M1, M2, gamma0):
     """<1/gamma> = int N/gamma dgamma via the geometric-series expansion.
 
-    Valid for |gamma - gamma0| < gamma0; truncated at the second moment.
+    Valid for ``|gamma - gamma0| < gamma0``; truncated at the second moment.
     """
     return M0 / gamma0 - M1 / gamma0**2 + M2 / gamma0**3
 
