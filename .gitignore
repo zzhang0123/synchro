@@ -25,3 +25,6 @@ AGENTS.md
 .cursorrules
 .aider*
 .continue/
+
+# Sphinx build output
+docs/_build/
