@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (unreleased)
+## 0.3.0 (2026-09-25)
 
 The package is renamed SyncMoments (`pip install syncmoments`,
 `import syncmoments`), and this release improves the numerics, dependency

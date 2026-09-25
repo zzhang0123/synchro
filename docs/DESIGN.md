@@ -11,7 +11,7 @@ manuscript does not define is tagged `[extension]`.
 Section 12 records the test inventory of the 0.2.0 acceptance run on
 2026-09-24, after three rounds of review fixes (test files, what each
 establishes), and the numbers the executed README examples printed.
-Section 12.10 records the changes of the unreleased 0.3.0 (task T-004:
+Section 12.10 records the changes of 0.3.0, released 2026-09-25 (task T-004:
 dependency robustness, bounded memory, recurrence-based derivatives,
 per-variable caps, symmetry assumptions, and the derivative rules of the
 transfer and weight-normalisation code) and their acceptance in two
