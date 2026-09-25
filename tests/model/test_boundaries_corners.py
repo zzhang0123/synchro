@@ -23,11 +23,11 @@ converges to 3e-9 between 96 and 128 cells), so the slow cells use 48 vs 96.
 import numpy as np
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.moments import Support
+import syncmoments  # noqa: F401
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.moments import Support
 
 from _boundary_oracles import (
     B_CORNERS,

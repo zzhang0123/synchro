@@ -19,12 +19,12 @@ import equinox as eqx
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments, PopulationSamples, Reference
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments, PopulationSamples, Reference
 
-from _harmonic_oracles import B0, GAMMA0, MANUSCRIPT, S_DEPTH, UNITS
+from _harmonic_oracles import B0, GAMMA0, REFERENCE, S_DEPTH, UNITS
 
-RESULTS = Path(MANUSCRIPT) / "validation" / "full_response_results.json"
+RESULTS = Path(REFERENCE) / "validation" / "full_response_results.json"
 WIDTHS = (0.5, 1.0)
 STOKES = ("I", "Q", "U", "V")
 

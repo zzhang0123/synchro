@@ -3,8 +3,8 @@
 import re
 from pathlib import Path
 
-import synchro
-from synchro.model import _basis_core
+import syncmoments
+from syncmoments.model import _basis_core
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -12,10 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_version_matches_pyproject():
     text = (ROOT / "pyproject.toml").read_text()
     declared = re.search(r'^version = "([^"]+)"', text, re.M).group(1)
-    assert synchro.__version__ == declared
+    assert syncmoments.__version__ == declared
 
 
 def test_provenance_version_is_the_package_version_not_installed_metadata():
-    # importlib.metadata.version("synchro") can name an unrelated PyPI
-    # distribution of the same name; provenance must use this package.
-    assert _basis_core.package_version() == synchro.__version__
+    # importlib.metadata reports whatever distribution is installed, which can
+    # be a stale build or, under the old name, an unrelated PyPI project;
+    # provenance must use the version of the imported package.
+    assert _basis_core.package_version() == syncmoments.__version__

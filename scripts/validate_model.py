@@ -15,10 +15,10 @@ from scipy.integrate import quad
 import jax
 import jax.numpy as jnp
 
-from synchro.stokes import stokes_harmonic
-from synchro.derivatives import derivative_spectra, _stokes_stack
-from synchro.expansion import build_expansion
-from synchro.ultrarel import F, G
+from syncmoments.stokes import stokes_harmonic
+from syncmoments.derivatives import derivative_spectra, _stokes_stack
+from syncmoments.expansion import build_expansion
+from syncmoments.ultrarel import F, G
 
 
 # --- SciPy reference of the (corrected) harmonic Stokes ---------------------

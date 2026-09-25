@@ -13,15 +13,15 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     field_independent,
     gaussian_screen,
     independent_screen,
     isotropic_pitch,
     no_assumption,
 )
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments, PopulationSamples, Reference
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments, PopulationSamples, Reference
 
 REFERENCE = Reference(5.2, 2.1, 0.3, scales=(1.3, 0.7, 0.9))
 

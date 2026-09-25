@@ -10,8 +10,8 @@ import jax.numpy as jnp
 import numpy as np
 
 from _nonlinear_oracles import polynomial_basis
-from synchro.model.assumptions import Parameters
-from synchro.model.index import MomentIndex, Truncation
+from syncmoments.model.assumptions import Parameters
+from syncmoments.model.index import MomentIndex, Truncation
 
 # -- helpers ---------------------------------------------------------------------
 

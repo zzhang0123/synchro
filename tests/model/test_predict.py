@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.predict``: exactness on the polynomial oracle kernel,
+"""Tests of ``syncmoments.model.predict``: exactness on the polynomial oracle kernel,
 budget slots, JSON round trips, propagation, JIT/autodiff and the real
 ``build_basis``. The harmonic-kernel assumption inequalities are in
 ``test_predict_assumptions.py``.
@@ -15,12 +15,12 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorBudget, ErrorTerm
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments, Reference
-from synchro.model.predict import Prediction, direct_channel_average, predict
+import syncmoments  # noqa: F401
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorBudget, ErrorTerm
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments, Reference
+from syncmoments.model.predict import Prediction, direct_channel_average, predict
 
 from _basis_stub import build_stub_basis, response_oracle
 from _predict_helpers import (

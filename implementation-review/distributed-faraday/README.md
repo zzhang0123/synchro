@@ -1,5 +1,9 @@
 # Distributed pure-Faraday implementation check
 
+Historical record, kept as written. It predates the 0.3.0 rename, so the
+package paths below read `synchro/...`; in the current tree they are
+`syncmoments/...`.
+
 Base revision: f421c5a959c0842b08261e48e9cec7552f515954. This local extension adds the joint emission-depth average and finite-statistic response documented in the package README, with a downstream-depth preprocessing helper and preserved external-screen compatibility.
 
 Run from this checkout with its dependencies installed:

@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.kernels``: shared helpers, the ``KernelModel`` protocol,
+"""Tests of ``syncmoments.model.kernels``: shared helpers, the ``KernelModel`` protocol,
 ``required_m_max`` and ``PolynomialTestKernel`` exactness (continuum: ``test_continuum``).
 """
 
@@ -15,12 +15,12 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import eval_legendre
 
-import synchro  # noqa: F401
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.channels import Channels
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.kernels import (
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.channels import Channels
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.kernels import (
     ContinuumKernel,
     KernelModel,
     Modes,
@@ -33,10 +33,10 @@ from synchro.model.kernels import (
     phase_weights,
     required_m_max,
 )
-from synchro.model.moments import Support
-from synchro.model.phase import TaylorPhase
+from syncmoments.model.moments import Support
+from syncmoments.model.phase import TaylorPhase
 
-MANUSCRIPT = "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling"
+from _harmonic_oracles import REFERENCE
 
 
 def nu_star(gamma0, B0):
@@ -139,7 +139,7 @@ def test_protocol_membership_and_namedtuples():
 def test_required_m_max_matches_manuscript_harmonic_cutoff():
     support = Support(gamma=(16.0, 24.0), B=(0.8, 1.2), depth=(0.0, 1.0))
     assert required_m_max(support, benchmark_channels()) == 40
-    sys.path.insert(0, MANUSCRIPT)
+    sys.path.insert(0, REFERENCE)
     try:
         from validation.full_response import harmonic_cutoff
     finally:

@@ -24,9 +24,9 @@ Two variants:
   by 6.4e-7 between (160, 12) and (256, 16); the 64-node angular grid was
   measured at 2.4e-4 (``w = 0.5``) and 9.2e-5 (``w = 1``) here, so its
   tolerance is 5e-4.
-* ``-m slow`` or ``SYNCHRO_RUN_SLOW=1`` (marked ``slow``, several minutes): ``L in {2, 4, 8}``
+* ``-m slow`` or ``SYNCMOMENTS_RUN_SLOW=1`` (marked ``slow``, several minutes): ``L in {2, 4, 8}``
   with the manuscript's 128 x 128 product nodes, moments on 16 x 16 x 256 x 256
-  (``SYNCHRO_BENCH_ANGULAR`` overrides the angular count, e.g. 160 when memory
+  (``SYNCMOMENTS_BENCH_ANGULAR`` overrides the angular count, e.g. 160 when memory
   is short), finite response within 1e-8 (measured 9e-15 at ``N = 0``, 1e-12
   at ``N = 1`` and 5.5e-10 at ``N = 2``, the AD-versus-five-point-difference
   residual), direct average on 8 x 8 x 96 x 96 within 2e-5 (measured 6.8e-6),
@@ -43,18 +43,18 @@ import os
 import numpy as np
 import pytest
 
-from synchro.model.basis import build_basis
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.predict import direct_channel_average, predict
+from syncmoments.model.basis import build_basis
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.predict import direct_channel_average, predict
 
 import _benchmark_helpers as H
 from _harmonic_oracles import BENCH_SUPPORT, benchmark_channels
 
-# ``slow`` tests run with ``-m slow`` or ``SYNCHRO_RUN_SLOW=1`` (tests/conftest.py)
+# ``slow`` tests run with ``-m slow`` or ``SYNCMOMENTS_RUN_SLOW=1`` (tests/conftest.py)
 slow = pytest.mark.slow
-FULL_ANGULAR = int(os.environ.get("SYNCHRO_BENCH_ANGULAR", "256"))
+FULL_ANGULAR = int(os.environ.get("SYNCMOMENTS_BENCH_ANGULAR", "256"))
 
 FINITE_TOL = 1e-5  # |finite - saved finite| / saved channel I (the design pin)
 FAST_FINITE_TOL = 5e-6  # 64 product nodes vs the manuscript's 128 (measured 1.9e-6)
@@ -273,7 +273,7 @@ def test_budget_and_provenance_of_the_benchmark(fast_bases, fast_moments):
     assert dict(pred.provenance.truncation)["N"] == 0
 
 
-# -- full variant (SYNCHRO_RUN_SLOW=1) ------------------------------------------------------
+# -- full variant (SYNCMOMENTS_RUN_SLOW=1) ------------------------------------------------------
 
 
 @slow

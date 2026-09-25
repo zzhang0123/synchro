@@ -1,4 +1,4 @@
-"""Phase routes: Taylor weights, screens against synchro.rm/faraday, AD and JIT."""
+"""Phase routes: Taylor weights, screens against syncmoments.rm/faraday, AD and JIT."""
 
 import math
 
@@ -9,9 +9,9 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from synchro.constants import C_SI_M
-from synchro.faraday import emission_polarisation
-from synchro.model.phase import (
+from syncmoments.constants import C_SI_M
+from syncmoments.faraday import emission_polarisation
+from syncmoments.model.phase import (
     CumulantScreen,
     EmpiricalScreen,
     GaussianScreen,
@@ -19,7 +19,7 @@ from synchro.model.phase import (
     TaylorPhase,
     phase_coordinate,
 )
-from synchro.rm import burn_depolarisation, screen_polarisation
+from syncmoments.rm import burn_depolarisation, screen_polarisation
 
 NU = np.array([[1.0e8, 1.5e8], [4.0e8, 1.4e9], [2.0e9, 1.0e10]])
 TAU = 2 * (C_SI_M / NU) ** 2

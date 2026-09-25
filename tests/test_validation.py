@@ -19,7 +19,7 @@ import validate_rt_moments
 import validate_sed
 import validate_cumulants
 import test_design
-from synchro.sed import power_law_emissivity_rel
+from syncmoments.sed import power_law_emissivity_rel
 
 # --- emissivity side -------------------------------------------------------
 
@@ -248,7 +248,7 @@ def test_design_transfer_los_jit():
 
 def test_bessel_kernels_match_scipy():
     from scipy.special import jv, jvp
-    from synchro.bessel import bessel_jn, bessel_jn_prime, bessel_jn_and_prime
+    from syncmoments.bessel import bessel_jn, bessel_jn_prime, bessel_jn_and_prime
 
     for n in (0, 1, 5, 20):
         for x in (1e-3, 0.5, 3.0, 18.0):
@@ -260,7 +260,7 @@ def test_bessel_kernels_match_scipy():
 
 
 def test_larmor_power_and_dimensional_stokes_scale_as_B_squared():
-    from synchro.stokes import larmor_power, stokes_harmonic
+    from syncmoments.stokes import larmor_power, stokes_harmonic
 
     p1 = float(larmor_power(5.0, np.pi / 4, 1e-6))
     p2 = float(larmor_power(5.0, np.pi / 4, 2e-6))
@@ -273,7 +273,7 @@ def test_larmor_power_and_dimensional_stokes_scale_as_B_squared():
 
 
 def test_apply_B_is_exact_second_moment():
-    from synchro.expansion import build_expansion
+    from syncmoments.expansion import build_expansion
 
     exp = build_expansion([1, 2, 3], 5.0, np.pi / 4, np.pi / 3)
     S = exp(jnp.zeros(3), jnp.zeros((3, 3)))
@@ -286,7 +286,7 @@ def test_apply_B_is_exact_second_moment():
 
 
 def test_rm_utilities_are_mutually_consistent():
-    from synchro.rm import (
+    from syncmoments.rm import (
         rotation_measure_practical,
         rotation_angle,
         gaussian_rm_cumulants,
@@ -311,7 +311,7 @@ def test_rm_utilities_are_mutually_consistent():
 
 
 def test_limiting_solutions():
-    from synchro.solutions import (
+    from syncmoments.solutions import (
         thin_limit,
         self_absorbed_source_function,
         uniform_source_intensity,
@@ -327,7 +327,7 @@ def test_limiting_solutions():
     # optically thin -> I -> eps L ; optically thick -> I -> S (saturates).
     # The thin end is a boundary case: tau here is ~1e-21, where the naive
     # 1-exp(-tau) underflows to exactly zero (hence -expm1 in solutions.py).
-    from synchro.solutions import power_law_emissivity
+    from syncmoments.solutions import power_law_emissivity
 
     L = 1e-8
     thin = float(uniform_source_intensity(1e4, 2.5, 1.0, L))
@@ -344,7 +344,7 @@ def test_limiting_solutions():
 
 
 def test_transfer_variable_step_and_conversion_matrix():
-    from synchro.transfer import (
+    from syncmoments.transfer import (
         mueller_matrix,
         transfer_los,
         conversion_matrix,
@@ -378,7 +378,7 @@ def test_absorbed_polarisation_fraction_thin_and_thick_limits():
     The sign flip to +3/(6p+13) is a power-law result and is NOT expected for
     the narrow Gaussian used here.
     """
-    from synchro.kirchhoff import (
+    from syncmoments.kirchhoff import (
         absorbed_polarisation_fraction,
         emissivity_from_moments,
         emissivity_Q_from_moments,
@@ -420,7 +420,7 @@ def test_absorbed_intensity_thin_limit_is_j_times_L():
 
     With the naive 1-exp(-tau) this returned exactly 0.0 for tau < 1e-16.
     """
-    from synchro.kirchhoff import (
+    from syncmoments.kirchhoff import (
         absorbed_intensity_from_moments,
         emissivity_from_moments,
     )
@@ -457,8 +457,8 @@ def test_moment_slab_polarised_absorption_matches_kirchhoff():
     Boundary sweep over eight decades of optical depth, spanning the thin
     (Pi -> jG/jF) and thick (Pi -> (S_plus-S_minus)/(S_plus+S_minus)) limits.
     """
-    from synchro.los_moments import moment_driven_slab
-    from synchro.kirchhoff import absorbed_polarisation_fraction
+    from syncmoments.los_moments import moment_driven_slab
+    from syncmoments.kirchhoff import absorbed_polarisation_fraction
 
     M0, M1, M2, ig = _gaussian_moment_set()
     args = (100.0, 30.0, 1.0, M0, M1, M2)
@@ -471,7 +471,7 @@ def test_moment_slab_polarised_absorption_matches_kirchhoff():
 
 
 def test_moment_slab_rejects_imposed_polarisation_with_kirchhoff_absorption():
-    from synchro.los_moments import moment_driven_slab
+    from syncmoments.los_moments import moment_driven_slab
 
     M0, M1, M2, ig = _gaussian_moment_set()
     import pytest
@@ -489,7 +489,7 @@ def test_transfer_slab_bright_optically_thick_slab_is_finite():
     scaling-and-squaring in expm produced NaN; the source column is now
     normalised (transfer_slab).  The saturated intensity must be eps/aI.
     """
-    from synchro.transfer import mueller_matrix, transfer_slab
+    from syncmoments.transfer import mueller_matrix, transfer_slab
 
     aI, eps_I = 3.5e-5, 6.27
     K = mueller_matrix(aI, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
@@ -512,8 +512,8 @@ def test_magnus_orders_on_a_two_region_path():
     [K_conv, K_rot] generates a U-V mixing that annihilates a pure-Q input,
     which hides the Omega2 gain and makes both orders look identical.
     """
-    from synchro.transfer import mueller_matrix, transfer_los
-    from synchro.magnus import magnus_S
+    from syncmoments.transfer import mueller_matrix, transfer_los
+    from syncmoments.magnus import magnus_S
 
     S0 = jnp.array([1.0, 0.6, 0.3, 0.2])
     ds = 1.0
@@ -546,7 +546,7 @@ def _gauss_hermite_ensemble(
     tails. The paper independently checks truncated physical populations and
     fixed-B derivatives. No tail or physical-PDF guarantee follows here.
     """
-    from synchro.stokes import stokes_harmonic
+    from syncmoments.stokes import stokes_harmonic
 
     x, w = np.polynomial.hermite_e.hermegauss(n_nodes)
     W = w / np.sum(w)
@@ -566,7 +566,7 @@ def test_convergence_is_fourth_order_in_the_width():
 
     Checks the expected fourth-order law for the normalized response; the paper separately checks physical fixed-B derivatives.
     """
-    from synchro.expansion import build_expansion
+    from syncmoments.expansion import build_expansion
 
     g0, a0, t0 = 20.0, np.pi / 4, np.pi / 3
     ns = (1, 10, 50)
@@ -592,7 +592,7 @@ def test_pitch_angle_is_the_binding_direction():
     The paper previously attributed a ~10% error at n=20 to a 6% energy spread;
     it is in fact the 0.1 rad pitch-angle spread. This pins the separation.
     """
-    from synchro.expansion import build_expansion
+    from syncmoments.expansion import build_expansion
 
     g0, a0, t0 = 5.0, np.pi / 4, np.pi / 3
     ns = (1, 20)
@@ -624,7 +624,7 @@ def test_mildly_relativistic_claims_of_section_5_4():
     reproduce; V_n/I_n at a single harmonic is fixed by geometry (full
     polarisation), so the meaningful statement is about the ensemble.
     """
-    from synchro.stokes import stokes_harmonic
+    from syncmoments.stokes import stokes_harmonic
 
     th = np.pi / 3
     mus = np.linspace(-0.995, 0.995, 61)  # coarse but adequate for a pin

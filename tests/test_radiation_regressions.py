@@ -14,13 +14,13 @@ import pytest
 from scipy.integrate import quad
 from scipy.special import digamma, jv, jvp, kv
 
-from synchro.bessel import bessel_jn_and_prime, bessel_kn
-from synchro.cumulants import cumulant_expansion, vector_cumulant_expansion
-from synchro.derivatives import derivative_spectra
-from synchro.expansion import build_expansion
-from synchro.sed import log_parabola_running_index
-from synchro.stokes import C_CGS, E_ESU, M_E, stokes_harmonic
-from synchro.ultrarel import F, G
+from syncmoments.bessel import bessel_jn_and_prime, bessel_kn
+from syncmoments.cumulants import cumulant_expansion, vector_cumulant_expansion
+from syncmoments.derivatives import derivative_spectra
+from syncmoments.expansion import build_expansion
+from syncmoments.sed import log_parabola_running_index
+from syncmoments.stokes import C_CGS, E_ESU, M_E, stokes_harmonic
+from syncmoments.ultrarel import F, G
 
 
 @pytest.mark.parametrize("n,x", [(512, 512.0), (1000, 1000.0), (3200, 2500.0)])
@@ -179,7 +179,7 @@ def test_log_parabola_mapping_contains_kernel_offset():
 
 
 def test_absolute_emissivity_uses_normalised_angular_measure():
-    from synchro.sed import power_law_emissivity_abs
+    from syncmoments.sed import power_law_emissivity_abs
 
     nu, field, density = 1e8, 3e-6, 2.0
     nu_b = E_ESU * field / (2 * np.pi * M_E * C_CGS)
@@ -221,8 +221,8 @@ def test_jit_resolution_guard_and_explicit_static_resolution():
 
 
 def test_finite_integral_tail_bounds_are_separate_from_quadrature():
-    from synchro.bessel import bessel_kn_tail_bound
-    from synchro.ultrarel import F_tail_bound
+    from syncmoments.bessel import bessel_kn_tail_bound
+    from syncmoments.ultrarel import F_tail_bound
 
     # Deliberately short cutoff makes the omitted positive tail measurable;
     # default cutoff50 would be below the floating-point comparison floor.
@@ -255,7 +255,7 @@ def test_finite_integral_tail_bounds_are_separate_from_quadrature():
 
 
 def test_absolute_emissivity_zero_field_limit():
-    from synchro.sed import power_law_emissivity_abs
+    from syncmoments.sed import power_law_emissivity_abs
 
     for p in (0.5, 1.0, 2.5):
         assert power_law_emissivity_abs(1e8, p, 1.0, 0.0) == 0.0
@@ -270,7 +270,7 @@ def test_extended_log_parabola_curvature_domain():
 
 
 def test_shared_constants_and_absolute_larmor_normalisation():
-    from synchro import constants, sed, stokes
+    from syncmoments import constants, sed, stokes
 
     # Independent numerical SI definitions/conversions, not module aliases.
     charge = 1.602176634e-19 * 2.99792458e9

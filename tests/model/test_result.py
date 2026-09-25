@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.fit.result`` (``FitResult`` and the builders that
+"""Tests of ``syncmoments.model.fit.result`` (``FitResult`` and the builders that
 wrap ``fit_bfgs``/``fit_nodal`` outcomes).
 
 Oracles: NumPy Gauss-Newton Fisher ``J^T J`` from central-difference
@@ -16,20 +16,20 @@ from numpy.testing import assert_allclose
 import pytest
 
 from _nonlinear_oracles import node_features, polynomial_basis, random_nodes, samples_of
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     Parameters,
     gaussian_screen,
     isotropic_pitch,
     no_assumption,
     nodal,
 )
-from synchro.model.errors import ErrorTerm, Provenance
-from synchro.model.fit.linear import fit_linear
-from synchro.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
-from synchro.model.fit.observation import StokesData
-from synchro.model.fit.result import MAX_FISHER_PARAMS, FitResult
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.predict import Prediction
+from syncmoments.model.errors import ErrorTerm, Provenance
+from syncmoments.model.fit.linear import fit_linear
+from syncmoments.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.fit.result import MAX_FISHER_PARAMS, FitResult
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.predict import Prediction
 
 # -- helpers ---------------------------------------------------------------------
 

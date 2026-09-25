@@ -3,7 +3,7 @@
 Run from the package root with ``PYTHONPATH=. python scripts/model_examples.py``
 (optionally ``a``, ``b``, ``c`` or ``d`` to select examples). The printed
 numbers are pasted into ``README.md``; rerun this script after any change to
-``synchro.model`` and update the README when the output changes.
+``syncmoments.model`` and update the README when the output changes.
 
 (a) the manuscript's smooth-channel benchmark regime (main.tex Section 5.3.1)
     with the harmonic kernel, ``independent_screen`` declared and
@@ -34,24 +34,33 @@ from pathlib import Path
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 
-import synchro  # noqa: F401  (enables float64)
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.assumptions import independent_screen
-from synchro.model.basis import build_basis
-from synchro.model.bounds import RemainderInputs
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.moments import JointMoments, PopulationSamples, Reference, Support
-from synchro.model.predict import predict
+import syncmoments  # noqa: F401  (enables float64)
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.assumptions import independent_screen
+from syncmoments.model.basis import build_basis
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.moments import (
+    JointMoments,
+    PopulationSamples,
+    Reference,
+    Support,
+)
+from syncmoments.model.predict import predict
 
 from model_examples_continuum import banner, example_b, example_d
 from model_examples_fit import example_c
 
 ROOT = Path(__file__).resolve().parents[1]
-MANUSCRIPT_RESULTS = ROOT.parent.parent / "validation" / "full_response_results.json"
+# Verbatim, hash-checked copy of the manuscript's saved benchmark results
+# (tests/model/reference/README.md); the script needs no manuscript checkout.
+MANUSCRIPT_RESULTS = (
+    ROOT / "tests" / "model" / "reference" / "validation" / "full_response_results.json"
+)
 
 GAMMA0, B0 = 20.0, 1.0  # manuscript benchmark: gamma0 = 20, B0 = 1 G
 NU_STAR = E_ESU * B0 / (2 * np.pi * GAMMA0 * M_E * C_CGS)  # Hz

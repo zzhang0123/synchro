@@ -1,70 +1,70 @@
-synchro.model
-=============
+syncmoments.model
+=================
 
 Finite joint response of channel Stokes spectra, error budget and declared assumptions.
 
-synchro.model.index
--------------------
+syncmoments.model.index
+-----------------------
 
-.. automodule:: synchro.model.index
+.. automodule:: syncmoments.model.index
 
-synchro.model.errors
---------------------
+syncmoments.model.errors
+------------------------
 
-.. automodule:: synchro.model.errors
+.. automodule:: syncmoments.model.errors
 
-synchro.model.channels
-----------------------
+syncmoments.model.channels
+--------------------------
 
-.. automodule:: synchro.model.channels
+.. automodule:: syncmoments.model.channels
 
-synchro.model.phase
--------------------
+syncmoments.model.phase
+-----------------------
 
-.. automodule:: synchro.model.phase
+.. automodule:: syncmoments.model.phase
 
-synchro.model.screens
----------------------
-
-.. automodule:: synchro.model.screens
-
-synchro.model.moments
----------------------
-
-.. automodule:: synchro.model.moments
-
-synchro.model.bounds
---------------------
-
-.. automodule:: synchro.model.bounds
-
-synchro.model.assumptions
+syncmoments.model.screens
 -------------------------
 
-.. automodule:: synchro.model.assumptions
+.. automodule:: syncmoments.model.screens
 
-synchro.model.kernels
----------------------
+syncmoments.model.moments
+-------------------------
 
-.. automodule:: synchro.model.kernels
+.. automodule:: syncmoments.model.moments
 
-synchro.model.harmonic
-----------------------
+syncmoments.model.bounds
+------------------------
 
-.. automodule:: synchro.model.harmonic
+.. automodule:: syncmoments.model.bounds
 
-synchro.model.basis
--------------------
+syncmoments.model.assumptions
+-----------------------------
 
-.. automodule:: synchro.model.basis
+.. automodule:: syncmoments.model.assumptions
 
-synchro.model.predict
----------------------
+syncmoments.model.kernels
+-------------------------
 
-.. automodule:: synchro.model.predict
+.. automodule:: syncmoments.model.kernels
 
-synchro.model.adapters
-----------------------
+syncmoments.model.harmonic
+--------------------------
 
-.. automodule:: synchro.model.adapters
+.. automodule:: syncmoments.model.harmonic
+
+syncmoments.model.basis
+-----------------------
+
+.. automodule:: syncmoments.model.basis
+
+syncmoments.model.predict
+-------------------------
+
+.. automodule:: syncmoments.model.predict
+
+syncmoments.model.adapters
+--------------------------
+
+.. automodule:: syncmoments.model.adapters
 

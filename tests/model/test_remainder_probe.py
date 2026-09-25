@@ -1,4 +1,4 @@
-"""``RemainderInputs.from_samples`` (``synchro.model._remainder_probe``) against
+"""``RemainderInputs.from_samples`` (``syncmoments.model._remainder_probe``) against
 NumPy oracles on the ``PolynomialTestKernel``: Frobenius norms of the order-``N+1``
 derivative tensors at the probe points, absolute moments, the measured angular
 residual, the ``app: depth moments`` inputs, and the covering inequality against the
@@ -12,14 +12,19 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import eval_legendre
 
-import synchro  # noqa: F401
-from synchro.constants import C_SI_M as _C
-from synchro.model.bounds import RemainderInputs
-from synchro.model.channels import Channels
-from synchro.model.index import Truncation
-from synchro.model.kernels import PolynomialTestKernel
-from synchro.model.moments import JointMoments, PopulationSamples, Reference, Support
-from synchro.model.predict import direct_channel_average, predict
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_SI_M as _C
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.channels import Channels
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import PolynomialTestKernel
+from syncmoments.model.moments import (
+    JointMoments,
+    PopulationSamples,
+    Reference,
+    Support,
+)
+from syncmoments.model.predict import direct_channel_average, predict
 
 from _basis_stub import build_stub_basis
 

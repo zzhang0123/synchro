@@ -1,4 +1,4 @@
-"""Tests for ``synchro.model.fit.diagnostics.identifiability``.
+"""Tests for ``syncmoments.model.fit.diagnostics.identifiability``.
 
 Oracle: ``numpy.linalg.svd`` of an independently assembled whitened design
 ``L^-1 R C [c | P]`` (``P, c`` from ``ParameterMap.affine_pieces``; a
@@ -21,12 +21,12 @@ from _diagnostics_fixtures import (
     make_data,
     reference_222,
 )
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     gaussian_screen,
     isotropic_pitch,
     no_assumption,
 )
-from synchro.model.fit.diagnostics import (
+from syncmoments.model.fit.diagnostics import (
     IdentifiabilityReport,
     identifiability,
 )

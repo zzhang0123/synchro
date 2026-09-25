@@ -3,83 +3,83 @@ Kernels, contractions and transfer
 
 The single-electron kernels, fixed-harmonic contractions, Faraday averages and transfer modules.
 
-synchro.constants
------------------
+syncmoments.constants
+---------------------
 
-.. automodule:: synchro.constants
+.. automodule:: syncmoments.constants
 
-synchro.bessel
---------------
-
-.. automodule:: synchro.bessel
-
-synchro.stokes
---------------
-
-.. automodule:: synchro.stokes
-
-synchro.ultrarel
-----------------
-
-.. automodule:: synchro.ultrarel
-
-synchro.derivatives
--------------------
-
-.. automodule:: synchro.derivatives
-
-synchro.expansion
------------------
-
-.. automodule:: synchro.expansion
-
-synchro.cumulants
------------------
-
-.. automodule:: synchro.cumulants
-
-synchro.rm
-----------
-
-.. automodule:: synchro.rm
-
-synchro.faraday
----------------
-
-.. automodule:: synchro.faraday
-
-synchro.sed
------------
-
-.. automodule:: synchro.sed
-
-synchro.transfer
-----------------
-
-.. automodule:: synchro.transfer
-
-synchro.solutions
------------------
-
-.. automodule:: synchro.solutions
-
-synchro.kirchhoff
------------------
-
-.. automodule:: synchro.kirchhoff
-
-synchro.conversion
+syncmoments.bessel
 ------------------
 
-.. automodule:: synchro.conversion
+.. automodule:: syncmoments.bessel
 
-synchro.magnus
+syncmoments.stokes
+------------------
+
+.. automodule:: syncmoments.stokes
+
+syncmoments.ultrarel
+--------------------
+
+.. automodule:: syncmoments.ultrarel
+
+syncmoments.derivatives
+-----------------------
+
+.. automodule:: syncmoments.derivatives
+
+syncmoments.expansion
+---------------------
+
+.. automodule:: syncmoments.expansion
+
+syncmoments.cumulants
+---------------------
+
+.. automodule:: syncmoments.cumulants
+
+syncmoments.rm
 --------------
 
-.. automodule:: synchro.magnus
+.. automodule:: syncmoments.rm
 
-synchro.los_moments
+syncmoments.faraday
 -------------------
 
-.. automodule:: synchro.los_moments
+.. automodule:: syncmoments.faraday
+
+syncmoments.sed
+---------------
+
+.. automodule:: syncmoments.sed
+
+syncmoments.transfer
+--------------------
+
+.. automodule:: syncmoments.transfer
+
+syncmoments.solutions
+---------------------
+
+.. automodule:: syncmoments.solutions
+
+syncmoments.kirchhoff
+---------------------
+
+.. automodule:: syncmoments.kirchhoff
+
+syncmoments.conversion
+----------------------
+
+.. automodule:: syncmoments.conversion
+
+syncmoments.magnus
+------------------
+
+.. automodule:: syncmoments.magnus
+
+syncmoments.los_moments
+-----------------------
+
+.. automodule:: syncmoments.los_moments
 

@@ -1,4 +1,4 @@
-"""Regression tests for review finding R22 on ``synchro.model.fit.nonlinear``.
+"""Regression tests for review finding R22 on ``syncmoments.model.fit.nonlinear``.
 
 ``fit_bfgs`` from ``z0 = 0`` on ``gaussian_screen(fit_hyper=True)`` used
 to abort with the ``gaussian_depth`` ``error_if`` when a line-search trial
@@ -14,11 +14,11 @@ import numpy as np
 import pytest
 
 from _nonlinear_oracles import polynomial_basis
-from synchro.model.assumptions import gaussian_screen
-from synchro.model.fit import nonlinear
-from synchro.model.fit.nonlinear import LogDensity, Transform, fit_bfgs
-from synchro.model.fit.observation import StokesData
-from synchro.model.index import MomentIndex, Truncation
+from syncmoments.model.assumptions import gaussian_screen
+from syncmoments.model.fit import nonlinear
+from syncmoments.model.fit.nonlinear import LogDensity, Transform, fit_bfgs
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.index import MomentIndex, Truncation
 
 
 def noisy_density(seed, prior):

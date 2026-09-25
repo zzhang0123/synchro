@@ -19,17 +19,19 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.channels import Channels
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.kernels import ContinuumKernel
-from synchro.ultrarel import F, G
+import syncmoments  # noqa: F401
+from syncmoments.model.channels import Channels
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import ContinuumKernel
+from syncmoments.ultrarel import F, G
 
 from _boundary_oracles import (
     BLOWUP,
     F_PINS,
+    F_REFERENCE,
     G_PINS,
+    G_REFERENCE,
     OK,
     gyro_hz,
     pair_errors,
@@ -66,10 +68,9 @@ def _pin_signed(h, c, pin):
 def test_continuum_F_G_pinned_to_mpmath(x):
     assert_allclose(float(F(jnp.asarray(x))), F_PINS[x], rtol=1e-9)
     assert_allclose(float(G(jnp.asarray(x))), G_PINS[x], rtol=1e-9)
-    mp = pytest.importorskip("mpmath")
-    mp.mp.dps = 20
-    g_ref = float(x * mp.besselk(mp.mpf(2) / 3, x))
-    assert_allclose(g_ref, G_PINS[x], rtol=1e-13)
+    # The float64 pins against the mpmath literals (32 digits).
+    assert_allclose(float(G_REFERENCE[x]), G_PINS[x], rtol=1e-13)
+    assert_allclose(float(F_REFERENCE[x]), F_PINS[x], rtol=1e-13)
 
 
 @pytest.mark.parametrize("x_min", [1e-6, 1e-3, 1e-1])

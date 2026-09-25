@@ -1,6 +1,6 @@
-"""Docstring contract of ``synchro.model`` (documentation audit, 2026-09-24).
+"""Docstring contract of ``syncmoments.model`` (documentation audit, 2026-09-24).
 
-Every public module of ``synchro.model`` and ``synchro.model.fit`` states its
+Every public module of ``syncmoments.model`` and ``syncmoments.model.fit`` states its
 manuscript labels (``LABEL``), its units (or that it is dimensionless), its
 shapes, and what it does not certify. Every public class or function has its
 own docstring; every public class names a manuscript label (a ``LABEL``
@@ -27,8 +27,8 @@ from pathlib import Path
 
 import pytest
 
-import synchro.model
-import synchro.model.fit
+import syncmoments.model
+import syncmoments.model.fit
 
 LABEL_RX = re.compile(r"LABEL|eq:|\[extension\]|app:|sec:|tab:")
 UNITS_RX = re.compile(
@@ -49,7 +49,7 @@ MODULE_POINTER_RX = re.compile(r"module\s+docstring|see\s+:(class|func|mod):", r
 
 def _public_modules():
     names = []
-    for package in (synchro.model, synchro.model.fit):
+    for package in (syncmoments.model, syncmoments.model.fit):
         for info in pkgutil.iter_modules(package.__path__):
             if info.name.startswith("_") or info.name == "fit":
                 continue
@@ -68,7 +68,7 @@ def _public_objects(module):
         obj = getattr(module, name, None)
         if not (inspect.isclass(obj) or inspect.isfunction(obj)):
             continue
-        if not getattr(obj, "__module__", "").startswith("synchro.model"):
+        if not getattr(obj, "__module__", "").startswith("syncmoments.model"):
             continue
         yield name, obj
 
@@ -120,13 +120,13 @@ def test_public_object_docstring(module_name, name):
 
 ROOT = Path(__file__).resolve().parents[2]
 DOCUMENTED = (
-    ("synchro.model.predict", "predict"),
-    ("synchro.model.predict", "direct_channel_average"),
-    ("synchro.model.basis", "build_basis"),
-    ("synchro.model.basis", "basis_convergence"),
-    ("synchro.model.fit.linear", "fit_linear"),
-    ("synchro.model.fit.nonlinear", "fit_bfgs"),
-    ("synchro.model.fit.nonlinear", "fit_nodal"),
+    ("syncmoments.model.predict", "predict"),
+    ("syncmoments.model.predict", "direct_channel_average"),
+    ("syncmoments.model.basis", "build_basis"),
+    ("syncmoments.model.basis", "basis_convergence"),
+    ("syncmoments.model.fit.linear", "fit_linear"),
+    ("syncmoments.model.fit.nonlinear", "fit_bfgs"),
+    ("syncmoments.model.fit.nonlinear", "fit_nodal"),
 )
 STALE = (
     "record(theta",  # ParameterMap.record() is theta-independent

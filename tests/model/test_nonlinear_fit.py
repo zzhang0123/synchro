@@ -1,4 +1,4 @@
-"""Tests of ``fit_bfgs`` and ``fit_nodal`` (``synchro.model.fit.nonlinear``).
+"""Tests of ``fit_bfgs`` and ``fit_nodal`` (``syncmoments.model.fit.nonlinear``).
 
 Oracles: NumPy least squares for the affine truth, ``scipy.optimize.nnls``
 for the simplex core (``u = A w >= 0``), ``scipy.special.eval_legendre``
@@ -20,26 +20,26 @@ from _nonlinear_oracles import (
     reference_of,
     samples_of,
 )
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     Parameters,
     gaussian_screen,
     isotropic_pitch,
     no_assumption,
     nodal,
 )
-from synchro.model.errors import ErrorTerm
-from synchro.model.fit import _nodal
-from synchro.model.fit.nonlinear import (
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.fit import _nodal
+from syncmoments.model.fit.nonlinear import (
     MAX_BFGS_PARAMS,
     LogDensity,
     Transform,
     fit_bfgs,
     fit_nodal,
 )
-from synchro.model.fit.result import FitResult
-from synchro.model.fit.observation import StokesData
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments
+from syncmoments.model.fit.result import FitResult
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments
 
 
 def stokes_data(basis, m, amplitude, *, noise=1e-2):

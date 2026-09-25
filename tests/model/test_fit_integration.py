@@ -1,4 +1,4 @@
-"""End-to-end synthetic linear fits on the harmonic kernel (``synchro.model.fit``).
+"""End-to-end synthetic linear fits on the harmonic kernel (``syncmoments.model.fit``).
 
 Pipeline: ``HarmonicKernel(m_max = required_m_max <= 40)`` on 16 bump
 channels, ``Truncation(1, 1, 1)``, a correlated 12-atom population,
@@ -34,10 +34,14 @@ from _integration_fixtures import (
     whitened_design,
     with_amplitude,
 )
-from synchro.model.assumptions import gaussian_screen, isotropic_pitch, no_assumption
-from synchro.model.errors import ErrorTerm
-from synchro.model.fit.observation import StokesData
-from synchro.model.moments import JointMoments
+from syncmoments.model.assumptions import (
+    gaussian_screen,
+    isotropic_pitch,
+    no_assumption,
+)
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.moments import JointMoments
 
 
 @pytest.fixture(scope="module")
@@ -138,6 +142,27 @@ def test_no_assumption_with_all_stokes_is_full_rank(pipeline):
     assert result.dof == 64 - 28
 
 
+# Inverse-oracle tolerances (T-004). An SVD pseudo-inverse of X is backward stable,
+# so to first order ||X^+ - X^+_exact|| / ||X^+|| <= c(n) cond(X) u; c(n) is a
+# modest function of the dimensions (it also absorbs forming F = G^T G, a
+# gamma_64 perturbation in the worst case). The worst-case c(n) would admit
+# relative errors above 1e-6 at cond(F) = 4.2e8, so the constant is an estimate
+# from measurement, not a bound: the norm-wise ratio
+# ||cov - oracle||_2 / (cond u ||oracle||_2) was 0.05-0.17 for pinv(F) and
+# 0.07-0.24 for pinv(Gw) pinv(Gw)^T on jax 0.10.0/numpy 2.3.5 and jax
+# 0.10.2/numpy 2.5.3 (isotropic_pitch cond(F) = 3.2e5, gaussian_screen 4.2e8).
+# A constant of 2 leaves 8x headroom and keeps the pinv(F) check below 1e-6.
+INVERSE_ROUNDOFF_CONSTANT = 2.0
+COVARIANCE_CONTROL_ERROR = 1e-6
+
+
+def inverse_misfit(cov, X, oracle):
+    """``||cov - oracle||_2 / (cond(X) u ||oracle||_2)``: pass when <= the constant."""
+    cond = np.linalg.cond(X)
+    scale = cond * np.finfo(float).eps * np.linalg.norm(oracle, 2)
+    return np.linalg.norm(cov - oracle, 2) / scale
+
+
 @pytest.mark.parametrize("name", ["isotropic_pitch", "gaussian_screen"])
 def test_affine_fit_recovers_the_truth_within_fisher_errors(pipeline, name):
     kernel, basis, pop, joint = pipeline
@@ -161,8 +186,18 @@ def test_affine_fit_recovers_the_truth_within_fisher_errors(pipeline, name):
     natural, expected = np.asarray(fisher(basis, data, pm, theta_A)), T.T @ F @ T
     assert_allclose(natural, expected, rtol=1e-9, atol=1e-12 * np.max(np.abs(expected)))
     cov = np.asarray(result.covariance)
-    # entries below 1e-9 of the largest are roundoff of the ill-conditioned inverse
-    assert_allclose(cov, np.linalg.pinv(F), rtol=1e-6, atol=1e-9 * np.max(np.abs(cov)))
+    # the covariance against both inverses, at their own roundoff (constants above)
+    Gw_pinv = np.linalg.pinv(Gw)
+    oracles = ((F, np.linalg.pinv(F)), (Gw, Gw_pinv @ Gw_pinv.T))
+    for X, oracle in oracles:
+        assert inverse_misfit(cov, X, oracle) <= INVERSE_ROUNDOFF_CONSTANT, name
+    # negative control: a covariance wrong by 1e-6 (relative, norm-wise) fails both
+    rng = np.random.default_rng(3)
+    E = rng.standard_normal(cov.shape)
+    E = (E + E.T) / np.linalg.norm(E + E.T, 2)
+    wrong = cov + COVARIANCE_CONTROL_ERROR * np.linalg.norm(cov, 2) * E
+    for X, oracle in oracles:
+        assert inverse_misfit(wrong, X, oracle) > INVERSE_ROUNDOFF_CONSTANT, name
     u_true = unknowns(pm, theta_true, AMPLITUDE)
     u_fit = unknowns(pm, result.theta, float(result.amplitude))
     pulls = np.abs(u_fit - u_true) / np.sqrt(np.diag(cov))

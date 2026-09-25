@@ -26,18 +26,18 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.special import jv, jvp, kv
 
-from synchro.bessel import bessel_jn_and_prime, bessel_kn
-from synchro.ultrarel import F, G
+from syncmoments.bessel import bessel_jn_and_prime, bessel_kn
+from syncmoments.ultrarel import F, G
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def _validate_import_roots() -> dict[str, str]:
     """Reject a shadow/installed package before recording this checkout's evidence."""
-    expected = (ROOT / "synchro").resolve()
+    expected = (ROOT / "syncmoments").resolve()
     paths = {}
     for name, module in tuple(sys.modules.items()):
-        if name != "synchro" and not name.startswith("synchro."):
+        if name != "syncmoments" and not name.startswith("syncmoments."):
             continue
         filename = getattr(module, "__file__", None)
         actual = Path(filename).resolve() if filename is not None else None
@@ -48,7 +48,7 @@ def _validate_import_roots() -> dict[str, str]:
                 "Run with PYTHONPATH set to this checkout or install this checkout."
             )
         paths[name] = str(actual)
-    required = {"synchro", "synchro.bessel", "synchro.ultrarel"}
+    required = {"syncmoments", "syncmoments.bessel", "syncmoments.ultrarel"}
     if not required.issubset(paths):
         raise RuntimeError(
             "Radiation audit provenance mismatch: required imported modules are missing"
@@ -57,7 +57,7 @@ def _validate_import_roots() -> dict[str, str]:
 
 
 def _source_metadata(import_paths: dict[str, str]) -> dict[str, Any]:
-    files = sorted((ROOT / "synchro").glob("*.py")) + [Path(__file__).resolve()]
+    files = sorted((ROOT / "syncmoments").glob("*.py")) + [Path(__file__).resolve()]
     hashes = {
         str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in files

@@ -8,7 +8,7 @@ from numpy.polynomial.hermite import hermgauss
 from numpy.testing import assert_allclose
 import pytest
 
-from synchro.rm import (
+from syncmoments.rm import (
     burn_depolarisation,
     gaussian_rm_cumulants,
     rotation_measure_practical,

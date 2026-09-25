@@ -1,4 +1,4 @@
-"""Boundary and extreme cases of ``synchro.model.fit.nonlinear``.
+"""Boundary and extreme cases of ``syncmoments.model.fit.nonlinear``.
 
 Both sides of every dispatch are evaluated directly: the preconditioner
 floor (a parameter with zero curvature), the box saturation of the tanh
@@ -14,11 +14,11 @@ from numpy.testing import assert_allclose
 import pytest
 
 from _nonlinear_oracles import polynomial_basis, random_nodes, samples_of
-from synchro.model.assumptions import Parameters, gaussian_screen, nodal
-from synchro.model.fit import nonlinear
-from synchro.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
-from synchro.model.fit.observation import StokesData
-from synchro.model.index import MomentIndex, Truncation
+from syncmoments.model.assumptions import Parameters, gaussian_screen, nodal
+from syncmoments.model.fit import nonlinear
+from syncmoments.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.index import MomentIndex, Truncation
 
 
 def zero_noise_data(basis, m, amplitude, noise=1e-2):

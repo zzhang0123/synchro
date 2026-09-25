@@ -1,4 +1,4 @@
-"""Regression tests for review findings on ``synchro.model.assumptions``.
+"""Regression tests for review findings on ``syncmoments.model.assumptions``.
 
 R01: ``assume()`` must not hand one input map's discrepancy allowance to a
 combined assumption that the other maps constrain further; the combined
@@ -19,7 +19,7 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     Closure,
     ParameterMap,
     fully_independent,
@@ -28,9 +28,9 @@ from synchro.model.assumptions import (
     isotropic_pitch,
     no_assumption,
 )
-from synchro.model.errors import ErrorTerm
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments, PopulationSamples, Reference
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments, PopulationSamples, Reference
 
 
 def reference():
@@ -205,4 +205,8 @@ def test_fully_independent_count_matches_docstring(orders):
     truncation = Truncation(L_mu, L_eta, N, depth_degree=depth_degree)
     pm = fully_independent(MomentIndex.build(truncation))
     assert pm.n_free() == 2 * N + truncation.max_b() + L_mu + L_eta + 2
-    assert "2N + max_b + L_mu + L_eta + 2" in fully_independent.__doc__
+    n_gamma, n_b, max_b = truncation.caps()  # (N, N, max_b) when uncapped
+    assert pm.n_free() == n_gamma + n_b + max_b + L_mu + L_eta + 2
+    doc = " ".join(fully_independent.__doc__.split())
+    assert "N_gamma + N_B + max_b + L_mu + L_eta + 2" in doc
+    assert "(N_gamma, N_B, max_b) = truncation.caps()" in doc

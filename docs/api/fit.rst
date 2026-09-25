@@ -1,30 +1,30 @@
-synchro.model.fit
-=================
+syncmoments.model.fit
+=====================
 
 Spectral fits: data, weighted least squares, nonlinear and nodal fits, diagnostics and results.
 
-synchro.model.fit.observation
------------------------------
+syncmoments.model.fit.observation
+---------------------------------
 
-.. automodule:: synchro.model.fit.observation
+.. automodule:: syncmoments.model.fit.observation
 
-synchro.model.fit.linear
-------------------------
+syncmoments.model.fit.linear
+----------------------------
 
-.. automodule:: synchro.model.fit.linear
+.. automodule:: syncmoments.model.fit.linear
 
-synchro.model.fit.nonlinear
----------------------------
+syncmoments.model.fit.nonlinear
+-------------------------------
 
-.. automodule:: synchro.model.fit.nonlinear
+.. automodule:: syncmoments.model.fit.nonlinear
 
-synchro.model.fit.diagnostics
------------------------------
+syncmoments.model.fit.diagnostics
+---------------------------------
 
-.. automodule:: synchro.model.fit.diagnostics
+.. automodule:: syncmoments.model.fit.diagnostics
 
-synchro.model.fit.result
-------------------------
+syncmoments.model.fit.result
+----------------------------
 
-.. automodule:: synchro.model.fit.result
+.. automodule:: syncmoments.model.fit.result
 

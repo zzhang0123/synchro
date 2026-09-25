@@ -16,11 +16,11 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 from _nonlinear_oracles import samples_of
-from synchro.model.assumptions import isotropic_pitch
-from synchro.model.errors import ErrorTerm
-from synchro.model.fit.linear import fit_linear
-from synchro.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
-from synchro.model.fit.observation import StokesData
+from syncmoments.model.assumptions import isotropic_pitch
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.fit.linear import fit_linear
+from syncmoments.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
+from syncmoments.model.fit.observation import StokesData
 from test_result import data_of, fd_jacobian, nodal_setup, setup
 
 NOISE = 1e-2

@@ -15,11 +15,11 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.kernels import required_m_max
-from synchro.model.moments import PopulationSamples
-from synchro.model.predict import direct_channel_average
+import syncmoments  # noqa: F401
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.moments import PopulationSamples
+from syncmoments.model.predict import direct_channel_average
 
 from _harmonic_oracles import BENCH_SUPPORT, benchmark_channels
 from _predict_helpers import harmonic_setup, samples_of

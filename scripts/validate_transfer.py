@@ -14,17 +14,17 @@ from __future__ import annotations
 import numpy as np
 import jax.numpy as jnp
 
-from synchro.rm import (
+from syncmoments.rm import (
     RM_PER_UNIT,
     rotation_measure_rad_m2,
     burn_depolarisation,
 )
-from synchro.transfer import (
+from syncmoments.transfer import (
     mueller_matrix,
     transfer_slab,
     transfer_los,
 )
-from synchro.solutions import (
+from syncmoments.solutions import (
     uniform_source_intensity,
 )
 

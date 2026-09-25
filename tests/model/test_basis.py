@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.basis``: exactness on the polynomial oracle, nested
+"""Tests of ``syncmoments.model.basis``: exactness on the polynomial oracle, nested
 derivatives against finite differences and the manuscript Section 5.3.1 benchmark
 coefficients (refusals, JIT/AD, provenance and convergence: ``test_basis_build``
 and ``test_basis_convergence``)."""
@@ -14,17 +14,17 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import eval_legendre
 
-import synchro  # noqa: F401
-from synchro.constants import C_SI_M
-from synchro.model.basis import (
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_SI_M
+from syncmoments.model.basis import (
     KernelTerms,
     SpectralBasis,
     build_basis,
 )
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.moments import JointMoments, PopulationSamples, Reference
-from synchro.model.phase import TaylorPhase
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.moments import JointMoments, PopulationSamples, Reference
+from syncmoments.model.phase import TaylorPhase
 
 from _basis_fixtures import (
     SMALL_SUPPORT,
@@ -38,7 +38,7 @@ from _harmonic_oracles import (
     B0,
     BENCH_SUPPORT,
     GAMMA0,
-    MANUSCRIPT,
+    REFERENCE,
     S_DEPTH,
     UNITS,
     benchmark_channels,
@@ -233,7 +233,7 @@ def test_third_order_columns_match_richardson_of_second_order():
 def manuscript_coefficients():
     """The manuscript's five-point coefficients at the two steps it reports
     (1e-3 and 5e-4) plus their Richardson combination (removes the h^4 term)."""
-    sys.path.insert(0, MANUSCRIPT)
+    sys.path.insert(0, REFERENCE)
     try:
         from validation import full_response, full_response_product
     finally:

@@ -1,4 +1,4 @@
-"""End-to-end nonlinear fits on the harmonic kernel (``synchro.model.fit``).
+"""End-to-end nonlinear fits on the harmonic kernel (``syncmoments.model.fit``).
 
 Same pipeline as ``test_fit_integration.py`` (harmonic kernel, 16 bump
 channels, ``Truncation(1, 1, 1)``, correlated atoms). Routes: ``fit_bfgs``
@@ -6,7 +6,7 @@ on the multilinear ``field_independent`` map started from ``project()`` of
 the ``no_assumption`` least-squares solution, ``fit_bfgs`` on
 ``independent_screen`` (refused by ``fit_linear``), ``fit_nodal`` on the
 atoms themselves, and the ``FitResult`` wrappers ``from_bfgs``/``from_nodal``
-when ``synchro.model.fit.result`` imports. Oracles: ``jax.jacfwd`` Fisher
+when ``syncmoments.model.fit.result`` imports. Oracles: ``jax.jacfwd`` Fisher
 information at the truth, explicit atom weights, NumPy chi-square.
 """
 
@@ -27,17 +27,17 @@ from _integration_fixtures import (
     make_data,
     samples_of,
 )
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     field_independent,
     independent_screen,
     no_assumption,
     nodal,
 )
-from synchro.model.errors import ErrorTerm
-from synchro.model.fit.diagnostics import feasibility_checks, identifiability
-from synchro.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
-from synchro.model.fit.result import FitResult
-from synchro.model.moments import JointMoments
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.fit.diagnostics import feasibility_checks, identifiability
+from syncmoments.model.fit.nonlinear import LogDensity, Transform, fit_bfgs, fit_nodal
+from syncmoments.model.fit.result import FitResult
+from syncmoments.model.moments import JointMoments
 
 
 @pytest.fixture(scope="module")

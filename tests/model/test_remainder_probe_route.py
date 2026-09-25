@@ -19,14 +19,14 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-import synchro.model
-from synchro.model.basis import build_basis
-from synchro.model.bounds import RemainderInputs
-from synchro.model.index import Truncation
-from synchro.model.moments import JointMoments
-from synchro.model.phase import GaussianScreen, TaylorPhase
-from synchro.model.predict import predict
+import syncmoments  # noqa: F401
+import syncmoments.model
+from syncmoments.model.basis import build_basis
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.index import Truncation
+from syncmoments.model.moments import JointMoments
+from syncmoments.model.phase import GaussianScreen, TaylorPhase
+from syncmoments.model.predict import predict
 
 from _predict_helpers import H_DEPTH_REF, H_S_DEPTH, harmonic_setup, samples_of
 
@@ -145,14 +145,14 @@ def _positive_certification_claims(text):
 
 def _owned_modules():
     skip = {"predict", "_budget_terms", "_direct", "assumptions", "_project", "_refine"}
-    for info in pkgutil.iter_modules(synchro.model.__path__):
+    for info in pkgutil.iter_modules(syncmoments.model.__path__):
         if info.name in skip or info.name == "fit":
             continue
-        yield importlib.import_module(f"synchro.model.{info.name}")
+        yield importlib.import_module(f"syncmoments.model.{info.name}")
 
 
 def test_r30_basis_docstring_does_not_call_finite_checks_certified():
-    import synchro.model.basis as basis_module
+    import syncmoments.model.basis as basis_module
 
     doc = " ".join(basis_module.__doc__.split())
     assert "Certified here" not in doc

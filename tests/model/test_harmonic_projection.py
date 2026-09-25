@@ -10,16 +10,16 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.channels import Channels
-from synchro.model.harmonic import HarmonicKernel, product_cells
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.phase import TaylorPhase
+import syncmoments  # noqa: F401
+from syncmoments.model.channels import Channels
+from syncmoments.model.harmonic import HarmonicKernel, product_cells
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.phase import TaylorPhase
 
 from _harmonic_oracles import (
     B0,
     GAMMA0,
-    MANUSCRIPT,
+    REFERENCE,
     NU_STAR,
     S_DEPTH,
     UNITS,
@@ -33,7 +33,7 @@ from _harmonic_oracles import (
 
 @pytest.fixture(scope="module")
 def manuscript_product():
-    sys.path.insert(0, MANUSCRIPT)
+    sys.path.insert(0, REFERENCE)
     try:
         from validation import full_response_product
     finally:

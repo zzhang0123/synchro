@@ -9,9 +9,9 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import jv, jvp
 
-import synchro  # noqa: F401  (enables x64)
-from synchro.constants import C_CGS, E_ESU, M_E
-from synchro.stokes import stokes_harmonic
+import syncmoments  # noqa: F401  (enables x64)
+from syncmoments.constants import C_CGS, E_ESU, M_E
+from syncmoments.stokes import stokes_harmonic
 
 
 def _automatic_count(n):

@@ -6,7 +6,7 @@ other modules may add their own fixtures below without changing these.
 
 import pytest
 
-from synchro.model.index import MomentIndex, Truncation
+from syncmoments.model.index import MomentIndex, Truncation
 
 
 @pytest.fixture(scope="session")

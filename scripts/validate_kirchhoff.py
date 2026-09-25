@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from synchro.kirchhoff import (
+from syncmoments.kirchhoff import (
     emissivity,
     absorption,
     source_function,

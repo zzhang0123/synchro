@@ -1,7 +1,7 @@
 """Index bookkeeping against an independent NumPy/itertools enumeration.
 
 The oracle enumerates every ``(l, k, r, s, b)`` row with ``itertools`` and
-counts with ``math.comb``; it shares no code with ``synchro.model.index``.
+counts with ``math.comb``; it shares no code with ``syncmoments.model.index``.
 Pinned numbers come from FINAL_DESIGN.md Section 3 and INTERFACES.md.
 """
 
@@ -14,7 +14,7 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-from synchro.model.index import Entry, MomentIndex, Truncation
+from syncmoments.model.index import Entry, MomentIndex, Truncation
 
 # ----------------------------------------------------------------------
 # Independent oracle

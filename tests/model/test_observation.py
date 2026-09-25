@@ -1,6 +1,6 @@
 """``StokesData`` against NumPy oracles: masking, whitening, response, dof, jit.
 
-Conventions under test (``synchro/model/fit/observation.py``):
+Conventions under test (``syncmoments/model/fit/observation.py``):
 ``stokes`` is ``(n_ch, 4)`` (channel-major flattening, Stokes order
 I, Q, U, V) or, with a ``response`` ``(n_data, 4 n_ch)``, the data vector
 ``(n_data,)``; ``noise`` is ``(n_data,)`` variances or ``(n_data, n_data)``
@@ -16,8 +16,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from synchro.model.errors import ErrorTerm
-from synchro.model.fit.observation import StokesData
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.fit.observation import StokesData
 
 # ----------------------------------------------------------------------
 # oracles and helpers

@@ -1,4 +1,4 @@
-# synchro
+# SyncMoments
 
 ```{include} ../README.md
 :start-after: <!-- docs:intro:start -->

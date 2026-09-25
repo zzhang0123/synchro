@@ -9,13 +9,13 @@ import math
 import numpy as np
 from scipy.special import eval_legendre
 
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.bounds import RemainderInputs
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.kernels import PolynomialTestKernel, required_m_max
-from synchro.model.moments import PopulationSamples, Reference, Support
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.kernels import PolynomialTestKernel, required_m_max
+from syncmoments.model.moments import PopulationSamples, Reference, Support
 
 GAMMA0, B0 = 20.0, 2.0
 LINE_NU = np.array([1.5e8, 4.0e8, 9.0e8])

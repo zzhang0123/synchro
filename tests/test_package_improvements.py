@@ -7,8 +7,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from synchro import CumulantExpansion, QuadraticTaylorExpansion
-from synchro.rm import gaussian_rm_cumulants, rm_moments, screen_polarisation
+from syncmoments import CumulantExpansion, QuadraticTaylorExpansion
+from syncmoments.rm import gaussian_rm_cumulants, rm_moments, screen_polarisation
 
 
 def response():
@@ -172,7 +172,7 @@ def test_screen_grid_weights_and_derivatives():
 
 def test_screen_gaussian_quadrature_matches_burn():
     from numpy.polynomial.hermite import hermgauss
-    from synchro.rm import burn_depolarisation
+    from syncmoments.rm import burn_depolarisation
 
     nodes, weights = hermgauss(60)
     lam = np.linspace(0, 1, 9)

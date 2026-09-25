@@ -11,13 +11,13 @@ import time
 
 import numpy as np
 
-import synchro  # noqa: F401  (enables float64)
-from synchro.model.assumptions import isotropic_pitch
-from synchro.model.basis import build_basis
-from synchro.model.index import Truncation
-from synchro.model.kernels import ContinuumKernel
-from synchro.model.moments import JointMoments
-from synchro.model.predict import predict
+import syncmoments  # noqa: F401  (enables float64)
+from syncmoments.model.assumptions import isotropic_pitch
+from syncmoments.model.basis import build_basis
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import ContinuumKernel
+from syncmoments.model.moments import JointMoments
+from syncmoments.model.predict import predict
 
 from model_examples_continuum import banner, galactic_population, galactic_setup
 
@@ -28,9 +28,9 @@ def example_c():
     )
     import jax.numpy as jnp
 
-    from synchro.model.fit.diagnostics import feasibility_checks, identifiability
-    from synchro.model.fit.linear import fit_linear
-    from synchro.model.fit.observation import StokesData
+    from syncmoments.model.fit.diagnostics import feasibility_checks, identifiability
+    from syncmoments.model.fit.linear import fit_linear
+    from syncmoments.model.fit.observation import StokesData
 
     t0 = time.time()
     channels, reference, support, screen = galactic_setup(n_ch=12)

@@ -6,7 +6,7 @@ resolution guard, ``required_m_max +/- 1``, ``m_max`` extremes, parity on and
 off, and the corner grid ``gamma0 x B0 x mu x eta`` of the line powers. Every
 cell asserts finiteness, ``rel_err < 1e-3`` between the two methods where
 both apply, no blow-up beyond ``1e6`` times the reference, and four corner
-cells are pinned to mpmath values. Companion files:
+cells are pinned to mpmath literals (``scripts/reference_constants.py``). Companion files:
 ``test_boundaries_quadrature.py``, ``test_boundaries_corners.py``,
 ``test_boundaries_continuum.py`` (including the recorded harmonic-vs-continuum
 ``E_phys`` check), ``test_boundaries_depth.py``, ``test_boundaries_fit.py``;
@@ -23,14 +23,19 @@ import pytest
 from scipy.integrate import quad
 from scipy.special import jv, jvp
 
-import synchro  # noqa: F401  (enables x64)
-from synchro.bessel import bessel_jn_and_prime
-from synchro.model.basis import build_basis
-from synchro.model.harmonic import HarmonicKernel, auto_nodes, harmonic_lines
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.channels import Channels
-from synchro.model.moments import JointMoments, PopulationSamples, Reference, Support
+import syncmoments  # noqa: F401  (enables x64)
+from syncmoments.bessel import bessel_jn_and_prime
+from syncmoments.model.basis import build_basis
+from syncmoments.model.harmonic import HarmonicKernel, auto_nodes, harmonic_lines
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.channels import Channels
+from syncmoments.model.moments import (
+    JointMoments,
+    PopulationSamples,
+    Reference,
+    Support,
+)
 
 from _basis_fixtures import small_harmonic
 from _boundary_oracles import (
@@ -39,11 +44,13 @@ from _boundary_oracles import (
     BLOWUP,
     GAMMA_CORNERS,
     J_PINS,
+    J_REFERENCE,
     M_MAX_VALUES,
     OK,
     gyro_hz,
     rel_err,
     relative_channel,
+    reordering_tolerance,
     scipy_channel_sum,
     scipy_lines,
 )
@@ -102,9 +109,9 @@ def test_pinned_bessel_corners_match_mpmath(cell):
     value, prime = bessel_jn_and_prime(float(m), x, n_nodes=auto_nodes(m))
     assert_allclose(float(value), j_ref, rtol=1e-11)
     assert_allclose(float(prime), jp_ref, rtol=1e-11)
-    mp = pytest.importorskip("mpmath")
-    mp.mp.dps = 30
-    assert_allclose(float(mp.besselj(m, x)), j_ref, rtol=1e-14)
+    j_exact, jp_exact = J_REFERENCE[cell]  # mpmath literals, 32 digits
+    assert_allclose(float(j_exact), j_ref, rtol=1e-14)
+    assert_allclose(float(jp_exact), jp_ref, rtol=1e-14)
 
 
 # -- corner grid of the line powers -----------------------------------------------------
@@ -186,7 +193,16 @@ def test_required_m_max_plus_minus_one_on_channel_modes():
     exactly one: line ``R`` never meets the channel, line ``R - 1`` does at the
     extremal angle. So ``m_max = R - 1``, ``R``, ``R + 1`` and ``R + 5`` give
     identical modes at every angle, and ``R - 2`` differs wherever line
-    ``R - 1`` lies inside the channel (both sides of the sufficiency edge)."""
+    ``R - 1`` lies inside the channel (both sides of the sufficiency edge).
+
+    "Identical" is up to evaluation order: the lines left out have
+    ``R_j(nu_m) = 0`` exactly, so the exact sums agree, but the vmapped batch
+    width and the harmonic reduction tree change with ``m_max`` (jax 0.10.2
+    gives 3.85e-34 = 2 ulp of ``I = 1.36e-18`` at ``t = 0.5``). The allowance
+    is ``reordering_tolerance``: ``2 gamma_K sum_m |r_m S_m|`` with ``K =
+    n_nodes + m_max`` summed terms (derivation in ``_boundary_oracles``),
+    about 4e-32 here, eight orders below the ``1e-6 I`` that a missing line
+    inside the channel must exceed."""
     support = Support(gamma=(1.2, 1.5), B=(1.0, 2.0), depth=(0.0, 1.0))
     gamma, B = float(support.gamma[1]), float(support.B[0])
     beta = np.sqrt(1 - 1 / gamma**2)
@@ -201,10 +217,21 @@ def test_required_m_max_plus_minus_one_on_channel_modes():
         at = {
             m: k.channel_modes(channels, gamma, B, mu, eta) for m, k in kernels.items()
         }
+        n_nodes = max(k.resolution() for k in kernels.values())
+        tol_I, tol_Q, tol_V = (
+            float(np.max(tol))  # one channel
+            for tol in reordering_tolerance(channels, R + 5, n_nodes, gamma, B, mu, eta)
+        )
         for m in (R - 1, R + 1, R + 5):
-            assert_allclose(np.asarray(at[m].I), np.asarray(at[R].I), rtol=0, atol=0)
-            assert_allclose(np.asarray(at[m].P), np.asarray(at[R].P), rtol=0, atol=0)
-            assert_allclose(np.asarray(at[m].V), np.asarray(at[R].V), rtol=0, atol=0)
+            assert_allclose(
+                np.asarray(at[m].I), np.asarray(at[R].I), rtol=0, atol=tol_I
+            )
+            assert_allclose(
+                np.asarray(at[m].P), np.asarray(at[R].P), rtol=0, atol=tol_Q
+            )
+            assert_allclose(
+                np.asarray(at[m].V), np.asarray(at[R].V), rtol=0, atol=tol_V
+            )
         assert np.isfinite(float(at[R].I[0]))
         nu = np.asarray(kernels[R].line_frequencies(gamma, B, mu, eta))
         inside = float(channels.support[0, 0]) < nu[R - 2] < nu_hi
@@ -213,7 +240,7 @@ def test_required_m_max_plus_minus_one_on_channel_modes():
             assert gap > 1e-6 * float(at[R].I[0]), (t, gap)
             differs += 1
         else:
-            assert gap == 0.0
+            assert gap <= tol_I, (t, gap, tol_I)
     assert differs >= 2
     # At the extremal angle line R sits above nu_hi and line R - 1 inside.
     mu, eta = 1.0 - 1e-6, -(1.0 - 1e-6)
@@ -334,19 +361,16 @@ def test_parity_off_moments_reduce_to_parity_on_vector(index_111):
 
 def test_bump_area_pinned_to_mpmath():
     """``unit_integral`` bump channels use the band area ``w * 1.2069003224378762``."""
-    from _boundary_oracles import BUMP_AREA_PIN
+    from _boundary_oracles import BUMP_AREA_PIN, BUMP_AREA_REFERENCE
 
     width = 3.0e7
     channels = Channels.bump([1.0e8], [width], normalisation="unit_integral")
     assert_allclose(
         float(channels.peak_scale()[0]), 1.0 / (width * BUMP_AREA_PIN), rtol=1e-14
     )
-    # Independent references: SciPy adaptive quadrature and mpmath at 30 digits
-    # (1.20690032243787617534). A 400-node Gauss-Legendre sum is not used: its
-    # summation roundoff is 2.7e-14 relative (measured), above the pin tolerance.
+    # Independent references: SciPy adaptive quadrature and the mpmath literal
+    # (32 digits). A 400-node Gauss-Legendre sum is not used: its summation
+    # roundoff is 2.7e-14 relative (measured), above the pin tolerance.
     area, _ = quad(lambda t: np.exp(1 - 1 / (1 - t**2)), -1, 1, epsrel=1e-13)
     assert_allclose(area, BUMP_AREA_PIN, rtol=1e-12)
-    mp = pytest.importorskip("mpmath")
-    mp.mp.dps = 30
-    exact = mp.quad(lambda t: mp.exp(1 - 1 / (1 - t**2)), [-1, 0, 1])
-    assert_allclose(float(exact), BUMP_AREA_PIN, rtol=1e-15)
+    assert_allclose(float(BUMP_AREA_REFERENCE), BUMP_AREA_PIN, rtol=1e-15)

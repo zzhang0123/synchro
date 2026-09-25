@@ -2,8 +2,8 @@
 
 Builds the frozen ``SpectralBasis`` field set of INTERFACES.md from a kernel's
 ``angular_projection`` by nested ``jax.jacfwd`` in ``z = (z_gamma, z_B)`` at
-the reference, so that the tests of ``synchro.model.predict`` do not depend
-on ``synchro.model.basis`` (phase 2, another engineer). Provenance and the
+the reference, so that the tests of ``syncmoments.model.predict`` do not depend
+on ``syncmoments.model.basis`` (phase 2, another engineer). Provenance and the
 kernel terms follow FINAL_DESIGN Sections 6 and 8; ``numerical`` is left
 unbounded (no two-quadrature estimate here).
 """
@@ -15,9 +15,9 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from synchro.model.errors import ErrorTerm, Provenance
-from synchro.model.index import MomentIndex
-from synchro.model.phase import CumulantScreen, TaylorPhase
+from syncmoments.model.errors import ErrorTerm, Provenance
+from syncmoments.model.index import MomentIndex
+from syncmoments.model.phase import CumulantScreen, TaylorPhase
 
 
 class KernelTerms(eqx.Module):
@@ -145,6 +145,7 @@ def build_stub_basis(
             ("L_eta", truncation.L_eta),
             ("N", truncation.N),
             ("depth_degree", truncation.depth_degree),
+            ("max_orders", truncation.max_orders),
         ),
         reference=reference.describe(),
         support=support.describe(),

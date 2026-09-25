@@ -3,7 +3,7 @@
 The ``slow`` marker is registered in ``pyproject.toml``. A test marked
 ``slow`` runs when it is selected explicitly (``-m slow``, or any ``-m``
 expression naming ``slow`` without ``not slow``) or when the environment
-sets ``SYNCHRO_RUN_SLOW=1``; otherwise it is skipped with that reason.
+sets ``SYNCMOMENTS_RUN_SLOW=1``; otherwise it is skipped with that reason.
 ``-m 'not slow'`` deselects it.
 """
 
@@ -11,11 +11,11 @@ import os
 
 import pytest
 
-SLOW_ENV = "SYNCHRO_RUN_SLOW"
+SLOW_ENV = "SYNCMOMENTS_RUN_SLOW"
 
 
 def slow_requested(markexpr: str, environ=os.environ) -> bool:
-    """True when the ``-m`` expression or ``SYNCHRO_RUN_SLOW`` asks for slow tests."""
+    """True when the ``-m`` expression or ``SYNCMOMENTS_RUN_SLOW`` asks for slow tests."""
     if environ.get(SLOW_ENV, "").strip() not in ("", "0"):
         return True
     expr = " ".join(markexpr.split())

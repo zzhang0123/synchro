@@ -14,17 +14,22 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model._allowances import check_allowances
-from synchro.model.basis import build_basis
-from synchro.model.bounds import RemainderInputs
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.index import Truncation
-from synchro.model.kernels import ContinuumKernel
-from synchro.model.moments import JointMoments, PopulationSamples, Reference, Support
-from synchro.model.phase import EmpiricalScreen
-from synchro.model.predict import direct_channel_average, predict
+import syncmoments  # noqa: F401
+from syncmoments.model._allowances import check_allowances
+from syncmoments.model.basis import build_basis
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import ContinuumKernel
+from syncmoments.model.moments import (
+    JointMoments,
+    PopulationSamples,
+    Reference,
+    Support,
+)
+from syncmoments.model.phase import EmpiricalScreen
+from syncmoments.model.predict import direct_channel_average, predict
 
 from _boundary_oracles import constant_kernel
 

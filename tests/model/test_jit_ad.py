@@ -1,4 +1,4 @@
-"""JIT and autodiff contract of ``synchro.model`` (FINAL_DESIGN Section 11, "JIT/AD").
+"""JIT and autodiff contract of ``syncmoments.model`` (FINAL_DESIGN Section 11, "JIT/AD").
 
 Checks, on a small harmonic configuration (``m_max = 10``, one 65 % bump
 channel at ``2 nu_*``, ``Truncation(1, 1, 2)``):
@@ -27,12 +27,12 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from synchro.model.assumptions import Parameters, gaussian_screen
-from synchro.model.basis import _build_core, build_basis
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import JointMoments, PopulationSamples, Reference
-from synchro.model.phase import TaylorPhase
-from synchro.model.predict import predict
+from syncmoments.model.assumptions import Parameters, gaussian_screen
+from syncmoments.model.basis import _build_core, build_basis
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import JointMoments, PopulationSamples, Reference
+from syncmoments.model.phase import TaylorPhase
+from syncmoments.model.predict import predict
 
 from _basis_fixtures import small_harmonic
 from _harmonic_oracles import B0, GAMMA0, S_DEPTH

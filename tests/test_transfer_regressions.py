@@ -8,9 +8,9 @@ from numpy.testing import assert_allclose
 from scipy.integrate import quad
 from scipy.linalg import expm
 
-from synchro.conversion import mueller_conversion
-from synchro.rm import C_CGS, E_ESU, M_E
-from synchro.transfer import mueller_matrix, transfer_slab
+from syncmoments.conversion import mueller_conversion
+from syncmoments.rm import C_CGS, E_ESU, M_E
+from syncmoments.transfer import mueller_matrix, transfer_slab
 
 
 def test_cold_plasma_conversion_sign_and_normalisation():
@@ -40,7 +40,7 @@ def test_zero_emissivity_reverse_derivative_matches_augmented_exponential():
 
 
 def test_zero_absorption_scalar_solution_and_derivative():
-    from synchro.solutions import uniform_source_intensity
+    from syncmoments.solutions import uniform_source_intensity
 
     def f(a):
         return uniform_source_intensity(1.0, 3.0, 1.0, 2.0, eps0=3.0, alpha0=a)
@@ -51,7 +51,7 @@ def test_zero_absorption_scalar_solution_and_derivative():
 
 
 def test_kirchhoff_endpoint_terms_against_analytic_weight():
-    from synchro.kirchhoff import absorption_moments
+    from syncmoments.kirchhoff import absorption_moments
 
     lo, hi, g0 = 2.0, 5.0, 3.0
 
@@ -71,7 +71,7 @@ def test_kirchhoff_endpoint_terms_against_analytic_weight():
 
 
 def test_reduced_slab_rejects_cgs_faraday_parameters():
-    from synchro.los_moments import moment_driven_slab
+    from syncmoments.los_moments import moment_driven_slab
 
     with pytest.raises(ValueError, match="cgs"):
         moment_driven_slab(
@@ -80,7 +80,7 @@ def test_reduced_slab_rejects_cgs_faraday_parameters():
 
 
 def test_weighted_magnus_matches_ordered_pair_sum():
-    from synchro.magnus import omega1, omega2, magnus_S
+    from syncmoments.magnus import omega1, omega2, magnus_S
 
     rng = np.random.default_rng(492)
     K = rng.normal(size=(5, 4, 4)) * 0.03
@@ -98,7 +98,7 @@ def test_weighted_magnus_matches_ordered_pair_sum():
 
 
 def test_cgs_emission_absorption_prefactors_and_signed_q():
-    from synchro.kirchhoff import cgs_coefficients_from_moments
+    from syncmoments.kirchhoff import cgs_coefficients_from_moments
     from scipy.special import kv
 
     nu, g, B, number = 1e8, 2500.0, 5e-6, 2e-9
@@ -113,7 +113,7 @@ def test_cgs_emission_absorption_prefactors_and_signed_q():
     # The local emissivity is exact for the point population. Absorption below
     # is specifically the second-order derivative-kernel approximation.
     assert_allclose(got[:2], amp * number * np.array([f, -gg]), rtol=2e-9)
-    from synchro.kirchhoff import absorption_from_moments, absorption_Q_from_moments
+    from syncmoments.kirchhoff import absorption_from_moments, absorption_Q_from_moments
 
     assert_allclose(
         got[2:],
@@ -144,7 +144,7 @@ def test_uniform_internal_rotation_has_sinc_depolarisation():
 
 
 def test_cgs_slab_conversion_axis_and_rotation_covariance():
-    from synchro.los_moments import moment_driven_slab_cgs
+    from syncmoments.los_moments import moment_driven_slab_cgs
 
     nu, ne, b = 1e8, 0.03, 5e-6
     L = 0.7 / abs(mueller_conversion(nu, ne, b))
@@ -170,7 +170,7 @@ def test_cgs_slab_conversion_axis_and_rotation_covariance():
 
 
 def test_transfer_shape_contract_and_empty_los():
-    from synchro.transfer import transfer_los
+    from syncmoments.transfer import transfer_los
 
     with pytest.raises(ValueError, match="shape"):
         transfer_slab(jnp.ones(3), jnp.zeros(4), jnp.eye(4), 1.0)
@@ -182,7 +182,7 @@ def test_transfer_shape_contract_and_empty_los():
 
 
 def test_zero_perpendicular_field_has_zero_radiation_derivatives():
-    from synchro.kirchhoff import cgs_coefficients_from_moments
+    from syncmoments.kirchhoff import cgs_coefficients_from_moments
 
     def f(b):
         return jnp.asarray(

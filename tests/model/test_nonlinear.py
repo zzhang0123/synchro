@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.fit.nonlinear``: ``Transform`` and ``LogDensity``.
+"""Tests of ``syncmoments.model.fit.nonlinear``: ``Transform`` and ``LogDensity``.
 
 Oracles: finite-difference Jacobians and ``numpy.linalg.slogdet`` for the
 log-determinants, a hand-written channel-major response matrix of the
@@ -18,16 +18,16 @@ from _nonlinear_oracles import (
     random_nodes,
     samples_of,
 )
-from synchro.model.assumptions import (
+from syncmoments.model.assumptions import (
     Parameters,
     gaussian_screen,
     isotropic_pitch,
     no_assumption,
     nodal,
 )
-from synchro.model.fit.nonlinear import LogDensity, Transform
-from synchro.model.fit.observation import StokesData
-from synchro.model.index import MomentIndex, Truncation
+from syncmoments.model.fit.nonlinear import LogDensity, Transform
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.index import MomentIndex, Truncation
 
 # -- helpers ---------------------------------------------------------------------
 

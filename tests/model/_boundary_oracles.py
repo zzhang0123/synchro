@@ -1,10 +1,12 @@
 """Shared oracles, grids and pins of the boundary sweeps (not collected).
 
-Every reference here is NumPy/SciPy/mpmath, independent of the JAX path.
-The mpmath pins were computed at 30 digits with the script recorded in the
-comments; they are literals so that a regression shows as numeric drift even
-when mpmath is not importable. ``slow`` marks the heaviest sweeps; the shared
-``tests/conftest.py`` skips them unless ``-m slow`` or ``SYNCHRO_RUN_SLOW=1``
+Every reference here is NumPy/SciPy or an mpmath literal, independent of the
+JAX path. The float64 pins (``*_PINS``) are checked against the
+``*_REFERENCE`` strings (32 significant digits, computed at 40 digits with
+mpmath by ``scripts/reference_constants.py``, which also checks them with
+``--check``); the tests never import mpmath, so no pin check is skipped when
+it is absent. ``slow`` marks the heaviest sweeps; the shared
+``tests/conftest.py`` skips them unless ``-m slow`` or ``SYNCMOMENTS_RUN_SLOW=1``
 selects them.
 """
 
@@ -14,10 +16,10 @@ import numpy as np
 import pytest
 from scipy.special import jv, jvp
 
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.channels import Channels
-from synchro.model.kernels import PolynomialTestKernel
-from synchro.model.moments import PopulationSamples, Reference, Support
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.channels import Channels
+from syncmoments.model.kernels import PolynomialTestKernel
+from syncmoments.model.moments import PopulationSamples, Reference, Support
 
 slow = pytest.mark.slow  # gated by tests/conftest.py
 
@@ -59,6 +61,43 @@ J_PINS = {
     (1, 0.14): (0.069828640001156863, 0.4963299992247096),
 }
 BUMP_AREA_PIN = 1.2069003224378762  # mpmath quad of exp(1 - 1/(1 - t^2)) on [-1, 1]
+
+# mpmath 1.3.0, mp.dps = 40, printed to 32 significant digits by scripts/reference_constants.py.
+J_REFERENCE = {
+    (300, 42.0): (
+        "3.4844960201597459387941167623487e-219",
+        "2.4644961977074485886871021989686e-218",
+    ),
+    (300, 299.0): (
+        "5.7749229700424629430866588438024e-2",
+        "8.9504332971478198672047735570404e-3",
+    ),
+    (1009, 1000.0): (
+        "1.4500347677074470065048317718541e-2",
+        "2.2436553524633411403473838894852e-3",
+    ),
+    (16, 15.5): (
+        "1.4614535990147157156769136593699e-1",
+        "6.195212489748960318844177808219e-2",
+    ),
+    (1, 0.14): (
+        "6.9828640001156863215457717426972e-2",
+        "4.9632999922470959744485995881858e-1",
+    ),
+}
+F_REFERENCE = {
+    1e-06: "2.1493468615984582190538996089851e-2",
+    0.001: "2.131390650914502874805750056478e-1",
+    1.0: "6.5142281535536396975194767188675e-1",
+    10.0: "1.9223826430086897417905416620076e-4",
+}
+G_REFERENCE = {
+    1e-06: "1.0747641081108539330340521571794e-2",
+    0.001: "1.0746383549069977018454486070122e-1",
+    1.0: "4.9447506210420826699389502575884e-1",
+    10.0: "1.8161187569530204280952461591074e-4",
+}
+BUMP_AREA_REFERENCE = "1.2069003224378761753362379963305"
 
 
 def rel_err(a, b, floor=1e-300):
@@ -111,6 +150,30 @@ def scipy_channel_sum(channels, m_max, gamma, B, mu, eta):
         nu, np.asarray(channels.centres_hz), np.asarray(channels.widths_hz)
     )
     return R @ I, R @ Q, R @ V
+
+
+UNIT_ROUNDOFF = 2.0**-53  # float64
+
+
+def reordering_tolerance(channels, m_max, n_nodes, gamma, B, mu, eta):
+    """Largest difference ``(I, Q, V)`` between two evaluation orders of one mode sum.
+
+    ``sum_m r_m S_m`` over ``m = 1..m_max`` with each ``S_m`` built from
+    Bessel quadrature sums of ``n_nodes`` terms: the longest accumulation chain
+    has ``K = n_nodes + m_max`` additions. Recursive summation of ``K`` terms
+    has error ``<= gamma_{K-1} sum |x_i|`` (Higham 2002, eq. 4.4), with
+    ``gamma_k = k u / (1 - k u)``; two orders differ by at most twice that.
+    ``sum |x_i|`` is taken as ``sum_m |r_m S_m|`` (SciPy), which assumes the
+    Bessel sums are well conditioned (integrand magnitudes of the order of
+    the value): an estimate, not a strict bound."""
+    K = n_nodes + m_max
+    gamma_k = K * UNIT_ROUNDOFF / (1 - K * UNIT_ROUNDOFF)
+    ms = np.arange(1, m_max + 1, dtype=float)
+    I, Q, V, nu = scipy_lines(ms, gamma, B, mu, eta)
+    R = bump_response(
+        nu, np.asarray(channels.centres_hz), np.asarray(channels.widths_hz)
+    )
+    return tuple(2 * gamma_k * (np.abs(R) @ np.abs(S)) for S in (I, Q, V))
 
 
 def relative_channel(gamma, B, m_centre, width):

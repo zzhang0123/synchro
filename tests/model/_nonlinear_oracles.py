@@ -4,7 +4,7 @@ The response matrix of a ``PolynomialTestKernel`` is written down directly
 from its coefficients (channel-major rows ``4 j + s``, ``s`` in ``I, Q, U,
 V``; ``P = sum c w_b M2`` split into real and imaginary parts), the node
 features from ``scipy.special.eval_legendre``, and gradients from central
-differences with one Richardson step. When ``synchro.model.basis`` is
+differences with one Richardson step. When ``syncmoments.model.basis`` is
 importable the basis comes from ``build_basis``; otherwise a private stub
 with the same three attributes (``index``, ``reference``,
 ``response_matrix``) stands in.
@@ -18,14 +18,14 @@ import jax.numpy as jnp
 import numpy as np
 from scipy.special import eval_legendre
 
-from synchro.constants import C_SI_M
-from synchro.model.channels import Channels
-from synchro.model.kernels import PolynomialTestKernel
-from synchro.model.moments import PopulationSamples, Reference, Support
-from synchro.model.phase import TaylorPhase
+from syncmoments.constants import C_SI_M
+from syncmoments.model.channels import Channels
+from syncmoments.model.kernels import PolynomialTestKernel
+from syncmoments.model.moments import PopulationSamples, Reference, Support
+from syncmoments.model.phase import TaylorPhase
 
 try:  # phase 2 module (E3); the stub below is used until it lands
-    from synchro.model.basis import build_basis
+    from syncmoments.model.basis import build_basis
 except ImportError:  # pragma: no cover - depends on the build order
     build_basis = None
 

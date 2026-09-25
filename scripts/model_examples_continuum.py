@@ -20,19 +20,24 @@ import jax.numpy as jnp
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 
-import synchro  # noqa: F401  (enables float64)
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.assumptions import isotropic_pitch
-from synchro.model.basis import build_basis
-from synchro.model.bounds import RemainderInputs, screen_factorisation_bound
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.kernels import ContinuumKernel, required_m_max
-from synchro.model.moments import JointMoments, PopulationSamples, Reference, Support
-from synchro.model.phase import EmpiricalScreen, GaussianScreen
-from synchro.model.predict import direct_channel_average, predict
+import syncmoments  # noqa: F401  (enables float64)
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.assumptions import isotropic_pitch
+from syncmoments.model.basis import build_basis
+from syncmoments.model.bounds import RemainderInputs, screen_factorisation_bound
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import ContinuumKernel, required_m_max
+from syncmoments.model.moments import (
+    JointMoments,
+    PopulationSamples,
+    Reference,
+    Support,
+)
+from syncmoments.model.phase import EmpiricalScreen, GaussianScreen
+from syncmoments.model.predict import direct_channel_average, predict
 
 
 def banner(title: str) -> None:
@@ -227,13 +232,19 @@ def two_ray_population(fields=(4.7e-6, 5.3e-6), depths=(25.0, 35.0)):
 
 
 def incident_polarisation(kernel, channels, ray):
-    """``<K_Q exp(2 i phi)>`` of one ray at the channel quadrature nodes ``(n_ch, n_nu)``."""
+    """``<K_Q exp(2 i phi)>`` of one ray at the channel quadrature nodes ``(n_ch, n_nu)``.
+
+    The samples go through ``jax.lax.map`` in batches of
+    ``kernel.samples_per_step(channels, 256)``, so one step holds at most the
+    kernel's ``chunk_budget`` ``F``/``G`` values (summation order only)."""
     nodes = jnp.asarray(channels.nodes)
 
-    def one(gamma, B, eta, phi):
+    def one(leaf):
+        gamma, B, eta, phi = leaf
         return kernel.kernels(nodes, gamma, B, eta)[1] * jnp.exp(2j * phi)
 
-    values = jax.vmap(one)(ray.gamma, ray.B, ray.eta, ray.phi)
+    batch = kernel.samples_per_step(channels, 256)
+    values = jax.lax.map(one, (ray.gamma, ray.B, ray.eta, ray.phi), batch_size=batch)
     return jnp.einsum("s,scn->cn", ray.normalised_weights(), values)
 
 

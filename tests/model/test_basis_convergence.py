@@ -10,18 +10,18 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.basis import (
+import syncmoments  # noqa: F401
+from syncmoments.model.basis import (
     _build_core,
     basis_convergence,
     build_basis,
 )
-from synchro.model.channels import Channels
-from synchro.model.errors import Provenance
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.kernels import ContinuumKernel
-from synchro.model.moments import Reference, Support
-from synchro.model.phase import TaylorPhase
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import Provenance
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.kernels import ContinuumKernel
+from syncmoments.model.moments import Reference, Support
+from syncmoments.model.phase import TaylorPhase
 
 from _basis_fixtures import (
     polynomial_setup,
@@ -116,6 +116,7 @@ def test_provenance_json_round_trip():
         "L_eta": 1,
         "N": 1,
         "depth_degree": None,
+        "max_orders": None,
         "parity": True,
         "components": ["I", "Q", "V"],
         "n0": 12,

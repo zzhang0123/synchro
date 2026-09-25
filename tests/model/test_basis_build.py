@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.basis.build_basis`` validation: refusals on both
+"""Tests of ``syncmoments.model.basis.build_basis`` validation: refusals on both
 sides of ``required_m_max`` and the smoothness threshold, the continuum kernel's
 closure, phase-degree checks and screen terms, input validation."""
 
@@ -10,19 +10,19 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.constants import C_SI_M
-from synchro.model.basis import (
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_SI_M
+from syncmoments.model.basis import (
     SpectralBasis,
     build_basis,
 )
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.kernels import ContinuumKernel
-from synchro.model.moments import Reference, Support
-from synchro.model.phase import CumulantScreen, GaussianScreen, TaylorPhase
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.kernels import ContinuumKernel
+from syncmoments.model.moments import Reference, Support
+from syncmoments.model.phase import CumulantScreen, GaussianScreen, TaylorPhase
 
 from _basis_fixtures import (
     SMALL_SUPPORT,

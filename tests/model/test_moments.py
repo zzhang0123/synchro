@@ -1,4 +1,4 @@
-"""Exact discrete-population oracles for ``synchro.model.moments``.
+"""Exact discrete-population oracles for ``syncmoments.model.moments``.
 
 Oracles are NumPy/SciPy (``eval_legendre``, explicit weighted sums) written
 independently of the JAX path. The manuscript toy population of
@@ -15,9 +15,9 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import eval_legendre
 
-from synchro.model.assumptions import field_independent
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import (
+from syncmoments.model.assumptions import field_independent
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import (
     UNIT_MOMENT_TOL,
     JointMoments,
     PopulationSamples,

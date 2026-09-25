@@ -9,13 +9,13 @@ from numpy.testing import assert_allclose
 import pytest
 from scipy.special import eval_legendre
 
-import synchro  # noqa: F401
-from synchro.model.basis import build_basis
-from synchro.model.channels import Channels
-from synchro.model.index import Truncation
-from synchro.model.moments import JointMoments
-from synchro.model.phase import GaussianScreen, TaylorPhase
-from synchro.model.predict import direct_channel_average, predict
+import syncmoments  # noqa: F401
+from syncmoments.model.basis import build_basis
+from syncmoments.model.channels import Channels
+from syncmoments.model.index import Truncation
+from syncmoments.model.moments import JointMoments
+from syncmoments.model.phase import GaussianScreen, TaylorPhase
+from syncmoments.model.predict import direct_channel_average, predict
 
 from _basis_stub import build_stub_basis
 from _predict_helpers import (

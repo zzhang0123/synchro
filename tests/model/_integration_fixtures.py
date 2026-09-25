@@ -8,7 +8,7 @@ latent ``t`` (correlated), optionally extended by a Gauss-Legendre pitch
 grid so that the pitch angle is exactly isotropic and independent.
 
 ``fit_linear``, ``fisher`` and ``FitResult`` are the package's
-(``synchro.model.fit.linear`` and ``synchro.model.fit.result``).
+(``syncmoments.model.fit.linear`` and ``syncmoments.model.fit.result``).
 """
 
 from __future__ import annotations
@@ -18,17 +18,17 @@ import functools
 import jax.numpy as jnp
 import numpy as np
 
-import synchro  # noqa: F401
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.assumptions import Parameters
-from synchro.model.channels import Channels
-from synchro.model.fit.linear import fisher, fit_linear
-from synchro.model.fit.observation import StokesData
-from synchro.model.fit.result import FitResult
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.moments import PopulationSamples, Reference, Support
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.assumptions import Parameters
+from syncmoments.model.channels import Channels
+from syncmoments.model.fit.linear import fisher, fit_linear
+from syncmoments.model.fit.observation import StokesData
+from syncmoments.model.fit.result import FitResult
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.moments import PopulationSamples, Reference, Support
 
 GAMMA0, B0 = 5.0, 1.0
 NU_STAR = E_ESU * B0 / (2 * np.pi * GAMMA0 * M_E * C_CGS)
@@ -58,7 +58,7 @@ def setup():
 @functools.lru_cache(maxsize=None)
 def cached_basis(truncation=TRUNCATION):
     """One ``SpectralBasis`` per truncation for the whole session (about 4 s each)."""
-    from synchro.model.basis import build_basis
+    from syncmoments.model.basis import build_basis
 
     kernel, channels, support, reference = setup()
     basis = build_basis(

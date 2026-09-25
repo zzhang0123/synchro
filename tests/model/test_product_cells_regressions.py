@@ -19,15 +19,15 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-import synchro  # noqa: F401
-from synchro.constants import C_CGS, E_ESU, M_E
-from synchro.model.basis import _build_core, build_basis
-from synchro.model.channels import Channels
-from synchro.model._harmonic_cells import RHO_SWITCH, harmonic_lines, product_cells
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.index import MomentIndex, Truncation
-from synchro.model.moments import Reference, Support
-from synchro.model.phase import TaylorPhase
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_CGS, E_ESU, M_E
+from syncmoments.model.basis import _build_core, build_basis
+from syncmoments.model.channels import Channels
+from syncmoments.model._harmonic_cells import RHO_SWITCH, harmonic_lines, product_cells
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.index import MomentIndex, Truncation
+from syncmoments.model.moments import Reference, Support
+from syncmoments.model.phase import TaylorPhase
 
 from _harmonic_oracles import B0, GAMMA0, S_DEPTH, benchmark_channels
 
@@ -158,8 +158,22 @@ def _loss(kernel, index, phase):
     return f
 
 
+# XLA temporaries of the R19 loss (bytes, compiled memory analysis), T-004 with the
+# bounded chunking of package B, jacfwd / grad: 3.318e7 / 3.338e7 on jax 0.10.0
+# and 3.321e7 / 3.951e7 on jax 0.10.2 (v0.2.0: 6.7 / 5.8 GB and 25.3 / 26.0 GB;
+# without the checkpoint grad needed 357.6 GB). The ratio (measured 1.01 and
+# 1.19) is the version-independent check; the cap leaves 5x headroom over the
+# largest measurement; the v0.2.0 figures exceed it 29-130x.
+R19_REVERSE_OVER_FORWARD = 2.0
+R19_TEMP_CAP_BYTES = 2.0e8
+
+
 def test_r19_reverse_mode_memory_stays_within_the_forward_mode_budget(record_property):
-    """Benchmark size (m_max = 40, three channels, 64 product nodes, N = 1)."""
+    """Benchmark size (m_max = 40, three channels, 64 product nodes, N = 1).
+
+    Reverse mode must stay within ``R19_REVERSE_OVER_FORWARD`` times the
+    forward-mode temporaries compiled on the same machine and XLA version,
+    and below the absolute ``R19_TEMP_CAP_BYTES``."""
     f = _loss(
         HarmonicKernel(40), MomentIndex.build(Truncation(2, 2, 1)), TaylorPhase(1)
     )
@@ -172,6 +186,5 @@ def test_r19_reverse_mode_memory_stays_within_the_forward_mode_budget(record_pro
             pytest.skip("XLA memory analysis not available on this backend")
         temp[name] = analysis.temp_size_in_bytes
     record_property("r19_temp_bytes", temp)
-    # Measured with the checkpoint: grad 5.8 GB, jacfwd 6.7 GB; without it grad 357.6 GB.
-    assert temp["grad"] <= 2 * temp["jacfwd"], temp
-    assert temp["grad"] < 16e9, temp
+    assert temp["grad"] <= R19_REVERSE_OVER_FORWARD * temp["jacfwd"], temp
+    assert max(temp.values()) < R19_TEMP_CAP_BYTES, temp

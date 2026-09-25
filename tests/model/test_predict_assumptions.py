@@ -12,13 +12,13 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.model.assumptions import field_independent, independent_screen
-from synchro.model.bounds import RemainderInputs
-from synchro.model.index import Truncation
-from synchro.model.moments import JointMoments
-from synchro.model.phase import TaylorPhase
-from synchro.model.predict import direct_channel_average, predict
+import syncmoments  # noqa: F401
+from syncmoments.model.assumptions import field_independent, independent_screen
+from syncmoments.model.bounds import RemainderInputs
+from syncmoments.model.index import Truncation
+from syncmoments.model.moments import JointMoments
+from syncmoments.model.phase import TaylorPhase
+from syncmoments.model.predict import direct_channel_average, predict
 
 from _basis_stub import build_stub_basis
 from _predict_helpers import harmonic_setup, samples_of

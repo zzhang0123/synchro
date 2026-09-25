@@ -1,4 +1,4 @@
-"""Tests of ``synchro.model.harmonic.HarmonicKernel``: channel modes, derivatives,
+"""Tests of ``syncmoments.model.harmonic.HarmonicKernel``: channel modes, derivatives,
 Bessel resolution classes, truncation dispatch (projections: ``test_harmonic_projection``).
 """
 
@@ -10,15 +10,15 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-import synchro  # noqa: F401
-from synchro.constants import C_CGS, E_ESU, M_E
-from synchro.model.channels import Channels
-from synchro.model.errors import ErrorTerm
-from synchro.model.harmonic import HarmonicKernel, auto_nodes, harmonic_lines
-from synchro.model.index import Truncation
-from synchro.model.kernels import required_m_max
-from synchro.model.moments import PopulationSamples, Reference, Support
-from synchro.model.phase import TaylorPhase
+import syncmoments  # noqa: F401
+from syncmoments.constants import C_CGS, E_ESU, M_E
+from syncmoments.model.channels import Channels
+from syncmoments.model.errors import ErrorTerm
+from syncmoments.model.harmonic import HarmonicKernel, auto_nodes, harmonic_lines
+from syncmoments.model.index import Truncation
+from syncmoments.model.kernels import required_m_max
+from syncmoments.model.moments import PopulationSamples, Reference, Support
+from syncmoments.model.phase import TaylorPhase
 
 from _harmonic_oracles import (
     BENCH_SUPPORT,
@@ -285,6 +285,7 @@ def test_physical_error_describe_and_validation():
     described = dict(kernel.describe())
     assert hash(kernel.describe())
     assert described["n_nodes"] == 256 and described["quadrature"] == "product"
+    assert described["m_chunk"] == 64 and described["chunk_budget"] == 1 << 20
     assert dict(HarmonicKernel(40, n_nodes=512).describe())["n_nodes"] == 512
     assert kernel.components == ("I", "Q", "V") and kernel.required_closures == ()
     assert "eq: smooth channel kernel" in kernel.LABEL
@@ -295,6 +296,8 @@ def test_physical_error_describe_and_validation():
         dict(m_max=40, E_phys=1.0),
         dict(m_max=2.5),
         dict(m_max=40, n_outer=1),
+        dict(m_max=40, chunk_budget=0),
+        dict(m_max=40, m_chunk=0),
     ]
     for kwargs in bad:
         with pytest.raises(ValueError):

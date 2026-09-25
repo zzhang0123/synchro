@@ -1,4 +1,4 @@
-"""Shared configurations of the ``synchro.model.basis`` tests (not collected).
+"""Shared configurations of the ``syncmoments.model.basis`` tests (not collected).
 
 The polynomial oracle obeys ``eq: angular parity`` and keeps only ``r + s <= N``
 so that the finite contraction is exact; the small harmonic configuration keeps
@@ -10,10 +10,10 @@ import math
 
 import numpy as np
 
-from synchro.model.channels import Channels
-from synchro.model.harmonic import HarmonicKernel
-from synchro.model.kernels import PolynomialTestKernel
-from synchro.model.moments import Reference, Support
+from syncmoments.model.channels import Channels
+from syncmoments.model.harmonic import HarmonicKernel
+from syncmoments.model.kernels import PolynomialTestKernel
+from syncmoments.model.moments import Reference, Support
 
 from _harmonic_oracles import B0, GAMMA0, NU_STAR, S_DEPTH
 

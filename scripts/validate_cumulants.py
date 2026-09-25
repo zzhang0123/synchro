@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from synchro.cumulants import (
+from syncmoments.cumulants import (
     raw_moments_from_cumulants,
     cumulant_expansion,
     gaussian_cumulants,
@@ -48,7 +48,7 @@ def test_vector_cumulant():
     import math
     import jax
     import jax.numpy as jnp
-    from synchro.cumulants import vector_cumulant_expansion
+    from syncmoments.cumulants import vector_cumulant_expansion
 
     # P=1 reduction must match the scalar Bell sum to Taylor order 4
     k1 = jnp.array([0.3])

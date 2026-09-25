@@ -1,15 +1,18 @@
 """Independent NumPy/SciPy oracles shared by the harmonic-kernel tests (not collected)."""
 
 import math
+from pathlib import Path
 
 import numpy as np
 from scipy.special import jv, jvp
 
-from synchro.constants import C_CGS, C_SI_M, E_ESU, M_E
-from synchro.model.channels import Channels
-from synchro.model.moments import Support
+from syncmoments.constants import C_CGS, C_SI_M, E_ESU, M_E
+from syncmoments.model.channels import Channels
+from syncmoments.model.moments import Support
 
-MANUSCRIPT = "/Users/zzhang/Documents/MyDrafts/Overleaf_Synchrotron_Emission_Modelling"
+# Verbatim copy of the manuscript's independent NumPy/SciPy reference
+# (validation/full_response*.py and its saved results); see reference/README.md.
+REFERENCE = str(Path(__file__).resolve().parent / "reference")
 GAMMA0, B0 = 20.0, 1.0
 NU_STAR = E_ESU * B0 / (2 * np.pi * GAMMA0 * M_E * C_CGS)
 S_DEPTH = 1.0 / (2 * (C_SI_M / NU_STAR) ** 2)  # zeta = (varphi - varphi_ref)/S_DEPTH
