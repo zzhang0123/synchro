@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- `docs/DESIGN.md` rendered as one code block in the 0.3.0 documentation: the
+  rename lengthened one Markdown fence to 18 backticks, and a closing fence
+  had text after it. Both are fixed; `tests/test_docs_fences.py` checks that
+  every fence in README, CHANGELOG and `docs/*.md` is three backticks and
+  paired. The `stable` documentation (built from the v0.3.0 tag) keeps the
+  broken page until the next release.
+- The README installs from PyPI (`python -m pip install syncmoments`).
+- `.github/workflows/publish.yml` publishes to PyPI when a GitHub Release is
+  published, with trusted publishing (no API token); 0.3.0 was uploaded this
+  way.
+
 ## 0.3.0 (2026-09-25)
 
 The package is renamed SyncMoments (`pip install syncmoments`,
