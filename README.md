@@ -117,7 +117,14 @@ original electric field, independently of this package's Python implementation.
 ## Install and verify
 <!-- docs:install:start -->
 
-Python 3.12 is the tested runtime. From this checkout:
+Python 3.12 is the tested runtime. Install the release from PyPI:
+
+```bash
+python -m pip install syncmoments
+```
+
+To run the tests, install from a checkout (or the source distribution, which
+carries the tests):
 
 ```bash
 python -m pip install -e '.[validation]'
