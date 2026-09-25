@@ -52,7 +52,7 @@ Importing `syncmoments` enables float64.
 
 ## 2. Object model
 
-``````````````````
+```
 syncmoments/model/
   index.py         Truncation, MomentIndex, Entry, lower_set_margin
   errors.py        ErrorTerm, ErrorBudget, AssumptionRecord, Provenance
@@ -1787,7 +1787,9 @@ tests/test_transfer_*.py, tests/test_ad_transform_matrix*.py and 7 more, -m "not
 test_ad_transform_matrix*.py -m slow -k "transfer or moment_driven or slab or los"
   JAX 0.10.0: 565 passed, 1203 deselected in 924.98s
   JAX 0.10.2: 565 passed, 1203 deselected in 903.04s
-``` Lint (ruff
+```
+
+Lint (ruff
 and black with JAX 0.10.0's Python, as above) passes, and the
 documentation builds with `-W` under Sphinx 8.2.3 and 9.1.0 without
 warnings.
