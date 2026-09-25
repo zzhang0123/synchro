@@ -1,0 +1,93 @@
+# Publish SyncMoments to PyPI with trusted publishing (no API token).
+#
+# Runs when a GitHub Release is published, or manually for an existing tag
+# (Actions -> "Publish to PyPI" -> Run workflow, ref = e.g. v0.3.0).
+# PyPI must list this repository, workflow file and the "pypi" environment
+# as a trusted publisher for the project "syncmoments".
+
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Tag to publish, for example v0.3.0"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and check the distributions
+    runs-on: ubuntu-latest
+    env:
+      REF: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.ref }}
+    steps:
+      - name: Accept only a release tag such as v0.3.0
+        run: |
+          if ! [[ "$REF" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([a-z]+[0-9]+)?$ ]]; then
+            echo "refusing ref '$REF': expected a tag like v0.3.0" >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ env.REF }}
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check that the tag names the package version
+        run: |
+          python - "$REF" <<'EOF'
+          import sys
+          import tomllib
+
+          ref = sys.argv[1]
+          with open("pyproject.toml", "rb") as handle:
+              version = tomllib.load(handle)["project"]["version"]
+          if ref != f"v{version}":
+              sys.exit(f"tag {ref!r} does not match the package version {version!r}")
+          print(f"tag {ref} matches version {version}")
+          EOF
+
+      - name: Build the sdist and wheel
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          python -m twine check --strict dist/*
+
+      - name: Install the wheel in a fresh environment and import it
+        run: |
+          python -m venv "$RUNNER_TEMP/smoke"
+          "$RUNNER_TEMP/smoke/bin/python" -m pip install dist/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/smoke/bin/python" -c "import syncmoments, syncmoments.model, syncmoments.model.fit; print(syncmoments.__version__)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Upload to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/syncmoments/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
