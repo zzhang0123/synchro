@@ -15,6 +15,7 @@ guide/radiation
 guide/fixed_harmonic
 guide/faraday
 guide/transfer
+guide/reconstruction
 ```
 
 ```{toctree}

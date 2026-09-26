@@ -34,6 +34,7 @@ _PADE13 = tuple(
 _THETA13 = 5.371920351148152
 
 
+@partial(jax.jit, static_argnames="max_squarings")
 def expm_pade13(A, max_squarings):
     """``exp(A)`` by Pade 13 on ``A 2^-n``, ``n = max(0, ceil(log2(|A|_1 / theta_13)))``
     (Higham 2005: backward error below the unit roundoff).
@@ -43,14 +44,17 @@ def expm_pade13(A, max_squarings):
     that costs relative errors from 1e-10 (m = 0) to 1e-1 (m = 31) where
     ``ceil`` stays at the conditioning limit (``tests/test_transfer_expm_boundaries.py``).
     Where ``ceil`` exceeds ``max_squarings`` but ``floor`` does not, ``floor``
-    is used, so the result is NaN exactly where ``expm``'s is (and where the
-    5x5 value's exponential, of larger norm, is refused)."""
+    is used, so the result is NaN exactly where ``expm``'s is in float64 (in
+    float32 ``expm`` used Pade 7, ``theta_7 = 3.93``, and a lower NaN bound).
+    Used for the slab value (5x5) and its propagators (8x8, ``propagators``).
+    Compiled, as ``expm`` is: op by op, XLA CPU rounded it an ulp differently."""
     norm = jax.lax.stop_gradient(jnp.max(jnp.sum(jnp.abs(A), axis=0)))
     ratio = jnp.log2(norm / _THETA13)
     low, high = jnp.maximum(0, jnp.floor(ratio)), jnp.maximum(0, jnp.ceil(ratio))
     return expm_squared(A, jnp.where(high > max_squarings, low, high), max_squarings)
 
 
+@partial(jax.jit, static_argnames="max_squarings")
 def expm_squared(A, n, max_squarings):
     """Pade-13 of ``A / 2^n`` squared ``n`` times (NaN if ``n > max_squarings``).
     A squaring step runs while any member needs it (``any_member``) and is
@@ -76,6 +80,20 @@ def expm_squared(A, n, max_squarings):
     steps = jnp.arange(max_squarings, dtype=n.dtype)
     R = jax.lax.scan(squaring, R, steps)[0]
     return jnp.where(n > max_squarings, jnp.nan, R)
+
+
+def propagators(K, ds, max_squarings):
+    """``(Phi, G) = (e^{-K ds}, int_0^ds e^{-K t} dt)`` from one 8x8 exponential.
+
+    The identity block (not ``I ds``) keeps the norm at ``max(|K ds|, 1)``, at
+    most that of the slab value's 5x5 exponential (same ``expm_pade13``), so
+    they exceed ``max_squarings`` only where the value is refused. There is no
+    branch on a member's value, so a ``jax.jvp`` of it inside a ``custom_jvp``
+    rule transposes under a batched ``vmap``."""
+    A = jnp.zeros((8, 8), dtype=K.dtype)
+    A = A.at[:4, :4].set(-K * ds).at[:4, 4:].set(jnp.eye(4, dtype=K.dtype))
+    E = expm_pade13(A, max_squarings)
+    return E[:4, :4], E[:4, 4:] * ds
 
 
 @jax.custom_batching.custom_vmap

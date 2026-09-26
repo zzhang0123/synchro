@@ -102,20 +102,32 @@ def test_sources_below_one_keep_the_unit_scale_bit_for_bit():
 
     On ``[1, 2)`` the code gives ``k = frexp(max|eps ds|)[1] = 1``, ``s = 2``,
     where v0.2.0 used ``s = max|eps ds|``: a change of the exact scaling, which
-    can change the value by rounding only; that range is not bit-for-bit."""
+    can change the value by rounding only; that range is not bit-for-bit.
+
+    Up to 0.3.0 the comparison was bit for bit with v0.2.0's value. Since 0.4.0
+    the exponential is ``expm_pade13`` (not ``jax.scipy.linalg.expm``), so the
+    unscaled matrix is exponentiated with it for the bit-for-bit check, and
+    v0.2.0's value is only required within ``16 u`` (both are accurate to a
+    few ``u`` here, ``|K ds|_1 = 0.99``)."""
+    from syncmoments._expm import expm_pade13
+
     K = jnp.asarray(
         [[0.3, 0.04, 0, 0], [0.04, 0.3, 0.6, 0], [0, -0.6, 0.3, -0.2], [0, 0, 0.2, 0.3]]
     )
     eps, S0 = jnp.array([0.7, -0.2, 0.1, 0.05]), jnp.array([1.0, 0.1, 0.0, 0.0])
     ds = 0.9
 
-    def v020(S, e, Kmat, d):
-        from jax.scipy.linalg import expm
+    def unit_scale(expm):
+        def value(S, e, Kmat, d):
+            M = jnp.zeros((5, 5)).at[:4, :4].set(-Kmat * d).at[:4, 4].set(e * d)
+            return jnp.sum(expm(M)[:4] * jnp.concatenate([S, jnp.ones(1)]), axis=1)
 
-        M = jnp.zeros((5, 5)).at[:4, :4].set(-Kmat * d).at[:4, 4].set(e * d)
-        return (expm(M, max_squarings=32) @ jnp.concatenate([S, jnp.ones(1)]))[:4]
+        return value
 
+    unscaled = unit_scale(lambda M: expm_pade13(M, 32))
+    v020 = unit_scale(lambda M: jax.scipy.linalg.expm(M, max_squarings=32))
     for wrap in WRAPS.values():
-        assert_array_equal(
-            wrap(transfer_slab)(S0, eps, K, ds), wrap(v020)(S0, eps, K, ds)
-        )
+        got = wrap(transfer_slab)(S0, eps, K, ds)
+        assert_array_equal(got, wrap(unscaled)(S0, eps, K, ds))
+        size = float(jnp.max(jnp.abs(got)))
+        assert_allclose(got, v020(S0, eps, K, ds), rtol=0, atol=16 * 2.0**-53 * size)

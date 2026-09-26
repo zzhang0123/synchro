@@ -127,6 +127,8 @@ DOCUMENTED = (
     ("syncmoments.model.fit.linear", "fit_linear"),
     ("syncmoments.model.fit.nonlinear", "fit_bfgs"),
     ("syncmoments.model.fit.nonlinear", "fit_nodal"),
+    ("syncmoments.model.fit.reduction", "reduce_response"),
+    ("syncmoments.model.fit.combinations", "fit_combinations"),
 )
 STALE = (
     "record(theta",  # ParameterMap.record() is theta-independent
@@ -169,3 +171,16 @@ def test_readme_shows_assumption_allowances_with_the_screen_bound():
     readme = _doc("README.md")
     assert "assumption_allowances=" in readme
     assert "screen_factorisation_bound(" in readme
+
+
+def test_package_docstring_lists_every_public_model_module():
+    """``syncmoments.__doc__`` names each public ``model`` and ``model.fit`` module."""
+    import syncmoments
+
+    doc = " ".join((syncmoments.__doc__ or "").split())
+    missing = []
+    for module_name in MODULES:
+        short = module_name.removeprefix("syncmoments.model.")
+        if not re.search(rf"(?<![\w.]){re.escape(short)}\b", doc):
+            missing.append(short)
+    assert not missing, f"syncmoments module docstring omits {missing}"

@@ -18,8 +18,9 @@ the two helpers' values under every batching pattern; ``grad`` and
 independent reference (``_ad_matrix_cases.slab_ref``) at 1e-12, with members
 that need 0 to 9 squarings in one batch, and per member equal to the
 unbatched evaluation. ``transfer_los`` mixes a member at ``max|eps ds| ~ 1e306``
-(derivatives of the value from ``_companion``) with order-1 members: values
-bit-identical to the unbatched ones, gradients within 1e-13.
+(derivatives of the value from ``_companion``) with order-1 members: Stokes
+vectors bit-identical to the unbatched ones, the contracted loss within 2 ulp
+(batched dot order) and gradients within 1e-13.
 """
 
 from __future__ import annotations
@@ -155,23 +156,40 @@ def test_one_level_batched_inside_or_outside_another_vmap():
 
 def test_nested_vmap_of_transfer_los_mixing_the_companion_route():
     """One member at ``max|eps ds| ~ 1e306`` takes ``_companion`` for the batch;
-    ``K_s`` and the source scale are batched at both levels."""
+    ``K_s`` and the source scale are batched at both levels.
+
+    The Stokes vectors under two ``vmap`` levels are compared byte for byte
+    with the unbatched ones. The scalar ``C @ S`` of ``value_and_grad`` is
+    compared within 2 ulp: XLA may evaluate that 4-term dot in a different
+    order (or with a fused multiply-add) once it is batched, which is a
+    rounding of the contraction, not of ``transfer_los``. JAX 0.10.0 gives 1
+    ulp on members (0, 1) and (1, 1); JAX 0.10.2 gives 0.
+    """
     eps_s = jnp.stack([EPS, -0.5 * EPS, 0.2 * EPS])
     K_s = jnp.stack([K1, K2, K3])
     K_n = K_s * jnp.array([[1.0, 3.0], [0.5, 20.0]])[..., None, None, None]
     a_n = jnp.array([[1.0, 1e306], [2.0, 0.5]])
     ds = jnp.array([0.7, 0.4, 1.1])
 
-    def loss(K, a):
-        return C @ transfer_los(S, eps_s * a, K, ds)
+    def stokes(K, a):
+        return transfer_los(S, eps_s * a, K, ds)
 
+    def loss(K, a):
+        return C @ stokes(K, a)
+
+    batched_stokes = jax.vmap(jax.vmap(stokes))(K_n, a_n)
     nested = jax.vmap(jax.vmap(jax.value_and_grad(loss, (0, 1))))
     value, (gK, ga) = nested(K_n, a_n)
     total = jax.grad(lambda K, a: jnp.sum(jax.vmap(jax.vmap(loss))(K, a)), (0, 1))
     sK, sa = total(K_n, a_n)
     for i, j in np.ndindex(2, 2):
+        single = stokes(K_n[i, j], a_n[i, j])
+        assert (
+            np.asarray(batched_stokes[i, j]).tobytes() == np.asarray(single).tobytes()
+        )
         v, (uK, ua) = jax.value_and_grad(loss, (0, 1))(K_n[i, j], a_n[i, j])
-        assert np.asarray(value[i, j]).tobytes() == np.asarray(v).tobytes()
+        v = float(v)
+        assert abs(float(value[i, j]) - v) <= 2 * np.spacing(abs(v))
         assert _rel(gK[i, j], uK) < 1e-13 and _rel(ga[i, j], ua) < 1e-13
         assert _rel(sK[i, j], uK) < 1e-13 and _rel(sa[i, j], ua) < 1e-13
     routes = [

@@ -30,10 +30,10 @@ import jax
 import jax.numpy as jnp
 from jax.custom_derivatives import SymbolicZero
 import numpy as np
-from jax.scipy.linalg import expm
 
 from ._expm import any_member as _any_member
 from ._expm import expm_pade13
+from ._expm import propagators as _propagators
 from .rm import _pow2
 
 
@@ -51,17 +51,25 @@ def transfer_slab(S, eps, K, ds, *, max_squarings=32):
     source column is carried as ``eps ds 2^-k`` with ``[S; 2^k]``, exact since
     the map is linear in ``eps``; ``k = floor(log2 max|eps ds|) + 1`` clipped to
     ``[0, 1022]`` (float64), built from its bit pattern. Without the scale the
-    scaling and squaring of ``expm`` overflows to NaN for an optically thick,
-    bright slab; no reciprocal of a data-dependent scale is formed (jax 0.10.2
-    CPU flushed the subnormal ``1/s`` to zero). Entries of ``eps ds`` below
+    scaling and squaring overflows to NaN for an optically thick, bright slab;
+    no reciprocal of a data-dependent scale is formed (jax 0.10.2 CPU flushed
+    the subnormal ``1/s`` to zero). Entries of ``eps ds`` below
     ``max|eps ds| 2^-1021`` become subnormal after scaling and flush to zero on
     XLA CPU, an absolute error below that bound.
+
+    The exponential is ``syncmoments._expm.expm_pade13`` (``ceil`` squaring
+    count): relative error against mpmath at most ``4.1 u max(|K ds|_1, 1)``,
+    ``u = 2^-53``, on 214 slabs (measured, not proven). 0.3.0 used
+    ``jax.scipy.linalg.expm`` (``floor``): measured up to ``2.85e6 u max(|K ds|_1, 1)``.
 
     Derivatives use ``out = Phi S + G eps``, ``Phi = e^{-K ds}``,
     ``G = int_0^ds e^{-K t} dt``: the tangent ``Phi dS + G deps + dPhi S + dG eps``
     comes from one 8x8 exponential ``[[Phi, G / ds], [0, I]]`` and its forward
-    derivative (``_tangent``), not through the scaled source column. The rule is
-    linear in the tangents and re-enters itself for the primal, so ``jvp``,
+    derivative in ``K`` (``_tangent``), not through the scaled source column;
+    in ``ds`` it is ``Phi (eps - K S)``, error at most ``|Phi| (6u (|eps| +
+    |K| |S|) + 5u |eps - K S|)`` plus that of ``Phi`` times ``|eps - K S|``
+    (``tests/test_transfer_length_derivative.py``). The rule is linear in the
+    tangents and re-enters itself for the primal, so ``jvp``,
     ``vjp``, ``jacfwd``, ``jacrev``, ``hessian``, ``vmap`` (reverse mode through
     a batched ``K`` or ``ds`` included), ``jit`` and ``lax.scan`` apply. Where
     JAX differentiates the value itself (the primal of a ``vjp`` under a further
@@ -166,7 +174,11 @@ def _slab_value(S, eps, K, ds, max_squarings, route=None):
 
 
 def _plain_value(S, eps, K, ds, max_squarings):
-    """Augmented 5x5 exponential with the source column scaled by ``2^-k``."""
+    """Augmented 5x5 exponential with the source column scaled by ``2^-k``.
+
+    ``expm_pade13`` is NaN exactly where ``jax.scipy.linalg.expm`` (0.3.0) was
+    in float64: ``floor(log2(|M|_1 / theta_13)) > max_squarings``. ``E @ y0`` is
+    a sum of products: XLA CPU rounded a matvec differently under ``vmap``."""
     dtype = jnp.result_type(S, K, eps, ds, 1.0)
     # A coordinate rescaling only: freezing it preserves derivatives of the
     # analytic map, and avoids the undefined derivative of ||eps|| at zero.
@@ -177,7 +189,7 @@ def _plain_value(S, eps, K, ds, max_squarings):
     M = M.at[:4, :4].set(-K * ds)
     M = M.at[:4, 4].set(column * _pow2(-k, real))
     y0 = jnp.concatenate([S.astype(dtype), _pow2(k, real).astype(dtype)[None]])
-    return (expm(M, max_squarings=max_squarings) @ y0)[:4]
+    return jnp.sum(expm_pade13(M, max_squarings)[:4] * y0, axis=1)
 
 
 def _companion(value, S, eps, K, ds, max_squarings):
@@ -231,19 +243,6 @@ def _finite_primal_jvp(primals, tangents):
     return _finite_primal(primals[0]), tangents[0]
 
 
-def _propagators(K, ds, max_squarings):
-    """``(Phi, G) = (e^{-K ds}, int_0^ds e^{-K t} dt)`` from one 8x8 exponential.
-
-    The identity block (not ``I ds``) keeps the norm at ``max(|K ds|, 1)``, at
-    most that of the value's 5x5 exponential, so they exceed ``max_squarings``
-    only where the value is refused. ``expm_pade13`` has no branch on a member's
-    value, so the rule's ``jax.jvp`` of it transposes under a batched ``vmap``."""
-    A = jnp.zeros((8, 8), dtype=K.dtype)
-    A = A.at[:4, :4].set(-K * ds).at[:4, 4:].set(jnp.eye(4, dtype=K.dtype))
-    E = expm_pade13(A, max_squarings)
-    return E[:4, :4], E[:4, 4:] * ds
-
-
 def _is_zero(t):
     return isinstance(t, SymbolicZero) or t.dtype == jax.dtypes.float0
 
@@ -260,31 +259,47 @@ def _tangent(primals, tangents, dtype, max_squarings):
 
     ``dPhi S + dG eps`` is ``((dPhi 2^a) (S 2^-j) + (dG 2^a) (eps 2^-j)) 2^(j - a)``,
     ``a = j // 2`` (``_split_exponent``): neither the forward pass nor its
-    transpose (``jacrev`` in ``K`` or ``ds``) forms ``dG eps`` or the cotangent
-    ``ct eps`` at full scale, which overflowed near 1.8e308 before 0.3.0. The
-    factors are exact powers of two (all 1 for ``j = 0``)."""
+    transpose (``jacrev`` in ``K``) forms ``dG eps`` or the cotangent ``ct eps``
+    at full scale, which overflowed near 1.8e308 before 0.3.0. The factors are
+    exact powers of two (all 1 for ``j = 0``). The ``ds`` direction is the
+    identity ``dPhi S + dG eps = Phi (eps - K S) dds`` (``_length_rate``): the
+    forward derivative of the exponential in ``ds`` rounded ``-K Phi S`` and
+    ``Phi eps`` at the scale of ``G eps`` (relative error up to 2e20 where
+    they cancel, 0.3.0)."""
     S, eps, K, ds = (jnp.asarray(p, dtype) for p in primals)
     dS, deps, dK, dds = tangents
-    if _is_zero(dK) and _is_zero(dds):
+    if _is_zero(dK):
         Phi, G = _propagators(K, ds, max_squarings)
         tangent = jnp.zeros(4, dtype)
     else:
         j = _split_exponent(S, eps * ds)
         a = j // 2
-        dK, dds = (
-            jnp.zeros_like(p) if _is_zero(t) else t.astype(dtype) * _pow2(a, dtype)
-            for p, t in ((K, dK), (ds, dds))
-        )
         (Phi, G), (dPhi, dG) = jax.jvp(
-            lambda K_, ds_: _propagators(K_, ds_, max_squarings), (K, ds), (dK, dds)
+            lambda K_: _propagators(K_, ds, max_squarings),
+            (K,),
+            (dK.astype(dtype) * _pow2(a, dtype),),
         )
         down = _pow2(-j, dtype)
         tangent = (dPhi @ (S * down) + dG @ (eps * down)) * _pow2(j - a, dtype)
+    if not _is_zero(dds):
+        rate, i = _length_rate(Phi, S, eps, K)
+        tangent = tangent + rate * (dds.astype(dtype) * _pow2(i, dtype))
     if not _is_zero(dS):
         tangent = tangent + Phi @ dS.astype(dtype)
     if not _is_zero(deps):
         tangent = tangent + G @ deps.astype(dtype)
     return tangent
+
+
+def _length_rate(Phi, S, eps, K):
+    """``(Phi r, i)``, ``r = eps 2^-i - K (S 2^-i)``, so ``Phi (eps - K S) = Phi r 2^i``;
+    ``i`` in ``[0, maxexp - 2]`` keeps ``|eps|``, ``4 |K| |S|`` below ``2^(maxexp // 2)``
+    (no overflow where the result is finite; entries below ``2^(i - 1022)`` flush)."""
+    sizes = jax.lax.stop_gradient(jnp.stack([jnp.max(jnp.abs(x)) for x in (eps, K, S)]))
+    e, maxexp = jnp.frexp(sizes)[1], jnp.finfo(Phi.dtype).maxexp
+    i = jnp.clip(jnp.maximum(e[0], e[1] + e[2] + 2) - maxexp // 2, 0, maxexp - 2)
+    down = _pow2(-i, Phi.dtype)
+    return Phi @ (eps * down - K @ (S * down)), i
 
 
 @partial(_slab.defjvp, symbolic_zeros=True)

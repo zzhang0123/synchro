@@ -29,6 +29,9 @@ FIGURES = [
     "compare_moment_cumulant.py",  # figures/moment_vs_cumulant.pdf   (Sec. 4.2)
     "application_foreground.py",  # figures/foreground_demo.pdf      (Sec. 5.5)
     "plot_transfer.py",  # figures/transfer.pdf             (Sec. 6)
+    # figures/sed_moment_reconstruction.{pdf,png} and its JSON/NPZ/CSV data
+    # (Sec. 5.3): public-API reduce_response + fit_combinations example
+    "sed_reconstruction_example.py",
 ]
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

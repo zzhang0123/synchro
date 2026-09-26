@@ -23,6 +23,7 @@ import pytest
 from scipy.linalg import expm, expm_frechet
 
 import syncmoments  # noqa: F401  (enables x64)
+from syncmoments._expm import expm_pade13
 from syncmoments.rm import _pow2
 from syncmoments.transfer import (
     _source_exponent,
@@ -68,7 +69,9 @@ def _dG_dK(K, ds):
 
 
 def _reference_primal(S, eps, K, ds, max_squarings=32):
-    """The 0.3.0 primal without the custom derivative rule (plain autodiff)."""
+    """The primal without the custom derivative rule (plain autodiff). Since
+    0.4.0 its exponential is ``expm_pade13``; up to 0.3.0 it was
+    ``jax.scipy.linalg.expm``, which this reference used then."""
     dtype = jnp.result_type(S, K, eps, ds, 1.0)
     column = (eps * ds).astype(dtype)
     k = _source_exponent(jax.lax.stop_gradient(jnp.max(jnp.abs(column))))
@@ -77,7 +80,7 @@ def _reference_primal(S, eps, K, ds, max_squarings=32):
     M = M.at[:4, :4].set(-K * ds)
     M = M.at[:4, 4].set(column * _pow2(-k, real))
     y0 = jnp.concatenate([S.astype(dtype), _pow2(k, real).astype(dtype)[None]])
-    return (jax.scipy.linalg.expm(M, max_squarings=max_squarings) @ y0)[:4]
+    return jnp.sum(expm_pade13(M, max_squarings)[:4] * y0, axis=1)
 
 
 def _rel(a, b):
@@ -184,15 +187,23 @@ PRIMAL_DTYPES = [(i, jnp.float64) for i in range(len(PRIMAL_INPUTS))] + [
 @pytest.mark.parametrize("wrap", WRAPS, ids=list(WRAPS))
 @pytest.mark.parametrize("inputs,dtype", PRIMAL_DTYPES)
 def test_primal_is_bit_identical_to_the_plain_implementation(inputs, dtype, wrap):
-    """The custom rule leaves the value unchanged, also as the primal of a jvp."""
+    """The custom rule leaves the value unchanged, also as the primal of a jvp.
+
+    Up to 0.3.0 this pinned the value bit for bit to ``jax.scipy.linalg.expm``
+    of the 5x5 matrix. Since 0.4.0 the value uses ``expm_pade13`` and differs
+    from 0.3.0 by 0.3.0's error; its accuracy against mpmath is asserted for
+    these inputs in ``tests/test_transfer_value_accuracy.py`` (PRIMAL_CASES).
+    The reference here is the same computation without the rule, compiled
+    (``transfer_slab`` is compiled even when called eagerly; XLA's fused
+    evaluation of ``expm_pade13`` and the op-by-op one differ by an ulp)."""
     S, eps, K, ds = PRIMAL_INPUTS[inputs]
     S, eps, K = (jnp.asarray(a, dtype) for a in (S, eps, K))
-    expected = WRAPS[wrap](_reference_primal)(S, eps, K, ds)
+    expected = jax.jit(_reference_primal)(S, eps, K, ds)
     got = WRAPS[wrap](transfer_slab)(S, eps, K, ds)
     assert got.dtype == expected.dtype
     assert_array_equal(got, expected)
     primal_out, _ = jax.jvp(lambda e: transfer_slab(S, e, K, ds), (eps,), (eps,))
-    assert_array_equal(primal_out, WRAPS["eager"](_reference_primal)(S, eps, K, ds))
+    assert_array_equal(primal_out, expected)
 
 
 def _los_oracle(K_s, ds):

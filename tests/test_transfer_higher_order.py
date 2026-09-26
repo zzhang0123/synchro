@@ -23,6 +23,7 @@ from numpy.testing import assert_array_equal
 import pytest
 
 import syncmoments  # noqa: F401  (enables x64)
+from syncmoments._expm import expm_pade13
 from syncmoments.rm import _pow2
 from syncmoments.transfer import (
     _source_exponent,
@@ -47,13 +48,14 @@ def ref_slab(S, eps, K, ds):
 
 
 def plain_5x5(S, eps, K, ds):
-    """The value as the plain implementation computes it (no derivative rule)."""
+    """The value as the plain implementation computes it (no derivative rule);
+    ``jax.scipy.linalg.expm`` up to 0.3.0, ``expm_pade13`` since 0.4.0."""
     column = eps * ds
     k = _source_exponent(jax.lax.stop_gradient(jnp.max(jnp.abs(column))))
     M = jnp.zeros((5, 5), dtype=column.dtype).at[:4, :4].set(-K * ds)
     M = M.at[:4, 4].set(column * _pow2(-k, column.dtype))
     y0 = jnp.concatenate([S, _pow2(k, column.dtype)[None]])
-    return (jax.scipy.linalg.expm(M, max_squarings=32) @ y0)[:4]
+    return jnp.sum(expm_pade13(M, 32)[:4] * y0, axis=1)
 
 
 def scan_of(slab):
@@ -187,8 +189,12 @@ def _random_slabs(n, seed):
 def test_primal_is_bit_identical_over_random_slabs(wrap):
     """Slabs with ``max|eps ds|`` from 1e-300 to 3e307 (both sides of the
     threshold; 300 under jit, 60 eagerly): the value, also as the primal of a
-    ``jvp``, equals the plain 5x5 value."""
-    ours, plain = WRAPS[wrap](transfer_slab), WRAPS[wrap](plain_5x5)
+    ``jvp``, equals the plain 5x5 value (the rule does not change it). The
+    plain value's exponential changed in 0.4.0 (``plain_5x5``); its accuracy
+    is tested in ``tests/test_transfer_value_accuracy.py``. ``plain_5x5`` is
+    compiled in both cases, as ``transfer_slab`` is (an op-by-op evaluation of
+    ``expm_pade13`` differs from XLA's fused one by an ulp)."""
+    ours, plain = WRAPS[wrap](transfer_slab), jax.jit(plain_5x5)
     primal_of_jvp = WRAPS[wrap](
         lambda S, e, K, d: jax.jvp(lambda e_: transfer_slab(S, e_, K, d), (e,), (e,))[0]
     )

@@ -11,6 +11,10 @@ observing response ``R``, noise covariance and optional discrepancy envelope.
 * ``identifiability``, ``feasibility_checks``: SVD null directions and necessary
   moment conditions.
 * ``FitResult``: the self-describing result.
+* ``reduce_response``, ``fit_combinations`` ``[extension]``: exact pre-fit
+  grouping ``C = H T`` and the identifiable combinations of a linear fit in a
+  declared coefficient metric (``CombinationFit``; analytic redundancy,
+  numerical rank and practical recoverability reported separately).
 
 A small residual is not a remainder certificate, feasibility checks are
 necessary conditions only, and an error envelope is not a noise distribution.
@@ -28,6 +32,15 @@ from .diagnostics import (
     identifiability,
 )
 from .result import FitResult
+from .layout import CoefficientLayout, coefficient_bounds
+from .reduction import (
+    LinearRelation,
+    ResponseReduction,
+    find_column_relations,
+    reduce_response,
+)
+from .combinations import fit_combinations
+from .combination_result import CombinationFit, ObservableSummary, TruthComparison
 
 __all__ = [
     "StokesData",
@@ -42,4 +55,14 @@ __all__ = [
     "feasibility_checks",
     "identifiability",
     "FitResult",
+    "CoefficientLayout",
+    "coefficient_bounds",
+    "LinearRelation",
+    "ResponseReduction",
+    "reduce_response",
+    "find_column_relations",
+    "fit_combinations",
+    "CombinationFit",
+    "ObservableSummary",
+    "TruthComparison",
 ]

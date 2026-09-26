@@ -1,6 +1,223 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2026-09-26)
+
+This release adds pre-fit response reduction and fits of identifiable
+combinations to `syncmoments.model.fit` (task T-006), with a runnable port of
+the continuum SED example of main.tex Section 5.3. It also removes the three
+transfer limitations that 0.3.0 listed for 0.3.1 (task T-007): the value of
+`transfer_slab` now uses the same Pade-13 exponential as its derivatives,
+`d out / d ds` is computed from the identity `Phi (eps - K S)`, and third
+derivatives are tested. Transfer values are therefore no longer
+bit-identical to 0.3.0 or 0.2.0 (see "Changed: transfer values").
+
+### Added
+
+- `syncmoments.model.fit.reduce_response` groups the response columns before
+  any data is seen: `C = H T` with `q = T a` over the full coordinates
+  `a = A (m, m0_ext)` (`CoefficientLayout`), and the Euclidean factorisation
+  `T = L Q`. Relation sources are kept apart (`LinearRelation`): structural
+  zeros, the continuum scaling identity (`ContinuumKernel` only; other
+  kernels fall back to structural zeros with a note), caller-declared
+  relations checked to `check_rtol`, and approximate relations that keep
+  `delta_C = C - H T`. `find_column_relations` proposes approximate
+  candidates only.
+- `syncmoments.model.fit.fit_combinations` fits the identifiable
+  combinations `beta = B x` of the reduced model in a declared coefficient
+  metric (Euclidean in `a` by default), with a required precision threshold
+  `max_sigma`, the numerical rank at `rank_tol`, repeated singular values
+  kept as clusters, and affine parameter maps or a fixed amplitude. The
+  `CombinationFit` result reports the estimator `K`, the resolution operator
+  `Pi`, the retained-subspace covariance, the retained, weak,
+  numerical-null and analytic-null directions, and four separate error
+  terms (declared discrepancy, unresolved directions, approximate reduction,
+  measured bias through `against_truth`); unconstrained terms are
+  `unbounded`, never zero. `ObservableSummary` propagates a linear
+  observable; `coefficient_bounds` gives a declared-support bound on `|a|`.
+  `fit_linear` and `identifiability` are unchanged.
+- New public modules `syncmoments.model.fit.layout`, `.reduction`,
+  `.combinations` and `.combination_result`; `syncmoments.model.fit` exports
+  `CoefficientLayout`, `coefficient_bounds`, `LinearRelation`,
+  `ResponseReduction`, `reduce_response`, `find_column_relations`,
+  `fit_combinations`, `CombinationFit`, `ObservableSummary` and
+  `TruthComparison` (`Subspaces` is importable from `combination_result`).
+  The design, its deviations from the task plan and the formulas are in
+  `docs/DESIGN.md` Section 10.1.
+- `scripts/sed_reconstruction_example.py` ports the smooth correlated
+  continuum example of main.tex Section 5.3 to these APIs, with an
+  independent NumPy/SciPy population integration for the mock data
+  (`scripts/sed_reconstruction_direct.py`, which imports only
+  `syncmoments.constants`). It writes `figures/sed_moment_reconstruction.{pdf,png}`
+  and the JSON, NPZ and CSV records (coefficients, operators,
+  uncertainties, residuals on withheld channels, provenance); the repository
+  keeps the figure and the CSV, and the JSON and NPZ are attached to the
+  v0.4.0 GitHub Release. The guide
+  page `docs/guide/reconstruction.md` explains the example and compares it
+  with the historical research run; `scripts/run_all.py` runs it with the
+  other figures. The example is split over seven scripts to keep each file
+  under 400 lines.
+
+### Changed: transfer values
+
+- The value's 5x5 exponential in `transfer_slab` (and so in `transfer_los`,
+  `moment_driven_slab` and `moment_driven_slab_cgs`) is
+  `syncmoments._expm.expm_pade13`, with `ceil(log2(|M|_1 / theta_13))`
+  squarings, instead of `jax.scipy.linalg.expm`, whose `floor` count applied
+  Pade 13 up to `2 theta_13`. The derivatives used `expm_pade13` already.
+  The power-of-two source scaling, the absence of a branch on a member's
+  value and one compilation per shape are unchanged.
+- Values change by about the 0.3.0 error, which grows with `|K ds|_1`: up
+  to 1.7e-9 relative on the sampled slabs below, but 2.8e-5 of `max|out|`
+  (3.4e-4 of `Q`) on an independent check slab at 36.3 MHz with
+  `L = 600 pc` and `|K ds|_1 = 8.7e4` (mpmath at 140 digits), where 0.4.0
+  gives 1.4e-12. On 72 independent check slabs (48 random, 24 realistic
+  cgs slabs from 30 MHz to 30 GHz) the largest ratio of the error to
+  `u max(|K ds|_1, 1)` is 2.85e6 for 0.3.0 and 3.45 for 0.4.0, so the
+  0.3.0 -> 0.4.0 change is not bounded by 1.7e-9 at large Faraday depth.
+  Relative error of the value against mpmath at 40 digits
+  (max-norm, relative to the largest entry of the truth), identical with
+  JAX 0.10.0 and 0.10.2:
+
+  | slabs | number | 0.3.0 | 0.4.0 |
+  |---|---|---|---|
+  | random | 150 | 8.5e-11 | 1.9e-13 |
+  | Faraday-dominated at `2^(m+1) theta_13 (1 +- 1e-9)`, `m = 0..11` | 24 | 1.7e-9 | 9.0e-13 |
+  | `moment_driven_slab_cgs`, `n_e = 0.03 cm^-3`, `B_par = 3 uG`, `L = 1 kpc`, 50 MHz to 20 GHz | 40 | 7.2e-10 | 4.6e-14 |
+
+  Over all 214 slabs the largest ratio of the error to
+  `u max(|K ds|_1, 1)`, with `u = 2^-53`, falls from 1.3e6 to 4.13.
+  The worst frequencies of the realistic spectrum move from 7.2e-10 to
+  1.3e-16 (794 MHz), 6.4e-10 to 1.4e-15 (199 MHz) and 3.5e-10 to 4.6e-14
+  (50 MHz). Per slab, 81 of the 214 moved toward the truth, 54 are
+  unchanged and 79 are slightly worse, all within
+  `4.13 u max(|K ds|_1, 1)`: where both methods are at roundoff `ceil` can
+  use one more squaring (largest case: the Faraday slab at `m = 11`, from
+  4.6e-13 to 8.9e-13).
+- The error model `c u max(|K ds|_1, 1)` is measured, not proven: `c` is at
+  most 4.13 on these 214 slabs, and the tests assert `c = 16`
+  (`tests/test_transfer_value_accuracy.py`).
+- The `max_squarings` refusal set is unchanged in float64: the value is NaN,
+  and the slab is refused with the existing message, exactly when
+  `floor(log2(|M|_1 / theta_13)) > max_squarings`. Where `ceil` exceeds the
+  budget and `floor` does not, the value uses `floor` and keeps the 0.3.0
+  accuracy. In float32 the refusal threshold now also uses `theta_13`
+  (5.37); 0.3.0 used `jax.scipy.linalg.expm`'s float32 Pade-7 threshold
+  `theta_7 = 3.93`, so float32 slabs with `|M|_1` between the two
+  thresholds (a factor 1.37) are now computed instead of refused.
+- Bit-identity that the tests require (the custom rule does not change the
+  value; eager, `jit` and `vmap` give the same bits) rests on two
+  XLA-specific measures: `expm_pade13` and the internal `expm_squared` are
+  `jax.jit`-compiled with a static `max_squarings`, as
+  `jax.scipy.linalg.expm` is (run op by op, XLA CPU rounded them 1 ulp
+  differently), and `E @ y0` is computed as a sum of products (inside
+  `lax.scan` under `vmap`, XLA rounded the matrix-vector product
+  differently on 35 of 40 random paths; now 40 of 40 are bit-identical).
+  This was verified on 40 random scan paths and the test suite in both
+  environments; XLA does not guarantee it in general.
+- Tests that pinned the value to 0.3.0 changed meaning:
+  `test_transfer_derivatives.py` checks that the rule leaves the value
+  bit-identical to a compiled `expm_pade13` reference (accuracy of the same
+  inputs moved to `PRIMAL_CASES` in `test_transfer_value_accuracy.py`);
+  `test_transfer_higher_order.py` uses the same reference;
+  `test_transfer_scaling.py` stays bit for bit against the unscaled matrix
+  at unit scale and compares with the v0.2.0 value within `16 u`.
+- Cost, jit-compiled, median ms, 0.3.0 -> 0.4.0:
+
+  | | JAX 0.10.0 | JAX 0.10.2 |
+  |---|---|---|
+  | `transfer_los`, 64 slabs | 0.334-0.354 -> 0.368-0.377 | 0.348 -> 0.346-0.371 |
+  | `transfer_los`, 512 slabs, `K ds` of norm about 21 | 2.65-2.76 -> 2.74-2.75 | 2.62-2.63 -> 2.77-2.83 |
+  | `transfer_los`, 512 slabs, `K ds` of norm about 0.2 | 2.00-2.08 -> 2.09-2.18 | 1.91-1.96 -> 2.11-2.26 |
+  | `jit(vmap)`, 256 rays of 64 slabs | 113.6-116.6 -> 27.4-29.2 | 118.9-122.0 -> 28.3-28.5 |
+  | the same at low norm | 114.5-115.9 -> 20.1-20.7 | 120.8-122.4 -> 20.4-21.2 |
+  | `grad` in `K`, 64 slabs | 2.10 -> 2.09-2.10 | 2.10-2.12 -> 2.13-2.17 |
+  | `jacfwd` in per-slab `ds`, 64 slabs | 12.6-12.8 -> 0.99-1.17 | 12.3-12.9 -> 1.08-1.09 |
+  | `jacrev` in per-slab `ds`, 64 slabs | 2.30 -> 1.02-1.03 | 2.37-2.38 -> 1.04-1.10 |
+  | eager `transfer_slab` | 0.062 -> 0.062 | 0.051-0.054 -> 0.052-0.053 |
+
+  The unbatched primal costs 0 to 16 % more. Under `vmap` it is 4 to 6
+  times faster, because `jax.scipy.linalg.expm` chose its Pade degree with
+  `lax.switch`, which under `vmap` becomes a select that evaluates every
+  degree. The `ds` derivatives are faster because they no longer
+  differentiate the exponential (below).
+
+### Fixed: `d out / d ds`
+
+- The `ds` tangent of `transfer_slab` is `Phi (eps - K S) dds`, from the
+  identity `d out / d ds = Phi (eps - K S)` (`Phi` commutes with `K`). 0.3.0
+  took it from the forward derivative of the 8x8 exponential in `ds`, whose
+  blocks `-K Phi S` and `Phi eps` were rounded at the scale of `G eps`; where
+  they cancel, the relative error was unbounded. When only `ds` is
+  differentiated, no derivative of the exponential is formed. The `K`, `S`
+  and `eps` directions are unchanged.
+- Error bound, first order in `u` and componentwise:
+  `|computed - Phi r| <= |Phi| gamma_5 (|eps| + |K| |S|) + gamma_4 |Phi| |r| + |Phi_hat - Phi| |r|`
+  with `r = eps - K S` and `gamma_n = n u`. The first two terms are
+  rigorous. The propagator error `|Phi_hat - Phi|` is not bounded; it is
+  modelled as `64 u max(|K ds|_1, 1) max|Phi|` (measured at most 37,
+  for an absorbing slab, where the Pade quotient of a decaying exponential
+  cancels by up to `e^theta_13`). The tests use `gamma_6` and `gamma_5`.
+- Measured against mpmath (JAX 0.10.0 and 0.10.2 identical): on four slabs
+  of the round-5 random set the relative error moves from 0.96, 7.5e-5,
+  2.1e20 and 5.1e2 to 1.8e-14, 2.0e-14, 6.6e-14 and 8.7e-15. Of the 119
+  finite round-5 slabs, 9 exceeded the bound in 0.3.0 and none does now;
+  of 40 ill-conditioned near-steady-state slabs, 10 did (9 with JAX
+  0.10.2) and none does now. The largest error/bound ratios fall from 7e31
+  and 1.2e22 to 0.20 and 0.076. The largest remaining relative error in the
+  ill-conditioned set, 6.5e-4, comes from the cancellation in `eps - K S`
+  and is inside the bound.
+- `eps` and `S` are scaled by an exact power of two `2^-i` (stop-gradient
+  exponent, `i` in `[0, maxexp - 2]`) before the subtraction, so `K S` does
+  not overflow where the derivative is finite (tested with `|K S| = 1e310`
+  and sources at 1.7e308 against a NumPy oracle scaled by `2^-600`, to
+  1e-13). The scaled and unscaled evaluations agree bit for bit at shifts
+  -8 to 8, 400 and 500 around the `2^512` threshold
+  (`tests/test_transfer_length_derivative.py`).
+
+### Tests
+
+- Third derivatives through `expm_pade13` are tests
+  (`tests/test_transfer_third_order.py`, 49 tests, 24 of them `slow`):
+  `d^3/ds^3` in four nestings against the analytic `K^2 Phi (eps - K S)`
+  (1e-12 of `|K|^2 |Phi| (|eps| + |K| |S|)`), `d^3/dK^3` of `transfer_slab`
+  in four nestings against three-level forward autodiff of the
+  `jax.scipy.linalg.expm` reference (1e-12 of the largest entry, `slow`),
+  and reverse over two forward levels of a sum over `vmap` in `K`. They
+  promote the round-5 probes of 0.3.0, so they passed before the change.
+- `tests/test_transfer_value_boundaries.py` (172 tests) validates the
+  value's squaring dispatcher at `|M|_1 = theta_13 2^m` for `m` in
+  {0, 1, 3, 10, 20, 31}, just below, at and just above: the `n` and `n + 1`
+  squaring methods evaluated directly agree with each other and with SciPy
+  within `1e-14 2^m`, the dispatcher picks `n` bit for bit, and the
+  `max_squarings` refusal equals the `floor` rule at budgets 0, 3 and 5 in
+  float64 and float32.
+- New T-006 tests: `tests/model/test_reduction.py` (38),
+  `test_reduction_scope.py` (13), `test_combinations.py` (20),
+  `test_combinations_modes.py` (13), `test_combinations_errors.py` (15),
+  `test_combinations_recovery.py` (10, one `slow`),
+  `test_combinations_accuracy.py` (14: `K C = Pi` within `16 u cond` with
+  every numerical mode retained and inside a split cluster, the cluster
+  `beta` correlation note, one slot threshold, pivot ties at 1e-11) and
+  `test_sed_example.py` (9, one `slow`: the full example against the
+  historical record); fixtures in `tests/model/_reduction_fixtures.py`.
+- `tests/test_ad_transform_matrix_nested.py::test_nested_vmap_of_transfer_los_mixing_the_companion_route`
+  compared the scalar `C @ transfer_los(...)` under nested `vmap` byte for
+  byte; with JAX 0.10.0 two members differ by 1 ulp, because XLA rounds the
+  test's own 4-term contraction differently batched and unbatched. It now
+  compares the Stokes vectors byte for byte (bit-identical in both
+  environments) and the scalar within 2 ulp.
+- Two tests (`test_random_slabs_match_mpmath` in
+  `test_transfer_value_accuracy.py` and the random-slab test of
+  `test_transfer_length_derivative.py`) recompute their references with
+  mpmath and are skipped without it; every other mpmath reference is a
+  literal.
+
+### Internal
+
+- `transfer._propagators` moved to `syncmoments._expm.propagators` (imported
+  back under the old name), and `transfer.py` gained `_length_rate`.
+
+### Documentation and packaging
 
 - `docs/DESIGN.md` rendered as one code block in the 0.3.0 documentation: the
   rename lengthened one Markdown fence to 18 backticks, and a closing fence
@@ -12,6 +229,117 @@
 - `.github/workflows/publish.yml` publishes to PyPI when a GitHub Release is
   published, with trusted publishing (no API token); 0.3.0 was uploaded this
   way.
+- The API reference lists the four new `fit` modules; the README describes
+  the combination fits (Section "Identifiable combinations of a continuum
+  SED"), and the user guide has the page "SED fits of identifiable
+  combinations".
+- Nine table rows of `docs/DESIGN.md` (Sections 12.2 and 12.10) rendered
+  truncated in 0.3.0 without a warning: MyST splits a table row at every
+  unescaped pipe, also inside a code span such as `|predict - direct|`, and
+  drops the cells beyond the header's count. Their pipes are escaped, and
+  `tests/test_docs_tables.py` checks that every table row of the README,
+  the changelog and `docs/**/*.md` has the header's cell count.
+
+### Known limitations
+
+Carried over from 0.3.0 (the list headed "to be addressed in 0.3.1"): the
+second derivatives in the weights below `2^-958` and under `jacfwd` over
+`jacfwd` below `sum(w) = 2^-512`, the RM variance at `2^-511`, the
+Hessian-vector product at `2^-1022` along `2^-1033`, and the scope of the
+AD-transform matrix are unchanged; see the 0.3.0 entry. Compile times and
+the 512-slab derivative costs with `expm_pade13` were not measured. The
+0.3.0 items on the value's exponential, on `d out / d ds` in ill-conditioned
+slabs and on untested third derivatives are resolved above.
+
+Transfer (T-007):
+
+- The value's error model `c u max(|K ds|_1, 1)` and the propagator term of
+  the `ds` bound (`64 u max(|K ds|_1, 1) max|Phi|`) are measured on the
+  sampled sets (at most 4.13 and 37), not proven. Strongly non-normal `K`
+  beyond those sets are not covered.
+- Where `ceil` exceeds `max_squarings` and `floor` does not, the value keeps
+  the 0.3.0 accuracy (up to about 1e-9 for rotation-dominated slabs), so
+  that the refusal set stays unchanged.
+- `_length_rate` clips its exponent at `maxexp - 2 = 1022`, so the `ds`
+  tangent still overflows for `|K| |S|` beyond about `2^1534`, and entries
+  of `eps` or `S` below `2^(i - 1022)` flush to zero after scaling.
+- Bit-identity between batched and unbatched, and eager and compiled,
+  values rests on the XLA-specific measures above.
+
+Response reduction and combination fits (T-006; `docs/DESIGN.md`
+Section 12.8):
+
+- Analytic grouping covers `ContinuumKernel` only; the harmonic and
+  polynomial kernels get structural zeros only. Completeness of the
+  relation set is proven for uncapped blocks and checked on listed cases
+  for capped ones. Fractional scales outside `[0.02, 0.4]` are untested.
+- `max_sigma`, `rank_tol` and `cluster_rtol` are declared conventions; the
+  retained set also depends on the noise model, masks, metric and
+  reference scales. In the example the numerical rank of 26 lies 5.8 %
+  above its cutoff and is recorded, not asserted. `fit_linear`, which ranks
+  the column-equilibrated design, and `fit_combinations` can reach
+  different ranks near `rank_tol` (28 against 26 on a 16-channel continuum
+  test case); their predictions agree only when the ranks agree.
+- Inside a cluster of equal singular values only the subspace is
+  determined; the canonical basis is a convention. The `beta` of a cluster
+  are correlated by at most `(rho^2 - 1)/2`, `rho` the cluster's
+  `s_max/s_min` (the measured value is noted per cluster); `K`, `Pi` and
+  `Cov_x` use the SVD's own vectors and do not depend on the basis.
+  The example's `beta_2`, `beta_3`, `beta_5` to `beta_8` therefore differ
+  from the per-combination values of the historical research run (which
+  used arbitrary SVD vectors); the cluster subspaces and norms agree.
+- `a_hat` is not a moment vector; no positivity or realisability test is
+  applied. Valued `unresolved` and `reduction_bias` terms need a declared
+  coefficient bound, which relies on the declared Support and does not
+  cover the excluded tail.
+- Affine parameter maps only (no combination route for `fit_bfgs` or
+  `fit_nodal`); error budgets from `predict` are not injected into
+  `data.discrepancy` automatically; eager and dense, not `jit` safe,
+  `n_x <= 2000`.
+- Mode stability under quadrature refinement depends on the quadrature:
+  at the coarse test quadrature the retained subspace turned by 7.6e-3 rad
+  and `beta_hat` moved by up to 0.37 of its standard deviation; at the
+  example quadrature by at most 4e-5 rad and 9e-4.
+- The example is one seed and one configuration. `beta_4` lies 4.0
+  standard deviations from its true value (measured truncation bias -0.83,
+  noise part -3.18; the seed is the historical one). A rescaled population
+  with the same direct SED has true `beta` up to 2.56 standard deviations
+  away, so the measured bias depends on which SED-equivalent population is
+  called the truth. The example establishes no physical adequacy, unique
+  moment recovery or exact global rank.
+- Monte Carlo checks in the tests use `6/sqrt(N)` tolerances; they are
+  statistical checks, not bounds.
+
+### Validation
+
+All runs below are from the final tree on 2026-09-26 (`docs/DESIGN.md`
+Section 12.12 has the commands, times and earlier runs):
+
+- The tree collects 5667 tests (1661 `slow`) with JAX 0.10.0 and 0.10.2,
+  against 5196 (1635) for 0.3.0. The 471 added tests are 284 in the four
+  new transfer files, 132 in the eight new model files, 18 in
+  `test_docstrings.py`, 10 in `test_certif_wording_fit.py` (both
+  parametrised over the new modules), 13 in `test_docs_fences.py` and 14
+  in `test_docs_tables.py`.
+- Fast suite (`-m "not slow"`): JAX 0.10.0 4006 passed; JAX 0.10.2 4004
+  passed, 2 skipped (mpmath).
+- Slow suite (`-m slow`): 1661 passed in each environment. The manuscript
+  benchmark's junit values are unchanged from 0.3.0 (largest
+  finite-vs-saved 5.55e-10; finite-vs-direct at `L = 8`, `N = 2`
+  1.644172e-4 and 1.753102e-3; mixed-term deletion change 1.024435e-3 and
+  4.090637e-3).
+- The full example reproduces the historical research run in both
+  environments: counts 60/52/30/9, numerical rank 26, `chi2` 55.2360702 on
+  63 degrees of freedom (differences -2.1e-14 and 3.3e-13), the top 16
+  singular values to 2.0e-14 and 2.7e-14 relative, the retained row space
+  to 1.1e-14 rad (`docs/guide/reconstruction.md`). The outputs in
+  `figures/` were regenerated from the final tree and record version 0.4.0.
+- Lint (ruff, black) passes; the documentation builds with
+  `-W --keep-going -E` under Sphinx 8.2.3 and 9.1.0, and for every
+  `docs/*.md` and guide page the rendered headings match the source
+  headings (a swallowed page raises no warning); the documentation,
+  docstring, version and wording tests pass in both environments;
+  `python -m build` and `twine check --strict` pass.
 
 ## 0.3.0 (2026-09-25)
 
